@@ -788,7 +788,7 @@
   <script>
     let cart = {};
     let salesData = [];
-    const SPREADSHEET_URL = 'https://script.google.com/macros/s/AKfycbyJOCvC8sCbgdrnEe4QMvxfUz351O0XtE5J9LZiOh_pk6Ws6-zzij5a5ApIfQm1EqjINw/exec';
+    const SPREADSHEET_URL = 'https://script.google.com/macros/s/AKfycbxeeAaFQNCHr2M6_yzZ500kIyXocFO3_cIiNM4KVSRSlP6xNFJ_2hiKXbXf1wUVqUxo5Q/exec';
 
     function saveData() {
       localStorage.setItem('salesData', JSON.stringify(salesData));
@@ -928,40 +928,44 @@ async function sendDataToGoogleSheet() {
     const saleDate = now.toLocaleDateString('th-TH', { year: 'numeric', month: '2-digit', day: '2-digit' });
     const saleTime = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
     
-    // สร้างข้อมูลสำหรับส่ง
-    const formData = new FormData();
-    const sales = Object.values(cart).map(item => ({
-      date: saleDate,
-      time: saleTime,
-      product: item.product,
-      mix: item.mix,
-      quantity: item.quantity,
-      totalPrice: item.totalPrice
-    }));
+    // สร้างข้อมูล
+    const sales = [];
+    for (const key in cart) {
+      const item = cart[key];
+      sales.push({
+        date: saleDate,
+        time: saleTime,
+        product: item.product,
+        mix: item.mix,
+        quantity: item.quantity,
+        totalPrice: item.totalPrice
+      });
+    }
 
-    console.log('Preparing to send data:', { sales });
+    const payload = {
+      sales: sales
+    };
 
-    // ส่งข้อมูล
+    console.log('Sending data:', JSON.stringify(payload));
+
+    // ส่งข้อมูลแบบ fetch
     const response = await fetch(SPREADSHEET_URL, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'text/plain;charset=utf-8',
       },
-      body: JSON.stringify({ sales })
+      body: JSON.stringify(payload)
     });
 
-    console.log('Response status:', response.status);
-    
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    
-    const result = await response.text();
-    console.log('Server response:', result);
-    
+
+    console.log('Response received');
     return true;
+
   } catch (error) {
-    console.error('Error sending data:', error);
+    console.error('Error:', error);
     return false;
   }
 }
