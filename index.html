@@ -940,24 +940,28 @@
     });
   }
 
-  // เพิ่ม console.log เพื่อดูข้อมูลที่จะส่ง
-  console.log('Sending data:', dataToSend);
+  // ใช้ XMLHttpRequest แทน fetch
+  const xhr = new XMLHttpRequest();
+  xhr.open('POST', SPREADSHEET_URL, true);
+  xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+  
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState === 4) {
+      console.log('Response:', xhr.responseText);
+      if (xhr.status === 200) {
+        alert('บันทึกข้อมูลสำเร็จ');
+      } else {
+        console.error('Error:', xhr.statusText);
+        alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
+      }
+    }
+  };
 
-  fetch(SPREADSHEET_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ sales: dataToSend })
-  })
-  .then(response => {
-    console.log('Response:', response);
-    alert('บันทึกข้อมูลสำเร็จ');
-  })
-  .catch(error => {
-    console.error('Error:', error);
-    alert('เกิดข้อผิดพลาด: ' + error.message);
-  });
+  // แปลงข้อมูลเป็น URL encoded
+  const formData = new URLSearchParams();
+  formData.append('sales', JSON.stringify(dataToSend));
+  
+  xhr.send(formData);
 }
 
       // Use a proxy server to avoid CORS issues if needed, or directly fetch
