@@ -788,7 +788,7 @@
   <script>
     let cart = {};
     let salesData = [];
-    const SPREADSHEET_URL = 'https://script.google.com/macros/s/AKfycbzNdXRq2bxsYXvtvyTQWa4WUkYKHC5SG0yZQfAPl3E_wUOLQfJ2SttCMbBbCvES5VgLRA/exec';
+    const SPREADSHEET_URL = 'https://script.google.com/macros/s/AKfycbypbQd1-PU6cJX39K-WQzoisDWDsy-dfJTt-DruMPdBn7W0tKi4uz21Sa0ua54SQt_TIQ/exec';
 
     function saveData() {
       localStorage.setItem('salesData', JSON.stringify(salesData));
@@ -923,42 +923,46 @@
     
     // START: ADDED CODE FOR GOOGLE SHEET CONNECTION
     function sendDataToGoogleSheet() {
-      const now = new Date();
-      const saleDate = now.toLocaleDateString('th-TH', { year: 'numeric', month: '2-digit', day: '2-digit' });
-      const saleTime = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
-      
-      // Prepare the data to be sent
-      const dataToSend = [];
-      for (const key in cart) {
-        const item = cart[key];
-        dataToSend.push({
-          date: saleDate,
-          time: saleTime,
-          product: item.product,
-          mix: item.mix,
-          quantity: item.quantity,
-          pricePerUnit: item.pricePerUnit,
-          totalPrice: item.totalPrice
-        });
-      }
+  const now = new Date();
+  const saleDate = now.toLocaleDateString('th-TH', { year: 'numeric', month: '2-digit', day: '2-digit' });
+  const saleTime = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+  
+  const dataToSend = {
+    sales: []
+  };
+  
+  for (const key in cart) {
+    const item = cart[key];
+    dataToSend.sales.push({
+      date: saleDate,
+      time: saleTime,
+      product: item.product,
+      mix: item.mix,
+      quantity: item.quantity,
+      totalPrice: item.totalPrice
+    });
+  }
 
-      // Use a proxy server to avoid CORS issues if needed, or directly fetch
-      // For this example, we assume the App Script is deployed correctly to handle CORS.
-      fetch(SPREADSHEET_URL, {
-        method: 'POST',
-        mode: 'no-cors', // Use 'no-cors' for simplicity with App Script
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ sales: dataToSend }),
-      })
-      .then(response => {
-        // Since we use 'no-cors', we can't check for success, but the request is sent.
-        // You can add logging or a simple alert here if needed for debugging.
-        console.log('Data sent to Google Sheet.');
-      })
-      .catch(error => console.error('Error sending data:', error));
-    }
+  // แสดงข้อมูลที่จะส่ง
+  console.log('Sending data:', JSON.stringify(dataToSend));
+
+  fetch(SPREADSHEET_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(dataToSend)
+  })
+  .then(response => {
+    console.log('Response received');
+    return true;
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    return false;
+  });
+}
     // END: ADDED CODE
 
     function confirmSale() {
