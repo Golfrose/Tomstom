@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ระบบขายสินค้า - ปรับปรุงสมบูรณ์</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     /* --- Global Styling and Color Palette --- */
     :root {
@@ -30,6 +31,60 @@
       line-height: 1.6;
     }
     @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;700&display=swap');
+
+    /* --- Login Page Styling --- */
+    .login-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: linear-gradient(135deg, #a06de5, #8862e3);
+      color: var(--button-text-color);
+      text-align: center;
+    }
+    .login-box {
+      background-color: var(--card-bg);
+      color: #333;
+      padding: 40px;
+      border-radius: var(--border-radius-large);
+      box-shadow: var(--shadow-medium);
+      width: 90%;
+      max-width: 400px;
+    }
+    .login-box h2 {
+      font-size: 2em;
+      margin-bottom: 20px;
+      font-weight: 700;
+      color: var(--primary-color);
+    }
+    .login-box input {
+      width: 100%;
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: var(--border-radius-small);
+      border: 1px solid #ddd;
+      font-size: 1em;
+    }
+    .login-box button {
+      width: 100%;
+      padding: 15px;
+      border: none;
+      border-radius: var(--border-radius-small);
+      background: var(--button-bg-2);
+      color: var(--button-text-color);
+      font-size: 1.2em;
+      font-weight: 500;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .login-box button:hover {
+      transform: translateY(-2px);
+    }
+    .error-message {
+      color: var(--secondary-color);
+      margin-top: 10px;
+    }
 
     /* --- Dashboard & Navigation --- */
     .dashboard {
@@ -106,6 +161,9 @@
     }
     .page {
       display: none;
+    }
+    .page-container {
+        display: none; /* Hide main app container by default */
     }
 
     /* --- Sale Page Components --- */
@@ -473,334 +531,415 @@
         width: 100%;
     }
   </style>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+  <div class="login-container" id="login-container">
+    <div class="login-box">
+      <h2>เข้าสู่ระบบ</h2>
+      <form id="login-form">
+        <input type="email" id="user-id" placeholder="Email" required>
+        <input type="password" id="password" placeholder="รหัสผ่าน" required>
+        <button type="submit">เข้าสู่ระบบ</button>
+        <p id="error-message" class="error-message"></p>
+      </form>
+    </div>
+  </div>
+
+  <div class="page-container" id="main-app" style="display: none;">
+    <div class="dashboard">
+      <p>ระบบขายสินค้า</p>
+      <h1 id="current-time">00:00:00</h1>
+      <p id="current-date"></p>
+    </div>
   
-  <div class="dashboard">
-    <p>ระบบขายสินค้า</p>
-    <h1 id="current-time">00:00:00</h1>
-    <p id="current-date"></p>
-  </div>
-
-  <div class="main-nav">
-    <div class="nav-btn active" onclick="showPage('sale')">
-      <i class="fas fa-shopping-cart"></i>
-      <span>หน้าขาย</span>
-    </div>
-    <div class="nav-btn" onclick="showPage('summary')">
-      <i class="fas fa-chart-bar"></i>
-      <span>สรุปยอด</span>
-    </div>
-    <div class="nav-btn" onclick="showPage('compare')">
-      <i class="fas fa-chart-line"></i>
-      <span>เปรียบเทียบ</span>
-    </div>
-  </div>
-
-  <div id="sale-page" class="page container">
-    <div class="category-card">
-      <i class="fas fa-cocktail"></i>
-      <span>หมวดน้ำ</span>
-    </div>
-    <div class="product-list">
-      <div class="product-card" data-product="น้ำผสมเงิน" data-price="100">
-        <h3>น้ำผสมเงิน</h3>
-        <span class="price">100 บาท/ขวด</span>
-        <div class="mix-options">
-          <label class="mix-option">
-            <input type="radio" name="mix-น้ำผสมเงิน" value="ผสมเงิน" data-price="100" checked> ผสมเงิน
-          </label>
-          <label class="mix-option">
-            <input type="radio" name="mix-น้ำผสมเงิน" value="ผสมเงินซิ" data-price="100"> ผสมเงินซิ
-          </label>
-          <label class="mix-option">
-            <input type="radio" name="mix-น้ำผสมเงิน" value="ผสมเงินน้ำตาลสด" data-price="100"> ผสมเงินน้ำตาลสด
-          </label>
-        </div>
-        <div class="quantity-control">
-          <button onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="0" min="0" class="quantity-input">
-          <button onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <button class="add-to-cart-btn" onclick="addToCart(this)">เพิ่มลงตะกร้า</button>
+    <div class="main-nav">
+      <div class="nav-btn active" onclick="showPage('sale')">
+        <i class="fas fa-shopping-cart"></i>
+        <span>หน้าขาย</span>
       </div>
-      <div class="product-card" data-product="น้ำผสมแดง" data-price="100">
-        <h3>น้ำผสมแดง</h3>
-        <span class="price">100 บาท/ขวด</span>
-        <div class="mix-options">
-          <label class="mix-option">
-            <input type="radio" name="mix-น้ำผสมแดง" value="ผสมแดง" data-price="100" checked> ผสมแดง
-          </label>
-          <label class="mix-option">
-            <input type="radio" name="mix-น้ำผสมแดง" value="ผสมแดงซิ" data-price="100"> ผสมแดงซิ
-          </label>
-          <label class="mix-option">
-            <input type="radio" name="mix-น้ำผสมแดง" value="ผสมแดงน้ำตาลสด" data-price="100"> ผสมแดงน้ำตาลสด
-          </label>
-        </div>
-        <div class="quantity-control">
-          <button onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="0" min="0" class="quantity-input">
-          <button onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <button class="add-to-cart-btn" onclick="addToCart(this)">เพิ่มลงตะกร้า</button>
+      <div class="nav-btn" onclick="showPage('summary')">
+        <i class="fas fa-chart-bar"></i>
+        <span>สรุปยอด</span>
       </div>
-      <div class="product-card" data-product="น้ำผสมไก่" data-price="100">
-        <h3>น้ำผสมไก่</h3>
-        <span class="price">100 บาท/ขวด</span>
-        <div class="mix-options">
-          <label class="mix-option">
-            <input type="radio" name="mix-น้ำผสมไก่" value="ผสมไก่" data-price="100" checked> ผสมไก่
-          </label>
-          <label class="mix-option">
-            <input type="radio" name="mix-น้ำผสมไก่" value="ผสมไก่ซิ" data-price="100"> ผสมไก่ซิ
-          </label>
-          <label class="mix-option">
-            <input type="radio" name="mix-น้ำผสมไก่" value="ผสมไก่น้ำตาลสด" data-price="100"> ผสมไก่น้ำตาลสด
-          </label>
-        </div>
-        <div class="quantity-control">
-          <button onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="0" min="0" class="quantity-input">
-          <button onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <button class="add-to-cart-btn" onclick="addToCart(this)">เพิ่มลงตะกร้า</button>
-      </div>
-      <div class="product-card" data-product="น้ำผสมซี" data-price="100">
-        <h3>น้ำผสมซี</h3>
-        <span class="price">100 บาท/ขวด</span>
-        <div class="mix-options">
-          <label class="mix-option">
-            <input type="radio" name="mix-น้ำผสมซี" value="ผสมซี" data-price="100" checked> ผสมซี
-          </label>
-          <label class="mix-option">
-            <input type="radio" name="mix-น้ำผสมซี" value="ผสมซีซิ" data-price="100"> ผสมซีซิ
-          </label>
-          <label class="mix-option">
-            <input type="radio" name="mix-น้ำผสมซี" value="ผสมซีน้ำตาลสด" data-price="100"> ผสมซีน้ำตาลสด
-          </label>
-        </div>
-        <div class="quantity-control">
-          <button onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="0" min="0" class="quantity-input">
-          <button onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <button class="add-to-cart-btn" onclick="addToCart(this)">เพิ่มลงตะกร้า</button>
-      </div>
-      <div class="product-card" data-product="น้ำดิบ" data-price="65">
-        <h3>น้ำดิบ</h3>
-        <span class="price">65 บาท/ขวด (2 ขวด 120 บาท)</span>
-        <input type="hidden" name="mix-น้ำดิบ" value="ไม่มี">
-        <div class="quantity-control">
-          <button onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="0" min="0" class="quantity-input">
-          <button onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <button class="add-to-cart-btn" onclick="addToCart(this)">เพิ่มลงตะกร้า</button>
-      </div>
-      <div class="product-card" data-product="แลกขวดฟรี" data-price="0">
-        <h3>แลกขวดฟรี</h3>
-        <span class="price">0 บาท</span>
-        <div class="mix-options">
-          <label class="mix-option">
-            <input type="radio" name="mix-แลกขวดฟรี" value="แลกฟรี" data-price="0" checked> แลกฟรี
-          </label>
-          <label class="mix-option">
-            <input type="radio" name="mix-แลกขวดฟรี" value="แลกฟรีผสมซิ" data-price="20"> แลกฟรีผสมซิ
-          </label>
-          <label class="mix-option">
-            <input type="radio" name="mix-แลกขวดฟรี" value="แลกฟรีผสมน้ำตาลสด" data-price="20"> แลกฟรีผสมน้ำตาลสด
-          </label>
-        </div>
-        <div class="quantity-control">
-          <button onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="0" min="0" class="quantity-input">
-          <button onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <button class="add-to-cart-btn" onclick="addToCart(this)">เพิ่มลงตะกร้า</button>
+      <div class="nav-btn" onclick="showPage('compare')">
+        <i class="fas fa-chart-line"></i>
+        <span>เปรียบเทียบ</span>
       </div>
     </div>
-    <div class="category-card" style="margin-top: 20px;">
-      <i class="fas fa-pills"></i>
-      <span>หมวดยา</span>
-    </div>
-    <div class="product-list">
-      <div class="product-card" data-product="ยาฝาเงิน" data-price="80">
-        <h3>ยาฝาเงิน</h3>
-        <span class="price">80 บาท/ขวด</span>
-        <input type="hidden" name="mix-ยาฝาเงิน" value="ไม่มี">
-        <div class="quantity-control">
-          <button onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="0" min="0" class="quantity-input">
-          <button onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <button class="add-to-cart-btn" onclick="addToCart(this)">เพิ่มลงตะกร้า</button>
+  
+    <div id="sale-page" class="page container" style="display: block;">
+      <div class="category-card">
+        <i class="fas fa-cocktail"></i>
+        <span>หมวดน้ำ</span>
       </div>
-      <div class="product-card" data-product="ยาฝาแดง" data-price="90">
-        <h3>ยาฝาแดง</h3>
-        <span class="price">90 บาท/ขวด</span>
-        <input type="hidden" name="mix-ยาฝาแดง" value="ไม่มี">
-        <div class="quantity-control">
-          <button onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="0" min="0" class="quantity-input">
-          <button onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <button class="add-to-cart-btn" onclick="addToCart(this)">เพิ่มลงตะกร้า</button>
-      </div>
-      <div class="product-card" data-product="ยาไก่" data-price="80">
-        <h3>ยาไก่</h3>
-        <span class="price">80 บาท/ขวด</span>
-        <input type="hidden" name="mix-ยาไก่" value="ไม่มี">
-        <div class="quantity-control">
-          <button onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="0" min="0" class="quantity-input">
-          <button onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <button class="add-to-cart-btn" onclick="addToCart(this)">เพิ่มลงตะกร้า</button>
-      </div>
-      <div class="product-card" data-product="ยาซี" data-price="80">
-        <h3>ยาซี</h3>
-        <span class="price">80 บาท/ขวด</span>
-        <input type="hidden" name="mix-ยาซี" value="ไม่มี">
-        <div class="quantity-control">
-          <button onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="0" min="0" class="quantity-input">
-          <button onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <button class="add-to-cart-btn" onclick="addToCart(this)">เพิ่มลงตะกร้า</button>
-      </div>
-    </div>
-    <div class="cart-icon" onclick="showCartModal()">
-      <i class="fas fa-shopping-basket"></i>
-      <span class="cart-count" id="cart-count">0</span>
-    </div>
-  </div>
-
-  <div id="cart-modal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3><i class="fas fa-shopping-basket"></i> สรุปรายการสั่งซื้อ</h3>
-      </div>
-      <div id="modal-items"></div>
-      <div class="modal-total">รวมทั้งหมด: <span id="modal-cart-total">0</span> บาท</div>
-      <div class="modal-actions">
-        <button class="confirm-btn" onclick="confirmSale()">
-          <i class="fas fa-check"></i> ยืนยันการขาย
-        </button>
-        <button class="cancel-btn" onclick="closeCartModal()">
-          <i class="fas fa-times"></i> ล้างตะกร้า
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <div id="summary-page" class="page container summary-page">
-    <h1>สรุปยอดขาย</h1>
-    <div class="date-filter">
-      <label for="report-date">วันที่:</label>
-      <input type="date" id="report-date">
-      <button onclick="loadReport()">ดูรายงาน</button>
-    </div>
-    <div class="summary-box-container">
-      <div class="summary-box">
-        <h3>ยอดรวมเงินทั้งหมด</h3>
-        <span id="total-revenue" class="value money">0</span>
-        <span>บาท</span>
-      </div>
-      <div class="summary-box">
-        <h3>ยอดรวมสินค้าที่ขายได้</h3>
-        <span id="total-quantity" class="value">0</span>
-        <span>ขวด</span>
-      </div>
-      <div class="summary-box">
-        <h3>รายการสินค้าที่ขายได้ (สรุป)</h3>
-        <ul id="product-summary-list"></ul>
-      </div>
-    </div>
-    <table class="summary-table">
-      <thead>
-        <tr>
-          <th>วันที่และเวลา</th>
-          <th>สินค้า</th>
-          <th>จำนวน</th>
-          <th>ราคาต่อหน่วย</th>
-          <th>รวม</th>
-          <th>จัดการ</th>
-        </tr>
-      </thead>
-      <tbody id="report-body"></tbody>
-    </table>
-    <div id="no-data" class="no-data" style="display: none;">ไม่พบข้อมูลการขายในวันที่เลือก</div>
-  </div>
-
-  <div id="compare-page" class="page container summary-page">
-    <h1>เปรียบเทียบยอดขาย</h1>
-    <div class="compare-mode-selection">
-        <label for="compare-mode-select">เลือกโหมดเปรียบเทียบ:</label>
-        <select id="compare-mode-select" onchange="switchCompareMode(this.value)">
-            <option value="day-to-day">วันต่อวัน</option>
-            <option value="date-range">ช่วงวัน</option>
-        </select>
-        <button onclick="clearComparison()">ล้างข้อมูล</button>
-    </div>
-
-    <div class="comparison-input-group">
-      <div id="day-to-day-mode" class="compare-mode-form active">
-          <div class="comparison-date-group">
-              <label for="compare-date-1">วันที่ 1:</label>
-              <input type="date" id="compare-date-1">
+      <div class="product-list">
+        <div class="product-card" data-product="น้ำผสมเงิน" data-price="100">
+          <h3>น้ำผสมเงิน</h3>
+          <span class="price">100 บาท/ขวด</span>
+          <div class="mix-options">
+            <label class="mix-option">
+              <input type="radio" name="mix-น้ำผสมเงิน" value="ผสมเงิน" data-price="100" checked> ผสมเงิน
+            </label>
+            <label class="mix-option">
+              <input type="radio" name="mix-น้ำผสมเงิน" value="ผสมเงินซิ" data-price="100"> ผสมเงินซิ
+            </label>
+            <label class="mix-option">
+              <input type="radio" name="mix-น้ำผสมเงิน" value="ผสมเงินน้ำตาลสด" data-price="100"> ผสมเงินน้ำตาลสด
+            </label>
           </div>
-          <div class="comparison-date-group">
-              <label for="compare-date-2">วันที่ 2:</label>
-              <input type="date" id="compare-date-2">
+          <div class="quantity-control">
+            <button onclick="changeQuantity(this, -1)">-</button>
+            <input type="number" value="0" min="0" class="quantity-input">
+            <button onclick="changeQuantity(this, 1)">+</button>
           </div>
+          <button class="add-to-cart-btn" onclick="addToCart(this)">เพิ่มลงตะกร้า</button>
+        </div>
+        <div class="product-card" data-product="น้ำผสมแดง" data-price="100">
+          <h3>น้ำผสมแดง</h3>
+          <span class="price">100 บาท/ขวด</span>
+          <div class="mix-options">
+            <label class="mix-option">
+              <input type="radio" name="mix-น้ำผสมแดง" value="ผสมแดง" data-price="100" checked> ผสมแดง
+            </label>
+            <label class="mix-option">
+              <input type="radio" name="mix-น้ำผสมแดง" value="ผสมแดงซิ" data-price="100"> ผสมแดงซิ
+            </label>
+            <label class="mix-option">
+              <input type="radio" name="mix-น้ำผสมแดง" value="ผสมแดงน้ำตาลสด" data-price="100"> ผสมแดงน้ำตาลสด
+            </label>
+          </div>
+          <div class="quantity-control">
+            <button onclick="changeQuantity(this, -1)">-</button>
+            <input type="number" value="0" min="0" class="quantity-input">
+            <button onclick="changeQuantity(this, 1)">+</button>
+          </div>
+          <button class="add-to-cart-btn" onclick="addToCart(this)">เพิ่มลงตะกร้า</button>
+        </div>
+        <div class="product-card" data-product="น้ำผสมไก่" data-price="100">
+          <h3>น้ำผสมไก่</h3>
+          <span class="price">100 บาท/ขวด</span>
+          <div class="mix-options">
+            <label class="mix-option">
+              <input type="radio" name="mix-น้ำผสมไก่" value="ผสมไก่" data-price="100" checked> ผสมไก่
+            </label>
+            <label class="mix-option">
+              <input type="radio" name="mix-น้ำผสมไก่" value="ผสมไก่ซิ" data-price="100"> ผสมไก่ซิ
+            </label>
+            <label class="mix-option">
+              <input type="radio" name="mix-น้ำผสมไก่" value="ผสมไก่น้ำตาลสด" data-price="100"> ผสมไก่น้ำตาลสด
+            </label>
+          </div>
+          <div class="quantity-control">
+            <button onclick="changeQuantity(this, -1)">-</button>
+            <input type="number" value="0" min="0" class="quantity-input">
+            <button onclick="changeQuantity(this, 1)">+</button>
+          </div>
+          <button class="add-to-cart-btn" onclick="addToCart(this)">เพิ่มลงตะกร้า</button>
+        </div>
+        <div class="product-card" data-product="น้ำผสมซี" data-price="100">
+          <h3>น้ำผสมซี</h3>
+          <span class="price">100 บาท/ขวด</span>
+          <div class="mix-options">
+            <label class="mix-option">
+              <input type="radio" name="mix-น้ำผสมซี" value="ผสมซี" data-price="100" checked> ผสมซี
+            </label>
+            <label class="mix-option">
+              <input type="radio" name="mix-น้ำผสมซี" value="ผสมซีซิ" data-price="100"> ผสมซีซิ
+            </label>
+            <label class="mix-option">
+              <input type="radio" name="mix-น้ำผสมซี" value="ผสมซีน้ำตาลสด" data-price="100"> ผสมซีน้ำตาลสด
+            </label>
+          </div>
+          <div class="quantity-control">
+            <button onclick="changeQuantity(this, -1)">-</button>
+            <input type="number" value="0" min="0" class="quantity-input">
+            <button onclick="changeQuantity(this, 1)">+</button>
+          </div>
+          <button class="add-to-cart-btn" onclick="addToCart(this)">เพิ่มลงตะกร้า</button>
+        </div>
+        <div class="product-card" data-product="น้ำดิบ" data-price="65">
+          <h3>น้ำดิบ</h3>
+          <span class="price">65 บาท/ขวด (2 ขวด 120 บาท)</span>
+          <input type="hidden" name="mix-น้ำดิบ" value="ไม่มี">
+          <div class="quantity-control">
+            <button onclick="changeQuantity(this, -1)">-</button>
+            <input type="number" value="0" min="0" class="quantity-input">
+            <button onclick="changeQuantity(this, 1)">+</button>
+          </div>
+          <button class="add-to-cart-btn" onclick="addToCart(this)">เพิ่มลงตะกร้า</button>
+        </div>
+        <div class="product-card" data-product="แลกขวดฟรี" data-price="0">
+          <h3>แลกขวดฟรี</h3>
+          <span class="price">0 บาท</span>
+          <div class="mix-options">
+            <label class="mix-option">
+              <input type="radio" name="mix-แลกขวดฟรี" value="แลกฟรี" data-price="0" checked> แลกฟรี
+            </label>
+            <label class="mix-option">
+              <input type="radio" name="mix-แลกขวดฟรี" value="แลกฟรีผสมซิ" data-price="20"> แลกฟรีผสมซิ
+            </label>
+            <label class="mix-option">
+              <input type="radio" name="mix-แลกขวดฟรี" value="แลกฟรีผสมน้ำตาลสด" data-price="20"> แลกฟรีผสมน้ำตาลสด
+            </label>
+          </div>
+          <div class="quantity-control">
+            <button onclick="changeQuantity(this, -1)">-</button>
+            <input type="number" value="0" min="0" class="quantity-input">
+            <button onclick="changeQuantity(this, 1)">+</button>
+          </div>
+          <button class="add-to-cart-btn" onclick="addToCart(this)">เพิ่มลงตะกร้า</button>
+        </div>
       </div>
-
-      <div id="date-range-mode" class="compare-mode-form">
-          <div class="comparison-date-group">
-              <label for="start-date-1">ช่วงที่ 1 เริ่ม:</label>
-              <input type="date" id="start-date-1">
-              <label for="end-date-1">ถึง:</label>
-              <input type="date" id="end-date-1">
+      <div class="category-card" style="margin-top: 20px;">
+        <i class="fas fa-pills"></i>
+        <span>หมวดยา</span>
+      </div>
+      <div class="product-list">
+        <div class="product-card" data-product="ยาฝาเงิน" data-price="80">
+          <h3>ยาฝาเงิน</h3>
+          <span class="price">80 บาท/ขวด</span>
+          <input type="hidden" name="mix-ยาฝาเงิน" value="ไม่มี">
+          <div class="quantity-control">
+            <button onclick="changeQuantity(this, -1)">-</button>
+            <input type="number" value="0" min="0" class="quantity-input">
+            <button onclick="changeQuantity(this, 1)">+</button>
           </div>
-          <div class="comparison-date-group">
-              <label for="start-date-2">ช่วงที่ 2 เริ่ม:</label>
-              <input type="date" id="start-date-2">
-              <label for="end-date-2">ถึง:</label>
-              <input type="date" id="end-date-2">
+          <button class="add-to-cart-btn" onclick="addToCart(this)">เพิ่มลงตะกร้า</button>
+        </div>
+        <div class="product-card" data-product="ยาฝาแดง" data-price="90">
+          <h3>ยาฝาแดง</h3>
+          <span class="price">90 บาท/ขวด</span>
+          <input type="hidden" name="mix-ยาฝาแดง" value="ไม่มี">
+          <div class="quantity-control">
+            <button onclick="changeQuantity(this, -1)">-</button>
+            <input type="number" value="0" min="0" class="quantity-input">
+            <button onclick="changeQuantity(this, 1)">+</button>
           </div>
+          <button class="add-to-cart-btn" onclick="addToCart(this)">เพิ่มลงตะกร้า</button>
+        </div>
+        <div class="product-card" data-product="ยาไก่" data-price="80">
+          <h3>ยาไก่</h3>
+          <span class="price">80 บาท/ขวด</span>
+          <input type="hidden" name="mix-ยาไก่" value="ไม่มี">
+          <div class="quantity-control">
+            <button onclick="changeQuantity(this, -1)">-</button>
+            <input type="number" value="0" min="0" class="quantity-input">
+            <button onclick="changeQuantity(this, 1)">+</button>
+          </div>
+          <button class="add-to-cart-btn" onclick="addToCart(this)">เพิ่มลงตะกร้า</button>
+        </div>
+        <div class="product-card" data-product="ยาซี" data-price="80">
+          <h3>ยาซี</h3>
+          <span class="price">80 บาท/ขวด</span>
+          <input type="hidden" name="mix-ยาซี" value="ไม่มี">
+          <div class="quantity-control">
+            <button onclick="changeQuantity(this, -1)">-</button>
+            <input type="number" value="0" min="0" class="quantity-input">
+            <button onclick="changeQuantity(this, 1)">+</button>
+          </div>
+          <button class="add-to-cart-btn" onclick="addToCart(this)">เพิ่มลงตะกร้า</button>
+        </div>
+      </div>
+      <div class="cart-icon" onclick="showCartModal()">
+        <i class="fas fa-shopping-basket"></i>
+        <span class="cart-count" id="cart-count">0</span>
+      </div>
+    </div>
+  
+    <div id="cart-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3><i class="fas fa-shopping-basket"></i> สรุปรายการสั่งซื้อ</h3>
+        </div>
+        <div id="modal-items"></div>
+        <div class="modal-total">รวมทั้งหมด: <span id="modal-cart-total">0</span> บาท</div>
+        <div class="modal-actions">
+          <button class="confirm-btn" onclick="confirmSale()">
+            <i class="fas fa-check"></i> ยืนยันการขาย
+          </button>
+          <button class="cancel-btn" onclick="closeCartModal()">
+            <i class="fas fa-times"></i> ล้างตะกร้า
+          </button>
+        </div>
+      </div>
+    </div>
+  
+    <div id="summary-page" class="page container summary-page">
+      <h1>สรุปยอดขาย</h1>
+      <div class="date-filter">
+        <label for="report-date">วันที่:</label>
+        <input type="date" id="report-date">
+        <button onclick="loadReport()">ดูรายงาน</button>
+      </div>
+      <div class="summary-box-container">
+        <div class="summary-box">
+          <h3>ยอดรวมเงินทั้งหมด</h3>
+          <span id="total-revenue" class="value money">0</span>
+          <span>บาท</span>
+        </div>
+        <div class="summary-box">
+          <h3>ยอดรวมสินค้าที่ขายได้</h3>
+          <span id="total-quantity" class="value">0</span>
+          <span>ขวด</span>
+        </div>
+        <div class="summary-box">
+          <h3>รายการสินค้าที่ขายได้ (สรุป)</h3>
+          <ul id="product-summary-list"></ul>
+        </div>
+      </div>
+      <table class="summary-table">
+        <thead>
+          <tr>
+            <th>วันที่และเวลา</th>
+            <th>สินค้า</th>
+            <th>จำนวน</th>
+            <th>ราคาต่อหน่วย</th>
+            <th>รวม</th>
+            <th>จัดการ</th>
+          </tr>
+        </thead>
+        <tbody id="report-body"></tbody>
+      </table>
+      <div id="no-data" class="no-data" style="display: none;">ไม่พบข้อมูลการขายในวันที่เลือก</div>
+    </div>
+  
+    <div id="compare-page" class="page container summary-page">
+      <h1>เปรียบเทียบยอดขาย</h1>
+      <div class="compare-mode-selection">
+          <label for="compare-mode-select">เลือกโหมดเปรียบเทียบ:</label>
+          <select id="compare-mode-select" onchange="switchCompareMode(this.value)">
+              <option value="day-to-day">วันต่อวัน</option>
+              <option value="date-range">ช่วงวัน</option>
+          </select>
+          <button onclick="clearComparison()">ล้างข้อมูล</button>
+      </div>
+  
+      <div class="comparison-input-group">
+        <div id="day-to-day-mode" class="compare-mode-form active">
+            <div class="comparison-date-group">
+                <label for="compare-date-1">วันที่ 1:</label>
+                <input type="date" id="compare-date-1">
+            </div>
+            <div class="comparison-date-group">
+                <label for="compare-date-2">วันที่ 2:</label>
+                <input type="date" id="compare-date-2">
+            </div>
+        </div>
+  
+        <div id="date-range-mode" class="compare-mode-form">
+            <div class="comparison-date-group">
+                <label for="start-date-1">ช่วงที่ 1 เริ่ม:</label>
+                <input type="date" id="start-date-1">
+                <label for="end-date-1">ถึง:</label>
+                <input type="date" id="end-date-1">
+            </div>
+            <div class="comparison-date-group">
+                <label for="start-date-2">ช่วงที่ 2 เริ่ม:</label>
+                <input type="date" id="start-date-2">
+                <label for="end-date-2">ถึง:</label>
+                <input type="date" id="end-date-2">
+            </div>
+        </div>
+        
+        <div class="date-filter compare-style">
+            <label for="product-select">เลือกสินค้า:</label>
+            <select id="product-select"></select>
+            <button onclick="compareSales()">เปรียบเทียบ</button>
+        </div>
       </div>
       
-      <div class="date-filter compare-style">
-          <label for="product-select">เลือกสินค้า:</label>
-          <select id="product-select"></select>
-          <button onclick="compareSales()">เปรียบเทียบ</button>
+      <div id="detailed-comparison-result" style="margin-top: 20px;"></div>
+      <div id="no-comparison-data" class="no-data" style="display: none;">
+        ไม่พบข้อมูลสำหรับเปรียบเทียบ
       </div>
-    </div>
-    
-    <div id="detailed-comparison-result" style="margin-top: 20px;"></div>
-    <div id="no-comparison-data" class="no-data" style="display: none;">
-      ไม่พบข้อมูลสำหรับเปรียบเทียบ
     </div>
   </div>
 
-  <script>
+  <script type="module">
+    // ส่วนนี้คือโค้ดเชื่อมต่อกับ Firebase
+    // ------------------------------------
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+    import { getDatabase, ref, push, onValue, set, get, child, remove } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+
+    // ** เปลี่ยนค่าใน firebaseConfig ให้เป็นของโปรเจกต์ของคุณ **
+    const firebaseConfig = {
+      apiKey: "AIzaSyC8yYWxiOH6HRHtBpPA5Qe3_ryV5BKS8m8",
+      authDomain: "tomstom-8.firebaseapp.com",
+      projectId: "tomstom-8",
+      databaseURL: "https://tomstom-8-default-rtdb.asia-southeast1.firebasedatabase.app",
+      storageBucket: "tomstom-8.appspot.com",
+      messagingSenderId: "595696774612",
+      appId: "1:595696774612:web:83f068cfa637f7a26d3a41"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+    const dbRef = ref(db);
+    // ------------------------------------
+
     let cart = {};
-    let salesData = [];
-    const SPREADSHEET_URL = 'https://script.google.com/macros/s/AKfycbzcFSNP-8Rr89GooN1Zx48yX9VBPXUmNULQPuBzqWc4fJW7UNnX1afohLe9UQDLY0g2zg/exec';
+    let salesData = {};
+    let currentUserUid = null;
 
-    function saveData() {
-      localStorage.setItem('salesData', JSON.stringify(salesData));
+    // ตรวจสอบสถานะการล็อกอินเมื่อโหลดหน้า
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            currentUserUid = user.uid;
+            document.getElementById('login-container').style.display = 'none';
+            document.getElementById('main-app').style.display = 'block';
+            initializeAppFeatures();
+        } else {
+            currentUserUid = null;
+            document.getElementById('login-container').style.display = 'flex';
+            document.getElementById('main-app').style.display = 'none';
+        }
+    });
+
+    // เพิ่มโค้ดสำหรับหน้าล็อกอิน
+    document.getElementById('login-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const userId = document.getElementById('user-id').value;
+      const password = document.getElementById('password').value;
+      const errorMessageEl = document.getElementById('error-message');
+      
+      errorMessageEl.textContent = "กำลังเข้าสู่ระบบ...";
+
+      // ใช้ Firebase Authentication สำหรับการล็อกอิน
+      signInWithEmailAndPassword(auth, userId, password)
+        .then((userCredential) => {
+          // ล็อกอินสำเร็จ
+          console.log("Logged in successfully:", userCredential.user);
+          errorMessageEl.textContent = "";
+        })
+        .catch((error) => {
+          // ล็อกอินไม่สำเร็จ
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          console.error("Login failed:", errorMessage);
+          if (errorCode === 'auth/wrong-password' || errorCode === 'auth/user-not-found') {
+            errorMessageEl.textContent = "User ID หรือรหัสผ่านไม่ถูกต้อง";
+          } else {
+            errorMessageEl.textContent = "เกิดข้อผิดพลาดในการล็อกอิน";
+          }
+        });
+    });
+
+    // โค้ดที่เหลือทั้งหมดของคุณ
+    function initializeAppFeatures() {
+      const salesRef = ref(db, 'sales');
+      onValue(salesRef, (snapshot) => {
+        salesData = snapshot.val() || {};
+        const today = new Date().toISOString().slice(0, 10);
+        document.getElementById('report-date').value = today;
+        loadReport();
+      });
+      showPage('sale');
+      updateTime();
+      setInterval(updateTime, 1000);
     }
-
-    function loadData() {
-      const storedData = localStorage.getItem('salesData');
-      if (storedData) {
-        salesData = JSON.parse(storedData);
-      }
-    }
-
+    
     function updateTime() {
       const now = new Date();
       const timeString = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
@@ -808,13 +947,6 @@
       document.getElementById('current-time').textContent = timeString;
       document.getElementById('current-date').textContent = dateString;
     }
-
-    document.addEventListener('DOMContentLoaded', (event) => {
-      loadData();
-      showPage('sale');
-      updateTime();
-      setInterval(updateTime, 1000);
-    });
 
     function showPage(pageId) {
       const pages = document.querySelectorAll('.page');
@@ -921,46 +1053,6 @@
       updateCartCount();
     }
     
-    // START: ADDED CODE FOR GOOGLE SHEET CONNECTION
-    function sendDataToGoogleSheet() {
-      const now = new Date();
-      const saleDate = now.toLocaleDateString('th-TH', { year: 'numeric', month: '2-digit', day: '2-digit' });
-      const saleTime = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
-      
-      // Prepare the data to be sent
-      const dataToSend = [];
-      for (const key in cart) {
-        const item = cart[key];
-        dataToSend.push({
-          date: saleDate,
-          time: saleTime,
-          product: item.product,
-          mix: item.mix,
-          quantity: item.quantity,
-          pricePerUnit: item.pricePerUnit,
-          totalPrice: item.totalPrice
-        });
-      }
-
-      // Use a proxy server to avoid CORS issues if needed, or directly fetch
-      // For this example, we assume the App Script is deployed correctly to handle CORS.
-      fetch(SPREADSHEET_URL, {
-        method: 'POST',
-        mode: 'no-cors', // Use 'no-cors' for simplicity with App Script
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ sales: dataToSend }),
-      })
-      .then(response => {
-        // Since we use 'no-cors', we can't check for success, but the request is sent.
-        // You can add logging or a simple alert here if needed for debugging.
-        console.log('Data sent to Google Sheet.');
-      })
-      .catch(error => console.error('Error sending data:', error));
-    }
-    // END: ADDED CODE
-
     function confirmSale() {
       if (Object.keys(cart).length === 0) {
         alert("ไม่มีรายการในตะกร้า!");
@@ -968,10 +1060,12 @@
       }
       
       const now = new Date();
+      const salesKey = now.toISOString().slice(0, 10);
+
+      const updates = {};
       for (const key in cart) {
         const item = cart[key];
         const newSale = {
-          id: Date.now() + Math.random(),
           date: now.toISOString(),
           product: item.product,
           mix: item.mix,
@@ -979,16 +1073,19 @@
           pricePerUnit: item.pricePerUnit,
           totalPrice: item.totalPrice
         };
-        salesData.push(newSale);
+        const newPostKey = push(ref(db, `sales/${salesKey}`)).key;
+        updates[`/sales/${salesKey}/${newPostKey}`] = newSale;
       }
       
-      // START: UPDATED CALL
-      sendDataToGoogleSheet(); // Send data to Google Sheet
-      // END: UPDATED CALL
-
-      saveData();
-      closeCartModal();
-      alert("บันทึกการขายเรียบร้อย!");
+      set(ref(db), updates)
+      .then(() => {
+        closeCartModal();
+        alert("บันทึกการขายเรียบร้อย!");
+      })
+      .catch((error) => {
+        console.error("Error writing to database", error);
+        alert("เกิดข้อผิดพลาดในการบันทึก");
+      });
     }
 
     function isSameDay(date1, date2) {
@@ -1013,9 +1110,8 @@
         totalQuantityEl.textContent = '0';
 
         const selectedDate = new Date(selectedDateStr);
-        const filteredData = salesData.filter(item => {
-            return isSameDay(item.date, selectedDate);
-        });
+        const dailySales = salesData[selectedDateStr] || {};
+        const filteredData = Object.values(dailySales);
 
         if (filteredData.length === 0) {
             noDataEl.style.display = 'block';
@@ -1045,6 +1141,8 @@
             if (item.product.includes('แลกขวดฟรี')) {
                 productClass = 'report-free';
             }
+            
+            const firebaseId = Object.keys(dailySales).find(key => dailySales[key] === item);
 
             tr.innerHTML = `
                 <td>${displayDate}</td>
@@ -1055,8 +1153,8 @@
                 <td>${item.pricePerUnit}</td>
                 <td>${item.totalPrice.toLocaleString()}</td>
                 <td class="summary-actions">
-                    <button class="edit-btn" onclick="editSaleItem(${item.id})">แก้</button>
-                    <button class="delete-btn" onclick="deleteSaleItem(${item.id})">ลบ</button>
+                    <button class="edit-btn" onclick="editSaleItem('${selectedDateStr}', '${firebaseId}')">แก้</button>
+                    <button class="delete-btn" onclick="deleteSaleItem('${selectedDateStr}', '${firebaseId}')">ลบ</button>
                 </td>
             `;
             reportBody.appendChild(tr);
@@ -1075,73 +1173,91 @@
         }
     }
 
-    function editSaleItem(itemId) {
-      const itemIndex = salesData.findIndex(item => item.id === itemId);
-      if (itemIndex === -1) {
-        alert("ไม่พบรายการนี้");
-        return;
-      }
-      const item = salesData[itemIndex];
-      const newQuantity = prompt("แก้ไขจำนวน:", item.quantity);
-      const parsedQuantity = parseInt(newQuantity);
-      if (isNaN(parsedQuantity) || parsedQuantity <= 0) {
-        alert("จำนวนไม่ถูกต้อง");
-        return;
-      }
-      
-      item.quantity = parsedQuantity;
-      item.totalPrice = parsedQuantity * item.pricePerUnit;
-      saveData();
-      loadReport();
-      alert("แก้ไขรายการเรียบร้อย!");
+    function editSaleItem(dateKey, itemId) {
+        const itemToEdit = salesData[dateKey][itemId];
+        const newQuantity = prompt("แก้ไขจำนวน:", itemToEdit.quantity);
+        const parsedQuantity = parseInt(newQuantity);
+        if (isNaN(parsedQuantity) || parsedQuantity < 0) {
+            alert("จำนวนไม่ถูกต้อง");
+            return;
+        }
+
+        let newTotalPrice = parsedQuantity * itemToEdit.pricePerUnit;
+        if (itemToEdit.product === 'น้ำดิบ') {
+            newTotalPrice = Math.floor(parsedQuantity / 2) * 120 + (parsedQuantity % 2) * 65;
+        }
+
+        const itemRef = ref(db, `sales/${dateKey}/${itemId}`);
+        set(itemRef, {
+            ...itemToEdit,
+            quantity: parsedQuantity,
+            totalPrice: newTotalPrice
+        })
+        .then(() => {
+            alert("แก้ไขรายการเรียบร้อย!");
+        })
+        .catch((error) => {
+            console.error("Error updating item: ", error);
+            alert("เกิดข้อผิดพลาดในการแก้ไข");
+        });
     }
 
-    function deleteSaleItem(itemId) {
-      if (confirm("ต้องการลบรายการนี้ใช่ไหม?")) {
-        salesData = salesData.filter(item => item.id !== itemId);
-        saveData();
-        loadReport();
-      }
+    function deleteSaleItem(dateKey, itemId) {
+        if (confirm("ต้องการลบรายการนี้ใช่ไหม?")) {
+            const itemRef = ref(db, `sales/${dateKey}/${itemId}`);
+            remove(itemRef)
+                .then(() => {
+                    alert("ลบรายการเรียบร้อย!");
+                })
+                .catch((error) => {
+                    console.error("Error removing item: ", error);
+                    alert("เกิดข้อผิดพลาดในการลบ");
+                });
+        }
     }
-    
+
+
     function populateProductSelect() {
-        const productSelect = document.getElementById('product-select');
-        productSelect.innerHTML = ''; 
-        
-        const allProducts = new Set();
-        salesData.forEach(sale => {
-            allProducts.add(sale.product);
-        });
+      const productSelect = document.getElementById('product-select');
+      productSelect.innerHTML = '';
+      
+      const allProducts = new Set();
+      for(const dateKey in salesData) {
+          const dailySales = salesData[dateKey];
+          for(const saleId in dailySales) {
+              allProducts.add(dailySales[saleId].product);
+          }
+      }
 
-        const defaultOption = document.createElement('option');
-        defaultOption.textContent = 'เลือกสินค้า...';
-        defaultOption.value = '';
-        productSelect.appendChild(defaultOption);
+      const defaultOption = document.createElement('option');
+      defaultOption.textContent = 'เลือกสินค้า...';
+      defaultOption.value = '';
+      productSelect.appendChild(defaultOption);
 
-        const allItemsOption = document.createElement('option');
-        allItemsOption.textContent = 'สินค้าทั้งหมด';
-        allItemsOption.value = 'all';
-        productSelect.appendChild(allItemsOption);
+      const allItemsOption = document.createElement('option');
+      allItemsOption.textContent = 'สินค้าทั้งหมด';
+      allItemsOption.value = 'all';
+      productSelect.appendChild(allItemsOption);
 
-        allProducts.forEach(product => {
-            const option = document.createElement('option');
-            option.textContent = product;
-            option.value = product;
-            productSelect.appendChild(option);
-        });
+      allProducts.forEach(product => {
+          const option = document.createElement('option');
+          option.textContent = product;
+          option.value = product;
+          productSelect.appendChild(option);
+      });
     }
 
     function switchCompareMode(mode) {
-        document.querySelectorAll('.compare-mode-form').forEach(form => {
-            form.classList.remove('active');
-        });
-        document.getElementById(mode + '-mode').classList.add('active');
-        clearComparison();
+      document.querySelectorAll('.compare-mode-form').forEach(form => {
+          form.classList.remove('active');
+      });
+      document.getElementById(mode + '-mode').classList.add('active');
+      clearComparison();
     }
     
     function clearComparison() {
-        document.getElementById('detailed-comparison-result').innerHTML = '';
-        document.getElementById('no-comparison-data').style.display = 'block';
+      document.getElementById('detailed-comparison-result').innerHTML = '';
+      document.getElementById('no-comparison-data').style.display = 'block';
     }
 
     function compareSales() {
@@ -1164,11 +1280,8 @@
                 alert('กรุณาเลือกวันที่ทั้งสองวัน');
                 return;
             }
-            const date1 = new Date(date1Str);
-            const date2 = new Date(date2Str);
-            
-            salesData1 = salesData.filter(item => isSameDay(item.date, date1));
-            salesData2 = salesData.filter(item => isSameDay(item.date, date2));
+            salesData1 = Object.values(salesData[date1Str] || {});
+            salesData2 = Object.values(salesData[date2Str] || {});
             label1 = formatDateThai(date1Str);
             label2 = formatDateThai(date2Str);
         } else if (mode === 'date-range') {
@@ -1181,20 +1294,15 @@
                 alert('กรุณาเลือกช่วงวันที่ทั้งสองช่วง');
                 return;
             }
+            
             const startDate1 = new Date(startDate1Str);
             const endDate1 = new Date(endDate1Str);
             const startDate2 = new Date(startDate2Str);
             const endDate2 = new Date(endDate2Str);
             
-            salesData1 = salesData.filter(item => {
-                const saleDate = new Date(item.date);
-                return saleDate >= startDate1 && saleDate <= new Date(endDate1.getFullYear(), endDate1.getMonth(), endDate1.getDate(), 23, 59, 59);
-            });
+            salesData1 = filterSalesByDateRange(startDate1, endDate1);
+            salesData2 = filterSalesByDateRange(startDate2, endDate2);
             
-            salesData2 = salesData.filter(item => {
-                const saleDate = new Date(item.date);
-                return saleDate >= startDate2 && saleDate <= new Date(endDate2.getFullYear(), endDate2.getMonth(), endDate2.getDate(), 23, 59, 59);
-            });
             label1 = `ช่วงที่ 1`;
             label2 = `ช่วงที่ 2`;
         }
@@ -1215,6 +1323,18 @@
         
         updateComparisonDisplay(comparisonProducts, comparisonData, [label1, label2]);
     }
+    
+    function filterSalesByDateRange(startDate, endDate) {
+      const filtered = [];
+      for(const dateKey in salesData) {
+        const saleDate = new Date(dateKey);
+        if (saleDate >= startDate && saleDate <= new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate(), 23, 59, 59)) {
+          filtered.push(...Object.values(salesData[dateKey]));
+        }
+      }
+      return filtered;
+    }
+    
 
     function calculateSales(data, productName) {
         let totalQuantity = 0;
