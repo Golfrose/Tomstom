@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ระบบขายสินค้า - ปรับปรุงสมบูรณ์</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     /* --- Global Styling and Color Palette --- */
     :root {
@@ -32,60 +31,6 @@
     }
     @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;700&display=swap');
 
-    /* --- Login Page Styling --- */
-    .login-container {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      background: linear-gradient(135deg, #a06de5, #8862e3);
-      color: var(--button-text-color);
-      text-align: center;
-    }
-    .login-box {
-      background-color: var(--card-bg);
-      color: #333;
-      padding: 40px;
-      border-radius: var(--border-radius-large);
-      box-shadow: var(--shadow-medium);
-      width: 90%;
-      max-width: 400px;
-    }
-    .login-box h2 {
-      font-size: 2em;
-      margin-bottom: 20px;
-      font-weight: 700;
-      color: var(--primary-color);
-    }
-    .login-box input {
-      width: 100%;
-      padding: 15px;
-      margin-bottom: 15px;
-      border-radius: var(--border-radius-small);
-      border: 1px solid #ddd;
-      font-size: 1em;
-    }
-    .login-box button {
-      width: 100%;
-      padding: 15px;
-      border: none;
-      border-radius: var(--border-radius-small);
-      background: var(--button-bg-2);
-      color: var(--button-text-color);
-      font-size: 1.2em;
-      font-weight: 500;
-      cursor: pointer;
-      transition: transform 0.2s;
-    }
-    .login-box button:hover {
-      transform: translateY(-2px);
-    }
-    .error-message {
-      color: var(--secondary-color);
-      margin-top: 10px;
-    }
-
     /* --- Dashboard & Navigation --- */
     .dashboard {
       background: linear-gradient(135deg, #a06de5, #8862e3);
@@ -109,7 +54,7 @@
       opacity: 0.9;
     }
     .main-nav {
-      display: flex;
+      display: none; /* เริ่มต้นซ่อนไว้ */
       justify-content: center;
       gap: 15px;
       margin-top: -60px;
@@ -161,9 +106,6 @@
     }
     .page {
       display: none;
-    }
-    .page-container {
-        display: none; /* Hide main app container by default */
     }
 
     /* --- Sale Page Components --- */
@@ -283,7 +225,7 @@
       background: var(--button-bg-1);
       border-radius: 50%;
       color: #fff;
-      display: flex;
+      display: none; /* เริ่มต้นซ่อนไว้ */
       justify-content: center;
       align-items: center;
       font-size: 1.5em;
@@ -530,28 +472,105 @@
         height: 400px;
         width: 100%;
     }
+
+    /* --- Login Page Styling --- */
+    .auth-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: var(--bg-color);
+    }
+    .auth-card {
+      background-color: var(--card-bg);
+      padding: 30px;
+      border-radius: var(--border-radius-large);
+      box-shadow: var(--shadow-medium);
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+    }
+    .auth-card h2 {
+      color: var(--primary-color);
+      margin-bottom: 20px;
+    }
+    .auth-form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    .auth-form input {
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: var(--border-radius-small);
+      font-size: 1em;
+    }
+    .auth-form button {
+      padding: 15px;
+      background: var(--button-bg-1);
+      color: var(--button-text-color);
+      border: none;
+      border-radius: var(--border-radius-small);
+      font-size: 1.1em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .auth-form button:hover {
+      background: var(--button-bg-2);
+    }
+    .auth-error {
+      color: var(--secondary-color);
+      margin-top: 10px;
+      font-weight: 500;
+    }
+    .logout-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      padding: 10px 20px;
+      background: var(--secondary-color);
+      color: white;
+      border: none;
+      border-radius: var(--border-radius-small);
+      font-weight: 500;
+      cursor: pointer;
+      display: none; /* เริ่มต้นซ่อนไว้ */
+    }
+    .logout-btn:hover {
+        background: #e55c3c;
+    }
   </style>
+
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <div class="login-container" id="login-container">
-    <div class="login-box">
+
+  <div id="auth-container" class="auth-container">
+    <div class="auth-card">
       <h2>เข้าสู่ระบบ</h2>
-      <form id="login-form">
-        <input type="email" id="user-id" placeholder="Email" required>
+      <form id="login-form" class="auth-form">
+        <input type="email" id="email" placeholder="อีเมล" required>
         <input type="password" id="password" placeholder="รหัสผ่าน" required>
         <button type="submit">เข้าสู่ระบบ</button>
-        <p id="error-message" class="error-message"></p>
       </form>
+      <div id="auth-error-message" class="auth-error"></div>
     </div>
   </div>
 
-  <div class="page-container" id="main-app" style="display: none;">
+  <div id="app-container" style="display: none;">
+    <button id="logout-btn" class="logout-btn" onclick="logout()">ออกจากระบบ</button>
+    
     <div class="dashboard">
       <p>ระบบขายสินค้า</p>
       <h1 id="current-time">00:00:00</h1>
       <p id="current-date"></p>
     </div>
-  
+
     <div class="main-nav">
       <div class="nav-btn active" onclick="showPage('sale')">
         <i class="fas fa-shopping-cart"></i>
@@ -566,8 +585,8 @@
         <span>เปรียบเทียบ</span>
       </div>
     </div>
-  
-    <div id="sale-page" class="page container" style="display: block;">
+
+    <div id="sale-page" class="page container">
       <div class="category-card">
         <i class="fas fa-cocktail"></i>
         <span>หมวดน้ำ</span>
@@ -745,7 +764,7 @@
         <span class="cart-count" id="cart-count">0</span>
       </div>
     </div>
-  
+
     <div id="cart-modal" class="modal">
       <div class="modal-content">
         <div class="modal-header">
@@ -763,7 +782,7 @@
         </div>
       </div>
     </div>
-  
+
     <div id="summary-page" class="page container summary-page">
       <h1>สรุปยอดขาย</h1>
       <div class="date-filter">
@@ -802,7 +821,7 @@
       </table>
       <div id="no-data" class="no-data" style="display: none;">ไม่พบข้อมูลการขายในวันที่เลือก</div>
     </div>
-  
+
     <div id="compare-page" class="page container summary-page">
       <h1>เปรียบเทียบยอดขาย</h1>
       <div class="compare-mode-selection">
@@ -813,7 +832,7 @@
           </select>
           <button onclick="clearComparison()">ล้างข้อมูล</button>
       </div>
-  
+
       <div class="comparison-input-group">
         <div id="day-to-day-mode" class="compare-mode-form active">
             <div class="comparison-date-group">
@@ -825,7 +844,7 @@
                 <input type="date" id="compare-date-2">
             </div>
         </div>
-  
+
         <div id="date-range-mode" class="compare-mode-form">
             <div class="comparison-date-group">
                 <label for="start-date-1">ช่วงที่ 1 เริ่ม:</label>
@@ -852,94 +871,84 @@
       <div id="no-comparison-data" class="no-data" style="display: none;">
         ไม่พบข้อมูลสำหรับเปรียบเทียบ
       </div>
+      <div class="chart-container">
+        <canvas id="comparisonChart"></canvas>
+      </div>
     </div>
   </div>
 
-  <script type="module">
-    // ส่วนนี้คือโค้ดเชื่อมต่อกับ Firebase
-    // ------------------------------------
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-    import { getDatabase, ref, push, onValue, set, get, child, remove } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
-
+  <script>
     // ** เปลี่ยนค่าใน firebaseConfig ให้เป็นของโปรเจกต์ของคุณ **
     const firebaseConfig = {
-      apiKey: "AIzaSyC8yYWxiOH6HRHtBpPA5Qe3_ryV5BKS8m8",
+      apiKey: "AIzaSyC8yYwXiOH6HRHtBpPA5Qe3_ryV5BKS8m8",
       authDomain: "tomstom-8.firebaseapp.com",
       projectId: "tomstom-8",
       databaseURL: "https://tomstom-8-default-rtdb.asia-southeast1.firebasedatabase.app",
       storageBucket: "tomstom-8.appspot.com",
       messagingSenderId: "595696774612",
-      appId: "1:595696774612:web:83f068cfa637f7a26d3a41"
+      appId: "1:595696774612:web:xxxxxx"
     };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getDatabase(app);
-    const dbRef = ref(db);
-    // ------------------------------------
-
-    let cart = {};
-    let salesData = {};
-    let currentUserUid = null;
-
-    // ตรวจสอบสถานะการล็อกอินเมื่อโหลดหน้า
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            currentUserUid = user.uid;
-            document.getElementById('login-container').style.display = 'none';
-            document.getElementById('main-app').style.display = 'block';
-            initializeAppFeatures();
-        } else {
-            currentUserUid = null;
-            document.getElementById('login-container').style.display = 'flex';
-            document.getElementById('main-app').style.display = 'none';
-        }
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const database = firebase.database();
+    
+    // Check authentication state
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        // User is signed in.
+        document.getElementById('auth-container').style.display = 'none';
+        document.getElementById('app-container').style.display = 'block';
+        document.querySelector('.main-nav').style.display = 'flex';
+        document.querySelector('.cart-icon').style.display = 'flex';
+        document.getElementById('logout-btn').style.display = 'block';
+        showPage('sale');
+      } else {
+        // User is signed out.
+        document.getElementById('auth-container').style.display = 'flex';
+        document.getElementById('app-container').style.display = 'none';
+      }
     });
 
-    // เพิ่มโค้ดสำหรับหน้าล็อกอิน
-    document.getElementById('login-form').addEventListener('submit', (e) => {
-      e.preventDefault();
-      const userId = document.getElementById('user-id').value;
+    // Handle Login
+    document.getElementById('login-form').addEventListener('submit', (event) => {
+      event.preventDefault();
+      const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
-      const errorMessageEl = document.getElementById('error-message');
+      const errorDiv = document.getElementById('auth-error-message');
+      errorDiv.textContent = '';
       
-      errorMessageEl.textContent = "กำลังเข้าสู่ระบบ...";
-
-      // ใช้ Firebase Authentication สำหรับการล็อกอิน
-      signInWithEmailAndPassword(auth, userId, password)
-        .then((userCredential) => {
-          // ล็อกอินสำเร็จ
-          console.log("Logged in successfully:", userCredential.user);
-          errorMessageEl.textContent = "";
+      auth.signInWithEmailAndPassword(email, password)
+        .then(() => {
+          // Logged in successfully
+          console.log("Logged in successfully!");
         })
         .catch((error) => {
-          // ล็อกอินไม่สำเร็จ
+          // Handle Errors here.
           const errorCode = error.code;
           const errorMessage = error.message;
-          console.error("Login failed:", errorMessage);
-          if (errorCode === 'auth/wrong-password' || errorCode === 'auth/user-not-found') {
-            errorMessageEl.textContent = "User ID หรือรหัสผ่านไม่ถูกต้อง";
+          console.error("Login failed:", errorCode, errorMessage);
+          if (errorCode === 'auth/user-not-found' || errorCode === 'auth/wrong-password') {
+            errorDiv.textContent = 'อีเมลหรือรหัสผ่านไม่ถูกต้อง';
           } else {
-            errorMessageEl.textContent = "เกิดข้อผิดพลาดในการล็อกอิน";
+            errorDiv.textContent = 'เกิดข้อผิดพลาดในการเข้าสู่ระบบ: ' + errorMessage;
           }
         });
     });
 
-    // โค้ดที่เหลือทั้งหมดของคุณ
-    function initializeAppFeatures() {
-      const salesRef = ref(db, 'sales');
-      onValue(salesRef, (snapshot) => {
-        salesData = snapshot.val() || {};
-        const today = new Date().toISOString().slice(0, 10);
-        document.getElementById('report-date').value = today;
-        loadReport();
+    // Handle Logout
+    function logout() {
+      auth.signOut().then(() => {
+        console.log("Logged out successfully!");
+      }).catch((error) => {
+        console.error("Logout failed:", error);
       });
-      showPage('sale');
-      updateTime();
-      setInterval(updateTime, 1000);
     }
-    
+
+    let cart = {};
+    let salesData = {};
+
     function updateTime() {
       const now = new Date();
       const timeString = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
@@ -947,6 +956,11 @@
       document.getElementById('current-time').textContent = timeString;
       document.getElementById('current-date').textContent = dateString;
     }
+
+    document.addEventListener('DOMContentLoaded', (event) => {
+      updateTime();
+      setInterval(updateTime, 1000);
+    });
 
     function showPage(pageId) {
       const pages = document.querySelectorAll('.page');
@@ -1052,40 +1066,31 @@
       cart = {};
       updateCartCount();
     }
-    
+
     function confirmSale() {
       if (Object.keys(cart).length === 0) {
         alert("ไม่มีรายการในตะกร้า!");
         return;
       }
       
-      const now = new Date();
-      const salesKey = now.toISOString().slice(0, 10);
-
-      const updates = {};
+      const userId = auth.currentUser.uid;
+      const salesRef = database.ref('sales/' + userId);
+      
       for (const key in cart) {
         const item = cart[key];
-        const newSale = {
-          date: now.toISOString(),
+        const newSaleRef = salesRef.push();
+        newSaleRef.set({
+          timestamp: firebase.database.ServerValue.TIMESTAMP,
           product: item.product,
           mix: item.mix,
           quantity: item.quantity,
           pricePerUnit: item.pricePerUnit,
           totalPrice: item.totalPrice
-        };
-        const newPostKey = push(ref(db, `sales/${salesKey}`)).key;
-        updates[`/sales/${salesKey}/${newPostKey}`] = newSale;
+        });
       }
       
-      set(ref(db), updates)
-      .then(() => {
-        closeCartModal();
-        alert("บันทึกการขายเรียบร้อย!");
-      })
-      .catch((error) => {
-        console.error("Error writing to database", error);
-        alert("เกิดข้อผิดพลาดในการบันทึก");
-      });
+      closeCartModal();
+      alert("บันทึกการขายเรียบร้อย!");
     }
 
     function isSameDay(date1, date2) {
@@ -1095,23 +1100,37 @@
                d1.getMonth() === d2.getMonth() &&
                d1.getDate() === d2.getDate();
     }
-
+    
+    // Fetch data from Firebase Realtime Database
     function loadReport() {
-        const selectedDateStr = document.getElementById('report-date').value;
-        const reportBody = document.getElementById('report-body');
-        const totalRevenueEl = document.getElementById('total-revenue');
-        const totalQuantityEl = document.getElementById('total-quantity');
-        const productSummaryListEl = document.getElementById('product-summary-list');
-        const noDataEl = document.getElementById('no-data');
+      const selectedDateStr = document.getElementById('report-date').value;
+      const reportBody = document.getElementById('report-body');
+      const totalRevenueEl = document.getElementById('total-revenue');
+      const totalQuantityEl = document.getElementById('total-quantity');
+      const productSummaryListEl = document.getElementById('product-summary-list');
+      const noDataEl = document.getElementById('no-data');
 
-        reportBody.innerHTML = '';
-        productSummaryListEl.innerHTML = '';
-        totalRevenueEl.textContent = '0';
-        totalQuantityEl.textContent = '0';
+      reportBody.innerHTML = '';
+      productSummaryListEl.innerHTML = '';
+      totalRevenueEl.textContent = '0';
+      totalQuantityEl.textContent = '0';
 
-        const selectedDate = new Date(selectedDateStr);
-        const dailySales = salesData[selectedDateStr] || {};
-        const filteredData = Object.values(dailySales);
+      const userId = auth.currentUser.uid;
+      const salesRef = database.ref('sales/' + userId);
+
+      salesRef.once('value', (snapshot) => {
+        const salesData = snapshot.val();
+        if (!salesData) {
+          noDataEl.style.display = 'block';
+          return;
+        }
+
+        const filteredData = Object.keys(salesData).map(key => ({
+            id: key,
+            ...salesData[key]
+        })).filter(item => {
+            return isSameDay(new Date(item.timestamp), new Date(selectedDateStr));
+        });
 
         if (filteredData.length === 0) {
             noDataEl.style.display = 'block';
@@ -1135,14 +1154,12 @@
             }
 
             const tr = document.createElement('tr');
-            const displayDate = new Date(item.date).toLocaleString('th-TH', { day: 'numeric', month: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+            const displayDate = new Date(item.timestamp).toLocaleString('th-TH', { day: 'numeric', month: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
             
             let productClass = '';
             if (item.product.includes('แลกขวดฟรี')) {
                 productClass = 'report-free';
             }
-            
-            const firebaseId = Object.keys(dailySales).find(key => dailySales[key] === item);
 
             tr.innerHTML = `
                 <td>${displayDate}</td>
@@ -1153,8 +1170,8 @@
                 <td>${item.pricePerUnit}</td>
                 <td>${item.totalPrice.toLocaleString()}</td>
                 <td class="summary-actions">
-                    <button class="edit-btn" onclick="editSaleItem('${selectedDateStr}', '${firebaseId}')">แก้</button>
-                    <button class="delete-btn" onclick="deleteSaleItem('${selectedDateStr}', '${firebaseId}')">ลบ</button>
+                    <button class="edit-btn" onclick="editSaleItem('${item.id}')">แก้</button>
+                    <button class="delete-btn" onclick="deleteSaleItem('${item.id}')">ลบ</button>
                 </td>
             `;
             reportBody.appendChild(tr);
@@ -1171,93 +1188,93 @@
             }
             productSummaryListEl.appendChild(li);
         }
+      });
     }
 
-    function editSaleItem(dateKey, itemId) {
-        const itemToEdit = salesData[dateKey][itemId];
-        const newQuantity = prompt("แก้ไขจำนวน:", itemToEdit.quantity);
-        const parsedQuantity = parseInt(newQuantity);
-        if (isNaN(parsedQuantity) || parsedQuantity < 0) {
-            alert("จำนวนไม่ถูกต้อง");
-            return;
-        }
-
-        let newTotalPrice = parsedQuantity * itemToEdit.pricePerUnit;
-        if (itemToEdit.product === 'น้ำดิบ') {
-            newTotalPrice = Math.floor(parsedQuantity / 2) * 120 + (parsedQuantity % 2) * 65;
-        }
-
-        const itemRef = ref(db, `sales/${dateKey}/${itemId}`);
-        set(itemRef, {
-            ...itemToEdit,
+    function editSaleItem(itemId) {
+      const newQuantity = prompt("แก้ไขจำนวน:");
+      const parsedQuantity = parseInt(newQuantity);
+      if (isNaN(parsedQuantity) || parsedQuantity <= 0) {
+        alert("จำนวนไม่ถูกต้อง");
+        return;
+      }
+      
+      const userId = auth.currentUser.uid;
+      const itemRef = database.ref('sales/' + userId + '/' + itemId);
+      itemRef.once('value', (snapshot) => {
+        const item = snapshot.val();
+        if (item) {
+          itemRef.update({
             quantity: parsedQuantity,
-            totalPrice: newTotalPrice
-        })
-        .then(() => {
+            totalPrice: parsedQuantity * item.pricePerUnit
+          }).then(() => {
+            loadReport();
             alert("แก้ไขรายการเรียบร้อย!");
-        })
-        .catch((error) => {
-            console.error("Error updating item: ", error);
-            alert("เกิดข้อผิดพลาดในการแก้ไข");
+          }).catch(error => {
+            console.error("Error updating data:", error);
+          });
+        }
+      });
+    }
+
+    function deleteSaleItem(itemId) {
+      if (confirm("ต้องการลบรายการนี้ใช่ไหม?")) {
+        const userId = auth.currentUser.uid;
+        const itemRef = database.ref('sales/' + userId + '/' + itemId);
+        itemRef.remove().then(() => {
+          loadReport();
+          alert("ลบรายการเรียบร้อย!");
+        }).catch(error => {
+          console.error("Error deleting data:", error);
+        });
+      }
+    }
+    
+    function populateProductSelect() {
+        const productSelect = document.getElementById('product-select');
+        productSelect.innerHTML = ''; 
+        
+        const allProducts = new Set();
+        const userId = auth.currentUser.uid;
+        const salesRef = database.ref('sales/' + userId);
+        salesRef.once('value', (snapshot) => {
+          const data = snapshot.val();
+          if (data) {
+            Object.values(data).forEach(sale => {
+              allProducts.add(sale.product);
+            });
+          }
+          
+          const defaultOption = document.createElement('option');
+          defaultOption.textContent = 'เลือกสินค้า...';
+          defaultOption.value = '';
+          productSelect.appendChild(defaultOption);
+
+          const allItemsOption = document.createElement('option');
+          allItemsOption.textContent = 'สินค้าทั้งหมด';
+          allItemsOption.value = 'all';
+          productSelect.appendChild(allItemsOption);
+
+          allProducts.forEach(product => {
+              const option = document.createElement('option');
+              option.textContent = product;
+              option.value = product;
+              productSelect.appendChild(option);
+          });
         });
     }
 
-    function deleteSaleItem(dateKey, itemId) {
-        if (confirm("ต้องการลบรายการนี้ใช่ไหม?")) {
-            const itemRef = ref(db, `sales/${dateKey}/${itemId}`);
-            remove(itemRef)
-                .then(() => {
-                    alert("ลบรายการเรียบร้อย!");
-                })
-                .catch((error) => {
-                    console.error("Error removing item: ", error);
-                    alert("เกิดข้อผิดพลาดในการลบ");
-                });
-        }
-    }
-
-
-    function populateProductSelect() {
-      const productSelect = document.getElementById('product-select');
-      productSelect.innerHTML = '';
-      
-      const allProducts = new Set();
-      for(const dateKey in salesData) {
-          const dailySales = salesData[dateKey];
-          for(const saleId in dailySales) {
-              allProducts.add(dailySales[saleId].product);
-          }
-      }
-
-      const defaultOption = document.createElement('option');
-      defaultOption.textContent = 'เลือกสินค้า...';
-      defaultOption.value = '';
-      productSelect.appendChild(defaultOption);
-
-      const allItemsOption = document.createElement('option');
-      allItemsOption.textContent = 'สินค้าทั้งหมด';
-      allItemsOption.value = 'all';
-      productSelect.appendChild(allItemsOption);
-
-      allProducts.forEach(product => {
-          const option = document.createElement('option');
-          option.textContent = product;
-          option.value = product;
-          productSelect.appendChild(option);
-      });
-    }
-
     function switchCompareMode(mode) {
-      document.querySelectorAll('.compare-mode-form').forEach(form => {
-          form.classList.remove('active');
-      });
-      document.getElementById(mode + '-mode').classList.add('active');
-      clearComparison();
+        document.querySelectorAll('.compare-mode-form').forEach(form => {
+            form.classList.remove('active');
+        });
+        document.getElementById(mode + '-mode').classList.add('active');
+        clearComparison();
     }
     
     function clearComparison() {
-      document.getElementById('detailed-comparison-result').innerHTML = '';
-      document.getElementById('no-comparison-data').style.display = 'block';
+        document.getElementById('detailed-comparison-result').innerHTML = '';
+        document.getElementById('no-comparison-data').style.display = 'block';
     }
 
     function compareSales() {
@@ -1269,72 +1286,79 @@
             alert('กรุณาเลือกสินค้าที่ต้องการเปรียบเทียบ');
             return;
         }
-        
-        let salesData1, salesData2, label1, label2;
-        let comparisonProducts;
 
-        if (mode === 'day-to-day') {
-            const date1Str = document.getElementById('compare-date-1').value;
-            const date2Str = document.getElementById('compare-date-2').value;
-            if (!date1Str || !date2Str) {
-                alert('กรุณาเลือกวันที่ทั้งสองวัน');
-                return;
-            }
-            salesData1 = Object.values(salesData[date1Str] || {});
-            salesData2 = Object.values(salesData[date2Str] || {});
-            label1 = formatDateThai(date1Str);
-            label2 = formatDateThai(date2Str);
-        } else if (mode === 'date-range') {
-            const startDate1Str = document.getElementById('start-date-1').value;
-            const endDate1Str = document.getElementById('end-date-1').value;
-            const startDate2Str = document.getElementById('start-date-2').value;
-            const endDate2Str = document.getElementById('end-date-2').value;
-            
-            if (!startDate1Str || !endDate1Str || !startDate2Str || !endDate2Str) {
-                alert('กรุณาเลือกช่วงวันที่ทั้งสองช่วง');
+        const userId = auth.currentUser.uid;
+        const salesRef = database.ref('sales/' + userId);
+
+        salesRef.once('value', (snapshot) => {
+            const salesData = snapshot.val();
+            if (!salesData) {
+                document.getElementById('no-comparison-data').style.display = 'block';
                 return;
             }
             
-            const startDate1 = new Date(startDate1Str);
-            const endDate1 = new Date(endDate1Str);
-            const startDate2 = new Date(startDate2Str);
-            const endDate2 = new Date(endDate2Str);
-            
-            salesData1 = filterSalesByDateRange(startDate1, endDate1);
-            salesData2 = filterSalesByDateRange(startDate2, endDate2);
-            
-            label1 = `ช่วงที่ 1`;
-            label2 = `ช่วงที่ 2`;
-        }
-        
-        if (selectedProduct === 'all') {
-            const allProducts = new Set();
-            salesData1.forEach(item => allProducts.add(item.product));
-            salesData2.forEach(item => allProducts.add(item.product));
-            comparisonProducts = Array.from(allProducts);
-        } else {
-            comparisonProducts = [selectedProduct];
-        }
+            let salesData1, salesData2, label1, label2;
+            let comparisonProducts;
 
-        const comparisonData = {
-            [label1]: comparisonProducts.map(p => calculateSales(salesData1, p)),
-            [label2]: comparisonProducts.map(p => calculateSales(salesData2, p))
-        };
-        
-        updateComparisonDisplay(comparisonProducts, comparisonData, [label1, label2]);
+            if (mode === 'day-to-day') {
+                const date1Str = document.getElementById('compare-date-1').value;
+                const date2Str = document.getElementById('compare-date-2').value;
+                if (!date1Str || !date2Str) {
+                    alert('กรุณาเลือกวันที่ทั้งสองวัน');
+                    return;
+                }
+                const date1 = new Date(date1Str);
+                const date2 = new Date(date2Str);
+                
+                salesData1 = Object.values(salesData).filter(item => isSameDay(new Date(item.timestamp), date1));
+                salesData2 = Object.values(salesData).filter(item => isSameDay(new Date(item.timestamp), date2));
+                label1 = formatDateThai(date1Str);
+                label2 = formatDateThai(date2Str);
+            } else if (mode === 'date-range') {
+                const startDate1Str = document.getElementById('start-date-1').value;
+                const endDate1Str = document.getElementById('end-date-1').value;
+                const startDate2Str = document.getElementById('start-date-2').value;
+                const endDate2Str = document.getElementById('end-date-2').value;
+                
+                if (!startDate1Str || !endDate1Str || !startDate2Str || !endDate2Str) {
+                    alert('กรุณาเลือกช่วงวันที่ทั้งสองช่วง');
+                    return;
+                }
+                const startDate1 = new Date(startDate1Str);
+                const endDate1 = new Date(endDate1Str);
+                const startDate2 = new Date(startDate2Str);
+                const endDate2 = new Date(endDate2Str);
+                
+                salesData1 = Object.values(salesData).filter(item => {
+                    const saleDate = new Date(item.timestamp);
+                    return saleDate >= startDate1 && saleDate <= new Date(endDate1.getFullYear(), endDate1.getMonth(), endDate1.getDate(), 23, 59, 59);
+                });
+                
+                salesData2 = Object.values(salesData).filter(item => {
+                    const saleDate = new Date(item.timestamp);
+                    return saleDate >= startDate2 && saleDate <= new Date(endDate2.getFullYear(), endDate2.getMonth(), endDate2.getDate(), 23, 59, 59);
+                });
+                label1 = `ช่วงที่ 1`;
+                label2 = `ช่วงที่ 2`;
+            }
+            
+            if (selectedProduct === 'all') {
+                const allProducts = new Set();
+                salesData1.forEach(item => allProducts.add(item.product));
+                salesData2.forEach(item => allProducts.add(item.product));
+                comparisonProducts = Array.from(allProducts);
+            } else {
+                comparisonProducts = [selectedProduct];
+            }
+
+            const comparisonData = {
+                [label1]: comparisonProducts.map(p => calculateSales(salesData1, p)),
+                [label2]: comparisonProducts.map(p => calculateSales(salesData2, p))
+            };
+            
+            updateComparisonDisplay(comparisonProducts, comparisonData, [label1, label2]);
+        });
     }
-    
-    function filterSalesByDateRange(startDate, endDate) {
-      const filtered = [];
-      for(const dateKey in salesData) {
-        const saleDate = new Date(dateKey);
-        if (saleDate >= startDate && saleDate <= new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate(), 23, 59, 59)) {
-          filtered.push(...Object.values(salesData[dateKey]));
-        }
-      }
-      return filtered;
-    }
-    
 
     function calculateSales(data, productName) {
         let totalQuantity = 0;
@@ -1402,8 +1426,12 @@
 
         const chartCanvas = document.createElement('canvas');
         chartCanvas.id = 'comparisonChart';
-        resultDiv.appendChild(chartCanvas);
-        
+        const chartContainer = document.querySelector('.chart-container');
+        if (chartContainer) {
+            chartContainer.innerHTML = '';
+            chartContainer.appendChild(chartCanvas);
+        }
+
         const chartData = {
             labels: products,
             datasets: [
