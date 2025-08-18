@@ -788,7 +788,7 @@
   <script>
     let cart = {};
     let salesData = [];
-    const SPREADSHEET_URL = 'https://script.google.com/macros/s/AKfycbxeeAaFQNCHr2M6_yzZ500kIyXocFO3_cIiNM4KVSRSlP6xNFJ_2hiKXbXf1wUVqUxo5Q/exec';
+    const SPREADSHEET_URL = 'https://script.google.com/macros/s/AKfycbzcFSNP-8Rr89GooN1Zx48yX9VBPXUmNULQPuBzqWc4fJW7UNnX1afohLe9UQDLY0g2zg/exec';
 
     function saveData() {
       localStorage.setItem('salesData', JSON.stringify(salesData));
@@ -922,64 +922,51 @@
     }
     
     // START: ADDED CODE FOR GOOGLE SHEET CONNECTION
-async function sendDataToGoogleSheet() {
-  try {
-    const now = new Date();
-    const saleDate = now.toLocaleDateString('th-TH', { year: 'numeric', month: '2-digit', day: '2-digit' });
-    const saleTime = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
-    
-    // สร้างข้อมูล
-    const sales = [];
-    for (const key in cart) {
-      const item = cart[key];
-      sales.push({
-        date: saleDate,
-        time: saleTime,
-        product: item.product,
-        mix: item.mix,
-        quantity: item.quantity,
-        totalPrice: item.totalPrice
-      });
+    function sendDataToGoogleSheet() {
+      const now = new Date();
+      const saleDate = now.toLocaleDateString('th-TH', { year: 'numeric', month: '2-digit', day: '2-digit' });
+      const saleTime = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+      
+      // Prepare the data to be sent
+      const dataToSend = [];
+      for (const key in cart) {
+        const item = cart[key];
+        dataToSend.push({
+          date: saleDate,
+          time: saleTime,
+          product: item.product,
+          mix: item.mix,
+          quantity: item.quantity,
+          pricePerUnit: item.pricePerUnit,
+          totalPrice: item.totalPrice
+        });
+      }
+
+      // Use a proxy server to avoid CORS issues if needed, or directly fetch
+      // For this example, we assume the App Script is deployed correctly to handle CORS.
+      fetch(SPREADSHEET_URL, {
+        method: 'POST',
+        mode: 'no-cors', // Use 'no-cors' for simplicity with App Script
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ sales: dataToSend }),
+      })
+      .then(response => {
+        // Since we use 'no-cors', we can't check for success, but the request is sent.
+        // You can add logging or a simple alert here if needed for debugging.
+        console.log('Data sent to Google Sheet.');
+      })
+      .catch(error => console.error('Error sending data:', error));
     }
-
-    const payload = {
-      sales: sales
-    };
-
-    console.log('Sending data:', JSON.stringify(payload));
-
-    // ส่งข้อมูลแบบ fetch
-    const response = await fetch(SPREADSHEET_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'text/plain;charset=utf-8',
-      },
-      body: JSON.stringify(payload)
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    console.log('Response received');
-    return true;
-
-  } catch (error) {
-    console.error('Error:', error);
-    return false;
-  }
-}
     // END: ADDED CODE
 
-    async function confirmSale() {
-  if (Object.keys(cart).length === 0) {
-    alert("ไม่มีรายการในตะกร้า!");
-    return;
-  }
-  
-  try {
-    const success = await sendDataToGoogleSheet();
-    if (success) {
+    function confirmSale() {
+      if (Object.keys(cart).length === 0) {
+        alert("ไม่มีรายการในตะกร้า!");
+        return;
+      }
+      
       const now = new Date();
       for (const key in cart) {
         const item = cart[key];
@@ -995,17 +982,14 @@ async function sendDataToGoogleSheet() {
         salesData.push(newSale);
       }
       
+      // START: UPDATED CALL
+      sendDataToGoogleSheet(); // Send data to Google Sheet
+      // END: UPDATED CALL
+
       saveData();
       closeCartModal();
       alert("บันทึกการขายเรียบร้อย!");
-    } else {
-      alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล กรุณาลองใหม่อีกครั้ง");
     }
-  } catch (error) {
-    console.error('Error in confirmSale:', error);
-    alert("เกิดข้อผิดพลาด: " + error.message);
-  }
-}
 
     function isSameDay(date1, date2) {
         const d1 = new Date(date1);
