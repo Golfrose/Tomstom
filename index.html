@@ -922,25 +922,43 @@
     }
     
     // START: ADDED CODE FOR GOOGLE SHEET CONNECTION
-    function sendDataToGoogleSheet() {
-      const now = new Date();
-      const saleDate = now.toLocaleDateString('th-TH', { year: 'numeric', month: '2-digit', day: '2-digit' });
-      const saleTime = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
-      
-      // Prepare the data to be sent
-      const dataToSend = [];
-      for (const key in cart) {
-        const item = cart[key];
-        dataToSend.push({
-          date: saleDate,
-          time: saleTime,
-          product: item.product,
-          mix: item.mix,
-          quantity: item.quantity,
-          pricePerUnit: item.pricePerUnit,
-          totalPrice: item.totalPrice
-        });
-      }
+   function sendDataToGoogleSheet() {
+  const now = new Date();
+  const saleDate = now.toLocaleDateString('th-TH', { year: 'numeric', month: '2-digit', day: '2-digit' });
+  const saleTime = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+  
+  const dataToSend = [];
+  for (const key in cart) {
+    const item = cart[key];
+    dataToSend.push({
+      date: saleDate,
+      time: saleTime,
+      product: item.product,
+      mix: item.mix,
+      quantity: item.quantity,
+      totalPrice: item.totalPrice
+    });
+  }
+
+  // เพิ่ม console.log เพื่อดูข้อมูลที่จะส่ง
+  console.log('Sending data:', dataToSend);
+
+  fetch(SPREADSHEET_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ sales: dataToSend })
+  })
+  .then(response => {
+    console.log('Response:', response);
+    alert('บันทึกข้อมูลสำเร็จ');
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('เกิดข้อผิดพลาด: ' + error.message);
+  });
+}
 
       // Use a proxy server to avoid CORS issues if needed, or directly fetch
       // For this example, we assume the App Script is deployed correctly to handle CORS.
