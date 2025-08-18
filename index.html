@@ -928,34 +928,31 @@ async function sendDataToGoogleSheet() {
     const saleDate = now.toLocaleDateString('th-TH', { year: 'numeric', month: '2-digit', day: '2-digit' });
     const saleTime = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
     
-    // สร้างข้อมูล Form URL Encoded
-    const formData = new FormData();
-    const sales = [];
-    
-    for (const key in cart) {
-      const item = cart[key];
-      sales.push({
+    const salesData = {
+      sales: Object.values(cart).map(item => ({
         date: saleDate,
         time: saleTime,
         product: item.product,
         mix: item.mix,
         quantity: item.quantity,
         totalPrice: item.totalPrice
-      });
-    }
-    
-    formData.append('sales', JSON.stringify(sales));
-    
-    // ทำ HTTP Request
+      }))
+    };
+
+    console.log('Sending data:', JSON.stringify(salesData));
+
     const response = await fetch(SPREADSHEET_URL, {
       method: 'POST',
       mode: 'no-cors',
-      body: formData
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(salesData)
     });
-    
-    console.log('Data sent successfully');
+
+    console.log('Response received');
     return true;
-    
+
   } catch (error) {
     console.error('Error sending data:', error);
     return false;
