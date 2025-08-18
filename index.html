@@ -979,35 +979,38 @@
     }
     // END: ADDED CODE
 
-    function confirmSale() {
-      if (Object.keys(cart).length === 0) {
-        alert("ไม่มีรายการในตะกร้า!");
-        return;
-      }
-      
-      const now = new Date();
-      for (const key in cart) {
-        const item = cart[key];
-        const newSale = {
-          id: Date.now() + Math.random(),
-          date: now.toISOString(),
-          product: item.product,
-          mix: item.mix,
-          quantity: item.quantity,
-          pricePerUnit: item.pricePerUnit,
-          totalPrice: item.totalPrice
-        };
-        salesData.push(newSale);
-      }
-      
-      // START: UPDATED CALL
-      sendDataToGoogleSheet(); // Send data to Google Sheet
-      // END: UPDATED CALL
-
-      saveData();
-      closeCartModal();
-      alert("บันทึกการขายเรียบร้อย!");
+   function confirmSale() {
+  if (Object.keys(cart).length === 0) {
+    alert("ไม่มีรายการในตะกร้า!");
+    return;
+  }
+  
+  // เพิ่ม try-catch block
+  try {
+    const now = new Date();
+    for (const key in cart) {
+      const item = cart[key];
+      const newSale = {
+        id: Date.now() + Math.random(),
+        date: now.toISOString(),
+        product: item.product,
+        mix: item.mix,
+        quantity: item.quantity,
+        pricePerUnit: item.pricePerUnit,
+        totalPrice: item.totalPrice
+      };
+      salesData.push(newSale);
     }
+    
+    sendDataToGoogleSheet(); // ส่งข้อมูลไป Google Sheet
+    saveData(); // บันทึกข้อมูลลง localStorage
+    closeCartModal(); // ปิดหน้าต่าง modal
+    alert("บันทึกการขายเรียบร้อย!");
+  } catch (error) {
+    console.error('Error in confirmSale:', error);
+    alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล: ' + error.message);
+  }
+}
 
     function isSameDay(date1, date2) {
         const d1 = new Date(date1);
