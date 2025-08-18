@@ -788,7 +788,7 @@
   <script>
     let cart = {};
     let salesData = [];
-    const SPREADSHEET_URL = 'https://script.google.com/macros/s/AKfycbypbQd1-PU6cJX39K-WQzoisDWDsy-dfJTt-DruMPdBn7W0tKi4uz21Sa0ua54SQt_TIQ/exec';
+    const SPREADSHEET_URL = 'https://script.google.com/macros/s/AKfycbyJOCvC8sCbgdrnEe4QMvxfUz351O0XtE5J9LZiOh_pk6Ws6-zzij5a5ApIfQm1EqjINw/exec';
 
     function saveData() {
       localStorage.setItem('salesData', JSON.stringify(salesData));
@@ -922,55 +922,56 @@
     }
     
     // START: ADDED CODE FOR GOOGLE SHEET CONNECTION
-    function sendDataToGoogleSheet() {
-  const now = new Date();
-  const saleDate = now.toLocaleDateString('th-TH', { year: 'numeric', month: '2-digit', day: '2-digit' });
-  const saleTime = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
-  
-  const dataToSend = {
-    sales: []
-  };
-  
-  for (const key in cart) {
-    const item = cart[key];
-    dataToSend.sales.push({
-      date: saleDate,
-      time: saleTime,
-      product: item.product,
-      mix: item.mix,
-      quantity: item.quantity,
-      totalPrice: item.totalPrice
+async function sendDataToGoogleSheet() {
+  try {
+    const now = new Date();
+    const saleDate = now.toLocaleDateString('th-TH', { year: 'numeric', month: '2-digit', day: '2-digit' });
+    const saleTime = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+    
+    // สร้างข้อมูล Form URL Encoded
+    const formData = new FormData();
+    const sales = [];
+    
+    for (const key in cart) {
+      const item = cart[key];
+      sales.push({
+        date: saleDate,
+        time: saleTime,
+        product: item.product,
+        mix: item.mix,
+        quantity: item.quantity,
+        totalPrice: item.totalPrice
+      });
+    }
+    
+    formData.append('sales', JSON.stringify(sales));
+    
+    // ทำ HTTP Request
+    const response = await fetch(SPREADSHEET_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      body: formData
     });
-  }
-
-  // แสดงข้อมูลที่จะส่ง
-  console.log('Sending data:', JSON.stringify(dataToSend));
-
-  fetch(SPREADSHEET_URL, {
-    method: 'POST',
-    mode: 'no-cors',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(dataToSend)
-  })
-  .then(response => {
-    console.log('Response received');
+    
+    console.log('Data sent successfully');
     return true;
-  })
-  .catch(error => {
-    console.error('Error:', error);
+    
+  } catch (error) {
+    console.error('Error sending data:', error);
     return false;
-  });
+  }
 }
     // END: ADDED CODE
 
-    function confirmSale() {
-      if (Object.keys(cart).length === 0) {
-        alert("ไม่มีรายการในตะกร้า!");
-        return;
-      }
-      
+    async function confirmSale() {
+  if (Object.keys(cart).length === 0) {
+    alert("ไม่มีรายการในตะกร้า!");
+    return;
+  }
+  
+  try {
+    const success = await sendDataToGoogleSheet();
+    if (success) {
       const now = new Date();
       for (const key in cart) {
         const item = cart[key];
@@ -986,14 +987,17 @@
         salesData.push(newSale);
       }
       
-      // START: UPDATED CALL
-      sendDataToGoogleSheet(); // Send data to Google Sheet
-      // END: UPDATED CALL
-
       saveData();
       closeCartModal();
       alert("บันทึกการขายเรียบร้อย!");
+    } else {
+      alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล กรุณาลองใหม่อีกครั้ง");
     }
+  } catch (error) {
+    console.error('Error in confirmSale:', error);
+    alert("เกิดข้อผิดพลาด: " + error.message);
+  }
+}
 
     function isSameDay(date1, date2) {
         const d1 = new Date(date1);
