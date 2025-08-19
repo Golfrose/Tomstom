@@ -144,3 +144,17 @@ body {
 .logout-btn:hover { background:#e55c3c; }
 
 #day-to-day-mode, #date-range-mode, .date-filter.compare-style { width:100%; max-width:640px; margin:12px auto; text-align:center; }
+
+/* ปุ่มกากบาทลบรายการใน modal */
+.modal-item { position: relative; }
+.modal-item .remove-item{
+  position: absolute; right: 10px; top: 10px;
+  width: 36px; height: 36px; border-radius: 50%;
+  border: none; cursor: pointer;
+  font-size: 20px; line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; background: rgba(255,255,255,0.18);
+  transition: transform .1s ease, background .15s ease;
+}
+.modal-item .remove-item:hover{ background: rgba(255,255,255,0.28); transform: scale(1.05); }
+.modal-item .remove-item:active{ transform: scale(0.98); }
