@@ -1,4 +1,4 @@
-name: Firebase Deploy (Hosting + Functions)
+name: Firebase Deploy (Hosting only)
 
 on:
   push:
@@ -7,10 +7,8 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Auth with Google
         uses: google-github-actions/auth@v2
@@ -25,9 +23,5 @@ jobs:
       - name: Install Firebase CLI
         run: npm i -g firebase-tools
 
-      - name: Install Functions deps
-        working-directory: functions
-        run: npm ci || npm install
-
-      - name: Deploy to Firebase
-        run: firebase deploy --only hosting,functions --project tomstom-8 --non-interactive
+      - name: Deploy to Firebase (Hosting only)
+        run: firebase deploy --only hosting --project tomstom-8 --non-interactive
