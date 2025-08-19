@@ -1,4 +1,4 @@
-// report.js — ปรับคอลัมน์ "จัดการ" เป็นปุ่มวงกลมแนวตั้ง + ใส่คลาสชื่อสินค้า
+// report.js
 import { auth, database } from './firebase.js';
 import { isSameDay } from './utils/date.js';
 
@@ -25,7 +25,6 @@ export function loadReport() {
       noDataEl.style.display = 'block';
       return;
     }
-
     const filteredData = Object.keys(salesData).map(id => ({ id, ...salesData[id] }))
       .filter(item => isSameDay(new Date(item.timestamp), new Date(selectedDateStr)));
 
@@ -50,17 +49,16 @@ export function loadReport() {
       });
 
       const productClass = item.product.includes('แลกขวดฟรี') ? 'report-free' : '';
-      const name = `${item.product} ${item.mix !== 'ไม่มี' ? `(${item.mix})` : ''}`;
 
       tr.innerHTML = `
         <td>${displayDate}</td>
-        <td class="${productClass}"><span class="product-name">${name}</span></td>
+        <td class="${productClass}">${item.product} ${item.mix !== 'ไม่มี' ? `(${item.mix})` : ''}</td>
         <td>${item.quantity}</td>
         <td>${item.pricePerUnit}</td>
         <td>${item.totalPrice.toLocaleString()}</td>
-        <td class="action-cell">
-          <button class="btn-icon btn-edit" data-id="${item.id}" aria-label="แก้ไข"></button>
-          <button class="btn-icon btn-delete" data-id="${item.id}" aria-label="ลบ"></button>
+        <td class="summary-actions">
+          <button class="edit-btn" data-id="${item.id}">แก้</button>
+          <button class="delete-btn" data-id="${item.id}">ลบ</button>
         </td>
       `;
       reportBody.appendChild(tr);
@@ -76,13 +74,9 @@ export function loadReport() {
       productSummaryListEl.appendChild(li);
     }
 
-    // bind edit/delete (เรียกฟังก์ชันเดิมของคุณ)
-    reportBody.querySelectorAll('.btn-edit').forEach(btn =>
-      btn.addEventListener('click', () => editSaleItem(btn.dataset.id))
-    );
-    reportBody.querySelectorAll('.btn-delete').forEach(btn =>
-      btn.addEventListener('click', () => deleteSaleItem(btn.dataset.id))
-    );
+    // bind edit/delete
+    reportBody.querySelectorAll('.edit-btn').forEach(btn => btn.addEventListener('click', () => editSaleItem(btn.dataset.id)));
+    reportBody.querySelectorAll('.delete-btn').forEach(btn => btn.addEventListener('click', () => deleteSaleItem(btn.dataset.id)));
   });
 }
 
