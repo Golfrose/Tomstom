@@ -145,24 +145,15 @@ body {
 
 #day-to-day-mode, #date-range-mode, .date-filter.compare-style { width:100%; max-width:640px; margin:12px auto; text-align:center; }
 
-.modal-item .remove-item{
-  position:absolute;
-  right:-8px;   /* ขยับออกไปทางขวา */
-  top:30%;      /* ขยับขึ้นนิดหน่อยจากกึ่งกลาง */
-  transform:translateY(-50%);
-  width:28px; height:28px;
-  border-radius:50%;
-  border:none;
-  cursor:pointer;
-  font-size:16px;
-  line-height:1;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  color:#fff;
-  background:#ff4d4f;
-  box-shadow:0 4px 10px rgba(0,0,0,.12);
-  transition:transform .1s ease, filter .15s ease;
+/* === Remove button (X) — version สะอาดตัวเดียวจบ === */
+#cart-modal .modal-item { position: relative; padding-right: 72px; }
+#cart-modal .modal-item .item-total { margin-right: 18px; }  /* กันไม่ให้เลขโดนทับ */
+#cart-modal .modal-item .remove-item {
+  position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+  width: 22px; height: 22px; border-radius: 50%; border: 0; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; line-height: 1; color: #fff; background: #ff4d4f; /* แดง */
+  box-shadow: 0 2px 6px rgba(0,0,0,.15); z-index: 2;
 }
-.modal-item .remove-item:hover{ filter:brightness(1.05); transform:translateY(-50%) scale(1.05); }
-.modal-item .remove-item:active{ transform:translateY(-50%) scale(.96); }
+#cart-modal .modal-item .remove-item:hover { filter: brightness(1.1); transform: translateY(-50%) scale(1.08); }
+#cart-modal .modal-item .remove-item:active { transform: translateY(-50%) scale(.95); }
