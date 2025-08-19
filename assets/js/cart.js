@@ -1,4 +1,4 @@
-// cart.js
+// cart.js — เวอร์ชันใส่ปุ่มกากบาทลบรายการในโมดัล
 export let cart = {};
 
 export function changeQuantity(inputEl, change) {
@@ -24,6 +24,7 @@ export function addToCart(productCard) {
   const pricePerUnit = parseFloat(mixRadio ? mixRadio.dataset.price : productCard.dataset.price);
 
   let totalPrice = pricePerUnit * quantity;
+  // โปรโมชัน: น้ำดิบ 2 ขวด 120
   if (product === 'น้ำดิบ') {
     totalPrice = Math.floor(quantity / 2) * 120 + (quantity % 2) * 65;
   }
@@ -47,16 +48,28 @@ export function updateCartCount() {
   document.getElementById('cart-count').textContent = totalItems;
 }
 
+/* ---------- ใหม่: ลบรายการจากตะกร้า ---------- */
+export function removeFromCart(key){
+  if(!cart[key]) return;
+  delete cart[key];
+  updateCartCount();
+  renderCartModal();  // รีเฟรช modal และยอดรวม
+}
+
+/* ---------- อัปเดต: ใส่ปุ่มกากบาท × ในแต่ละแถว ---------- */
 export function renderCartModal() {
   const modalItems = document.getElementById('modal-items');
   modalItems.innerHTML = '';
   let totalCartPrice = 0;
+
   for (const key in cart) {
     const item = cart[key];
     totalCartPrice += item.totalPrice;
+
     const itemDiv = document.createElement('div');
     itemDiv.classList.add('modal-item');
     itemDiv.innerHTML = `
+      <button class="remove-item" data-key="${key}" aria-label="ลบรายการ">×</button>
       <div class="item-details">
         <div>${item.product} ${item.mix !== 'ไม่มี' ? `(${item.mix})` : ''}</div>
         <small>${item.quantity} ขวด × ${item.pricePerUnit}฿</small>
@@ -65,8 +78,14 @@ export function renderCartModal() {
     `;
     modalItems.appendChild(itemDiv);
   }
+
   document.getElementById('modal-cart-total').textContent = totalCartPrice.toLocaleString();
   document.getElementById('cart-modal').style.display = 'flex';
+
+  // bind ปุ่มลบทุกรายการ
+  modalItems.querySelectorAll('.remove-item').forEach(btn => {
+    btn.addEventListener('click', (e) => removeFromCart(e.currentTarget.dataset.key));
+  });
 }
 
 export function clearCart() {
