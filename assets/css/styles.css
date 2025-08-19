@@ -142,3 +142,37 @@ body {
 .auth-error { color: var(--secondary-color); margin-top:10px; font-weight:500; }
 .logout-btn { position:absolute; top:20px; right:20px; padding:10px 20px; background: var(--secondary-color); color:white; border:none; border-radius: var(--border-radius-small); font-weight:500; cursor:pointer; display:none; }
 .logout-btn:hover { background:#e55c3c; }
+
+/* === Center all compare blocks on #compare-page === */
+#compare-page.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;            /* จัดลูกทุกตัวให้อยู่กึ่งกลางแนวนอน */
+}
+
+#compare-page .compare-mode-selection,
+#compare-page .comparison-input-group,
+#compare-page #day-to-day-mode,
+#compare-page #date-range-mode,
+#compare-page .date-filter.compare-style,
+#compare-page #detailed-comparison-result,
+#compare-page #no-comparison-data {
+  width: 100%;
+  max-width: 640px;               /* ปรับได้ 560–720 ตามชอบ */
+  margin: 12px auto;              /* auto ซ้าย/ขวา = กลาง */
+  text-align: center;             /* เนื้อหาด้านในให้อยู่กึ่งกลาง */
+}
+
+#compare-page .comparison-date-group,
+#compare-page .date-filter.compare-style {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;        /* กลางภายในบล็อก */
+  gap: 10px;
+}
+
+#compare-page .chart-container {
+  width: 100%;
+  max-width: 900px;               /* กราฟกว้างกว่าได้ */
+  margin: 16px auto 0;
+}
