@@ -145,9 +145,24 @@ body {
 
 #day-to-day-mode, #date-range-mode, .date-filter.compare-style { width:100%; max-width:640px; margin:12px auto; text-align:center; }
 
-/* ย้ายปุ่มลบ (×) ไปชิดขวากลางแถว + เปลี่ยนเป็นวงกลมสีแดง */
-.modal-item{ position:relative; padding-right:56px; } 
-.modal-item .item-total{ margin-right:44px; } 
-.modal-item .remove-item{ position:absolute; right:12px; top:50%; transform:translateY(-50%); width:36px; height:36px; border-radius:50%; border:none; cursor:pointer; font-size:20px; line-height:1; display:flex; align-items:center; justify-content:center; color:#fff; background:#ff4d4f; box-shadow:0 4px 10px rgba(0,0,0,.12); transition:transform .1s ease, filter .15s ease; } 
-.modal-item .remove-item:hover{ filter:brightness(1.05); transform:translateY(-50%) scale(1.05); } 
+.modal-item .remove-item{
+  position:absolute;
+  right:-8px;   /* ขยับออกไปทางขวา */
+  top:30%;      /* ขยับขึ้นนิดหน่อยจากกึ่งกลาง */
+  transform:translateY(-50%);
+  width:28px; height:28px;
+  border-radius:50%;
+  border:none;
+  cursor:pointer;
+  font-size:16px;
+  line-height:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#fff;
+  background:#ff4d4f;
+  box-shadow:0 4px 10px rgba(0,0,0,.12);
+  transition:transform .1s ease, filter .15s ease;
+}
+.modal-item .remove-item:hover{ filter:brightness(1.05); transform:translateY(-50%) scale(1.05); }
 .modal-item .remove-item:active{ transform:translateY(-50%) scale(.96); }
