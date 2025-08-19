@@ -1,18 +1,6 @@
 {
   "hosting": {
     "public": ".",
-    "ignore": [
-      "**/.*",
-      "**/node_modules/**"
-    ],
-    "rewrites": [
-      {
-        "source": "/api/**",
-        "function": "apiProxy"
-      }
-    ]
-  },
-  "functions": {
-    "source": "functions"
+    "ignore": ["**/.*", "**/node_modules/**"]
   }
 }
