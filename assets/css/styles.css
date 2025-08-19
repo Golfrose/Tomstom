@@ -167,13 +167,6 @@ body {
   -webkit-overflow-scrolling: touch;
 }
 
-/* คอลัมน์สุดท้าย = ปุ่มจัดการ */
-#summary-page table th:last-child,
-#summary-page table td:last-child {
-  white-space: nowrap;          /* ไม่ตัดคำปุ่ม */
-  width: 1%;                    /* ให้กินที่เท่าที่จำเป็น */
-}
-
 /* จัดปุ่มให้อยู่ขวาเสมอ */
 #summary-page table td:last-child{
   display: flex;
@@ -202,17 +195,4 @@ body {
   }
 }
 
-.summary-table td.summary-actions {
-  display: flex;
-  gap: 6px;                /* ระยะห่างระหว่างปุ่ม */
-  justify-content: center; /* จัดกึ่งกลางแนวนอน */
-  align-items: center;     /* จัดกึ่งกลางแนวตั้ง */
-  padding: 6px 0;          /* กันไม่ให้ปุ่มเบียดขอบบนล่าง */
-}
 
-.summary-table td.summary-actions button {
-  margin: 0;
-  line-height: 1.2;
-  padding: 4px 10px;
-  font-size: 14px;
-}
