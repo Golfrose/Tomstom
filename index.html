@@ -1,555 +1,29 @@
 <!DOCTYPE html>
-<html>
+<html lang="th">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ระบบขายสินค้า - ปรับปรุงสมบูรณ์</title>
+  <title>ระบบขายสินค้า - แยกไฟล์โครงสร้าง</title>
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    /* --- Global Styling and Color Palette --- */
-    :root {
-      --bg-color: #e0e9ff;
-      --card-bg: #fff;
-      --primary-color: #6a5acd; /* Dark purple */
-      --secondary-color: #ff6347; /* Red-orange */
-      --accent-color: #4CAF50; /* Green */
-      --button-bg-1: linear-gradient(135deg, #a06de5, #8862e3);
-      --button-bg-2: linear-gradient(135deg, #6a6ee0, #4d51d9);
-      --button-text-color: #fff;
-      --border-radius-large: 20px;
-      --border-radius-small: 12px;
-      --shadow-light: 0 4px 15px rgba(0, 0, 0, 0.1);
-      --shadow-medium: 0 8px 25px rgba(0, 0, 0, 0.15);
-    }
-    body {
-      font-family: 'Prompt', sans-serif;
-      background-color: var(--bg-color);
-      color: #333;
-      margin: 0;
-      padding: 0;
-      line-height: 1.6;
-    }
-    @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;700&display=swap');
 
-    /* --- Dashboard & Navigation --- */
-    .dashboard {
-      background: linear-gradient(135deg, #a06de5, #8862e3);
-      color: var(--button-text-color);
-      padding: 40px 20px 80px;
-      border-bottom-left-radius: 40px;
-      border-bottom-right-radius: 40px;
-      box-shadow: var(--shadow-medium);
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    .dashboard h1 {
-      font-size: 2.5em;
-      margin: 0;
-      font-weight: 700;
-    }
-    .dashboard p {
-      margin: 5px 0 20px;
-      font-size: 1.1em;
-      font-weight: 300;
-      opacity: 0.9;
-    }
-    .main-nav {
-      display: none; /* เริ่มต้นซ่อนไว้ */
-      justify-content: center;
-      gap: 15px;
-      margin-top: -60px;
-      position: relative;
-    }
-    .nav-btn {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 20px;
-      background-color: #f7f9fc;
-      border-radius: var(--border-radius-large);
-      text-align: center;
-      color: #555;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.3s ease-in-out;
-      width: 100px;
-      box-shadow: var(--shadow-light);
-    }
-    .nav-btn:hover {
-      transform: translateY(-5px);
-      box-shadow: var(--shadow-medium);
-      color: var(--primary-color);
-    }
-    .nav-btn.active {
-      background: var(--button-bg-1);
-      color: var(--button-text-color);
-      transform: translateY(-5px);
-      box-shadow: var(--shadow-medium);
-    }
-    .nav-btn i {
-      font-size: 1.5em;
-      margin-bottom: 8px;
-    }
-    .nav-btn span {
-        font-size: 0.9em;
-    }
+  <!-- Styles -->
+  <link rel="stylesheet" href="./assets/css/styles.css">
 
-    /* --- Page Containers --- */
-    .container {
-      max-width: 90%;
-      margin: 20px auto;
-      padding: 25px;
-      background-color: var(--card-bg);
-      border-radius: var(--border-radius-large);
-      box-shadow: var(--shadow-light);
-      position: relative;
-    }
-    .page {
-      display: none;
-    }
-
-    /* --- Sale Page Components --- */
-    .category-card {
-      background-color: var(--bg-color);
-      padding: 15px 25px;
-      border-radius: var(--border-radius-small);
-      text-align: center;
-      font-size: 1.2em;
-      font-weight: 500;
-      color: var(--primary-color);
-      margin-bottom: 20px;
-      box-shadow: var(--shadow-light);
-    }
-    .product-list {
-      display: grid;
-      gap: 20px;
-    }
-    .product-card {
-      background-color: #f7f9fc;
-      padding: 20px;
-      border-radius: var(--border-radius-large);
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-    }
-    .product-card h3 {
-      font-size: 1.3em;
-      color: var(--primary-color);
-      margin: 0 0 5px;
-    }
-    .product-card .price {
-      font-size: 1.1em;
-      color: #666;
-      font-weight: 500;
-      margin-bottom: 15px;
-      display: block;
-    }
-    .mix-options {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .mix-option {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 1em;
-      cursor: pointer;
-    }
-    .mix-option input[type="radio"] {
-      -webkit-appearance: none;
-      -moz-appearance: none;
-      appearance: none;
-      width: 20px;
-      height: 20px;
-      border: 2px solid #ccc;
-      border-radius: 50%;
-      outline: none;
-      transition: all 0.2s ease;
-      cursor: pointer;
-    }
-    .mix-option input[type="radio"]:checked {
-      border-color: var(--primary-color);
-      background-color: var(--primary-color);
-      box-shadow: 0 0 0 4px #fff, 0 0 0 6px var(--primary-color);
-    }
-    .quantity-control {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 15px;
-      margin-top: 20px;
-    }
-    .quantity-control button {
-      background: var(--button-bg-1);
-      color: var(--button-text-color);
-      border: none;
-      width: 45px;
-      height: 45px;
-      border-radius: 50%;
-      font-size: 1.5em;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-    .quantity-control button:hover {
-      transform: scale(1.1);
-      box-shadow: var(--shadow-light);
-    }
-    .quantity-control input {
-      width: 60px;
-      height: 45px;
-      text-align: center;
-      border: 1px solid #ddd;
-      border-radius: var(--border-radius-small);
-      font-size: 1.2em;
-    }
-    .add-to-cart-btn {
-      width: 100%;
-      padding: 15px;
-      background: var(--button-bg-2);
-      color: var(--button-text-color);
-      border: none;
-      border-radius: var(--border-radius-small);
-      font-size: 1.1em;
-      font-weight: 500;
-      cursor: pointer;
-      margin-top: 20px;
-      box-shadow: var(--shadow-light);
-    }
-
-    /* --- Shopping Cart Icon --- */
-    .cart-icon {
-      position: fixed;
-      bottom: 25px;
-      right: 25px;
-      width: 65px;
-      height: 65px;
-      background: var(--button-bg-1);
-      border-radius: 50%;
-      color: #fff;
-      display: none; /* เริ่มต้นซ่อนไว้ */
-      justify-content: center;
-      align-items: center;
-      font-size: 1.5em;
-      box-shadow: var(--shadow-medium);
-      cursor: pointer;
-      z-index: 100;
-      animation: bounce 2s infinite;
-    }
-    .cart-count {
-      position: absolute;
-      top: -5px;
-      right: -5px;
-      background-color: var(--secondary-color);
-      color: white;
-      border-radius: 50%;
-      padding: 5px 8px;
-      font-size: 0.8em;
-      font-weight: bold;
-      animation: pulse 1s infinite;
-    }
-    @keyframes bounce {
-      0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-      40% { transform: translateY(-10px); }
-      60% { transform: translateY(-5px); }
-    }
-    @keyframes pulse {
-      0% { box-shadow: 0 0 0 0 rgba(255, 99, 71, 0.4); }
-      70% { box-shadow: 0 0 0 10px rgba(255, 99, 71, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(255, 99, 71, 0); }
-    }
-
-    /* --- Modal Styling --- */
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 101;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0,0,0,0.5);
-      backdrop-filter: blur(5px);
-      justify-content: center;
-      align-items: center;
-    }
-    .modal-content {
-      background: linear-gradient(135deg, #a06de5, #8862e3);
-      color: var(--button-text-color);
-      padding: 30px;
-      border-radius: var(--border-radius-large);
-      width: 90%;
-      max-width: 400px;
-      box-shadow: var(--shadow-medium);
-      text-align: center;
-    }
-    .modal-header {
-      margin-bottom: 20px;
-    }
-    .modal-header h3 {
-      font-size: 1.5em;
-      margin: 0;
-      font-weight: 500;
-    }
-    .modal-item {
-      background-color: rgba(255, 255, 255, 0.1);
-      padding: 15px;
-      border-radius: var(--border-radius-small);
-      margin-bottom: 10px;
-      text-align: left;
-      font-size: 1.1em;
-      font-weight: 400;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .modal-item .item-details {
-      flex: 1;
-    }
-    .modal-item .item-total {
-      font-weight: bold;
-    }
-    .modal-total {
-      font-size: 1.8em;
-      font-weight: 700;
-      margin: 20px 0;
-      border-top: 1px dashed rgba(255, 255, 255, 0.5);
-      padding-top: 20px;
-    }
-    .modal-actions {
-      display: flex;
-      gap: 15px;
-    }
-    .modal-actions button {
-      flex: 1;
-      padding: 15px;
-      border: none;
-      border-radius: var(--border-radius-small);
-      font-size: 1.1em;
-      font-weight: 600;
-      cursor: pointer;
-      transition: transform 0.3s ease;
-    }
-    .modal-actions button:hover {
-        transform: translateY(-2px);
-    }
-    .confirm-btn {
-      background-color: var(--accent-color);
-      color: white;
-    }
-    .cancel-btn {
-      background-color: #f0f0f0;
-      color: #555;
-    }
-    
-    /* --- Summary & Compare Page Styling --- */
-    .summary-page .summary-box-container {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-    }
-    .summary-page .summary-box {
-      background-color: #f7f9fc;
-      padding: 20px;
-      border-radius: var(--border-radius-large);
-      box-shadow: var(--shadow-light);
-      text-align: center;
-    }
-    .summary-page .summary-box h3 {
-      font-size: 1.1em;
-      color: var(--primary-color);
-      margin: 0 0 10px;
-    }
-    .summary-page .summary-box .value {
-      font-size: 2em;
-      font-weight: 700;
-      color: var(--secondary-color);
-    }
-    .summary-page .summary-box .value.money {
-        color: var(--primary-color);
-    }
-    .summary-page .summary-box ul {
-      list-style-type: none;
-      padding: 0;
-      margin: 0;
-      text-align: left;
-    }
-    .summary-page .summary-box li {
-      margin-bottom: 5px;
-      font-size: 0.95em;
-      font-weight: 500;
-    }
-    .summary-page .summary-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-    }
-    .summary-page .summary-table th, .summary-page .summary-table td {
-      text-align: left;
-      padding: 12px 15px;
-      border-bottom: 1px solid #eee;
-    }
-    .summary-page .summary-table th {
-      background-color: #f7f9fc;
-      font-weight: 600;
-      color: #666;
-    }
-    .summary-page .no-data {
-      text-align: center;
-      padding: 50px;
-      color: #999;
-    }
-    .summary-page .date-filter {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
-    .summary-page .date-filter input, .summary-page .date-filter select {
-      padding: 8px;
-      border-radius: var(--border-radius-small);
-      border: 1px solid #ccc;
-    }
-    .summary-page .date-filter button {
-      padding: 8px 15px;
-      border-radius: var(--border-radius-small);
-      background-color: var(--primary-color);
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-    .summary-page .summary-actions {
-      display: flex;
-      gap: 5px;
-    }
-    .summary-page .summary-actions button {
-      padding: 5px 10px;
-      font-size: 0.9em;
-    }
-    .summary-page .summary-actions .edit-btn { background-color: #ffc107; color: white; border: none; }
-    .summary-page .summary-actions .delete-btn { background-color: #dc3545; color: white; border: none; }
-    .summary-page .report-free {
-      color: var(--secondary-color);
-      font-weight: bold;
-    }
-    .compare-mode-selection {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        margin-bottom: 20px;
-    }
-    .compare-mode-form {
-        display: none;
-    }
-    .compare-mode-form.active {
-        display: block;
-    }
-    .comparison-input-group {
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-    }
-    .comparison-date-group {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        align-items: center;
-    }
-    .comparison-result-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 20px;
-    }
-    .comparison-result-table th, .comparison-result-table td {
-        border: 1px solid #ccc;
-        padding: 10px;
-        text-align: center;
-    }
-    .comparison-result-table th {
-        background-color: #f7f9fc;
-        font-weight: bold;
-    }
-    .chart-container {
-        margin-top: 30px;
-        position: relative;
-        height: 400px;
-        width: 100%;
-    }
-
-    /* --- Login Page Styling --- */
-    .auth-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      background: var(--bg-color);
-    }
-    .auth-card {
-      background-color: var(--card-bg);
-      padding: 30px;
-      border-radius: var(--border-radius-large);
-      box-shadow: var(--shadow-medium);
-      width: 90%;
-      max-width: 400px;
-      text-align: center;
-    }
-    .auth-card h2 {
-      color: var(--primary-color);
-      margin-bottom: 20px;
-    }
-    .auth-form {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-    }
-    .auth-form input {
-      padding: 12px;
-      border: 1px solid #ddd;
-      border-radius: var(--border-radius-small);
-      font-size: 1em;
-    }
-    .auth-form button {
-      padding: 15px;
-      background: var(--button-bg-1);
-      color: var(--button-text-color);
-      border: none;
-      border-radius: var(--border-radius-small);
-      font-size: 1.1em;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-    .auth-form button:hover {
-      background: var(--button-bg-2);
-    }
-    .auth-error {
-      color: var(--secondary-color);
-      margin-top: 10px;
-      font-weight: 500;
-    }
-    .logout-btn {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      padding: 10px 20px;
-      background: var(--secondary-color);
-      color: white;
-      border: none;
-      border-radius: var(--border-radius-small);
-      font-weight: 500;
-      cursor: pointer;
-      display: none; /* เริ่มต้นซ่อนไว้ */
-    }
-    .logout-btn:hover {
-        background: #e55c3c;
-    }
-  </style>
-
+  <!-- Firebase SDK (compat to match original) -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-
+  <!-- Auth -->
   <div id="auth-container" class="auth-container">
     <div class="auth-card">
       <h2>เข้าสู่ระบบ</h2>
@@ -562,9 +36,10 @@
     </div>
   </div>
 
-  <div id="app-container" style="display: none;">
-    <button id="logout-btn" class="logout-btn" onclick="logout()">ออกจากระบบ</button>
-    
+  <!-- App -->
+  <div id="app-container" style="display:none;">
+    <button id="logout-btn" class="logout-btn">ออกจากระบบ</button>
+
     <div class="dashboard">
       <p>ระบบขายสินค้า</p>
       <h1 id="current-time">00:00:00</h1>
@@ -572,199 +47,45 @@
     </div>
 
     <div class="main-nav">
-      <div class="nav-btn active" onclick="showPage('sale')">
+      <div class="nav-btn active" data-page="sale">
         <i class="fas fa-shopping-cart"></i>
         <span>หน้าขาย</span>
       </div>
-      <div class="nav-btn" onclick="showPage('summary')">
+      <div class="nav-btn" data-page="summary">
         <i class="fas fa-chart-bar"></i>
         <span>สรุปยอด</span>
       </div>
-      <div class="nav-btn" onclick="showPage('compare')">
+      <div class="nav-btn" data-page="compare">
         <i class="fas fa-chart-line"></i>
         <span>เปรียบเทียบ</span>
       </div>
     </div>
 
+    <!-- Sale Page -->
     <div id="sale-page" class="page container">
       <div class="category-card">
         <i class="fas fa-cocktail"></i>
         <span>หมวดน้ำ</span>
       </div>
-      <div class="product-list">
-        <div class="product-card" data-product="น้ำผสมเงิน" data-price="100">
-          <h3>น้ำผสมเงิน</h3>
-          <span class="price">100 บาท/ขวด</span>
-          <div class="mix-options">
-            <label class="mix-option">
-              <input type="radio" name="mix-น้ำผสมเงิน" value="ผสมเงิน" data-price="100" checked> ผสมเงิน
-            </label>
-            <label class="mix-option">
-              <input type="radio" name="mix-น้ำผสมเงิน" value="ผสมเงินซิ" data-price="100"> ผสมเงินซิ
-            </label>
-            <label class="mix-option">
-              <input type="radio" name="mix-น้ำผสมเงิน" value="ผสมเงินน้ำตาลสด" data-price="100"> ผสมเงินน้ำตาลสด
-            </label>
-          </div>
-          <div class="quantity-control">
-            <button onclick="changeQuantity(this, -1)">-</button>
-            <input type="number" value="0" min="0" class="quantity-input">
-            <button onclick="changeQuantity(this, 1)">+</button>
-          </div>
-          <button class="add-to-cart-btn" onclick="addToCart(this)">เพิ่มลงตะกร้า</button>
-        </div>
-        <div class="product-card" data-product="น้ำผสมแดง" data-price="100">
-          <h3>น้ำผสมแดง</h3>
-          <span class="price">100 บาท/ขวด</span>
-          <div class="mix-options">
-            <label class="mix-option">
-              <input type="radio" name="mix-น้ำผสมแดง" value="ผสมแดง" data-price="100" checked> ผสมแดง
-            </label>
-            <label class="mix-option">
-              <input type="radio" name="mix-น้ำผสมแดง" value="ผสมแดงซิ" data-price="100"> ผสมแดงซิ
-            </label>
-            <label class="mix-option">
-              <input type="radio" name="mix-น้ำผสมแดง" value="ผสมแดงน้ำตาลสด" data-price="100"> ผสมแดงน้ำตาลสด
-            </label>
-          </div>
-          <div class="quantity-control">
-            <button onclick="changeQuantity(this, -1)">-</button>
-            <input type="number" value="0" min="0" class="quantity-input">
-            <button onclick="changeQuantity(this, 1)">+</button>
-          </div>
-          <button class="add-to-cart-btn" onclick="addToCart(this)">เพิ่มลงตะกร้า</button>
-        </div>
-        <div class="product-card" data-product="น้ำผสมไก่" data-price="100">
-          <h3>น้ำผสมไก่</h3>
-          <span class="price">100 บาท/ขวด</span>
-          <div class="mix-options">
-            <label class="mix-option">
-              <input type="radio" name="mix-น้ำผสมไก่" value="ผสมไก่" data-price="100" checked> ผสมไก่
-            </label>
-            <label class="mix-option">
-              <input type="radio" name="mix-น้ำผสมไก่" value="ผสมไก่ซิ" data-price="100"> ผสมไก่ซิ
-            </label>
-            <label class="mix-option">
-              <input type="radio" name="mix-น้ำผสมไก่" value="ผสมไก่น้ำตาลสด" data-price="100"> ผสมไก่น้ำตาลสด
-            </label>
-          </div>
-          <div class="quantity-control">
-            <button onclick="changeQuantity(this, -1)">-</button>
-            <input type="number" value="0" min="0" class="quantity-input">
-            <button onclick="changeQuantity(this, 1)">+</button>
-          </div>
-          <button class="add-to-cart-btn" onclick="addToCart(this)">เพิ่มลงตะกร้า</button>
-        </div>
-        <div class="product-card" data-product="น้ำผสมซี" data-price="100">
-          <h3>น้ำผสมซี</h3>
-          <span class="price">100 บาท/ขวด</span>
-          <div class="mix-options">
-            <label class="mix-option">
-              <input type="radio" name="mix-น้ำผสมซี" value="ผสมซี" data-price="100" checked> ผสมซี
-            </label>
-            <label class="mix-option">
-              <input type="radio" name="mix-น้ำผสมซี" value="ผสมซีซิ" data-price="100"> ผสมซีซิ
-            </label>
-            <label class="mix-option">
-              <input type="radio" name="mix-น้ำผสมซี" value="ผสมซีน้ำตาลสด" data-price="100"> ผสมซีน้ำตาลสด
-            </label>
-          </div>
-          <div class="quantity-control">
-            <button onclick="changeQuantity(this, -1)">-</button>
-            <input type="number" value="0" min="0" class="quantity-input">
-            <button onclick="changeQuantity(this, 1)">+</button>
-          </div>
-          <button class="add-to-cart-btn" onclick="addToCart(this)">เพิ่มลงตะกร้า</button>
-        </div>
-        <div class="product-card" data-product="น้ำดิบ" data-price="65">
-          <h3>น้ำดิบ</h3>
-          <span class="price">65 บาท/ขวด (2 ขวด 120 บาท)</span>
-          <input type="hidden" name="mix-น้ำดิบ" value="ไม่มี">
-          <div class="quantity-control">
-            <button onclick="changeQuantity(this, -1)">-</button>
-            <input type="number" value="0" min="0" class="quantity-input">
-            <button onclick="changeQuantity(this, 1)">+</button>
-          </div>
-          <button class="add-to-cart-btn" onclick="addToCart(this)">เพิ่มลงตะกร้า</button>
-        </div>
-        <div class="product-card" data-product="แลกขวดฟรี" data-price="0">
-          <h3>แลกขวดฟรี</h3>
-          <span class="price">0 บาท</span>
-          <div class="mix-options">
-            <label class="mix-option">
-              <input type="radio" name="mix-แลกขวดฟรี" value="แลกฟรี" data-price="0" checked> แลกฟรี
-            </label>
-            <label class="mix-option">
-              <input type="radio" name="mix-แลกขวดฟรี" value="แลกฟรีผสมซิ" data-price="20"> แลกฟรีผสมซิ
-            </label>
-            <label class="mix-option">
-              <input type="radio" name="mix-แลกขวดฟรี" value="แลกฟรีผสมน้ำตาลสด" data-price="20"> แลกฟรีผสมน้ำตาลสด
-            </label>
-          </div>
-          <div class="quantity-control">
-            <button onclick="changeQuantity(this, -1)">-</button>
-            <input type="number" value="0" min="0" class="quantity-input">
-            <button onclick="changeQuantity(this, 1)">+</button>
-          </div>
-          <button class="add-to-cart-btn" onclick="addToCart(this)">เพิ่มลงตะกร้า</button>
-        </div>
+      <div class="product-list" id="product-list-water">
+        <!-- ใส่ด้วย server-side หรือ static HTML ก็ได้: ใช้โครงจาก original -->
       </div>
-      <div class="category-card" style="margin-top: 20px;">
+
+      <div class="category-card" style="margin-top:20px;">
         <i class="fas fa-pills"></i>
         <span>หมวดยา</span>
       </div>
-      <div class="product-list">
-        <div class="product-card" data-product="ยาฝาเงิน" data-price="80">
-          <h3>ยาฝาเงิน</h3>
-          <span class="price">80 บาท/ขวด</span>
-          <input type="hidden" name="mix-ยาฝาเงิน" value="ไม่มี">
-          <div class="quantity-control">
-            <button onclick="changeQuantity(this, -1)">-</button>
-            <input type="number" value="0" min="0" class="quantity-input">
-            <button onclick="changeQuantity(this, 1)">+</button>
-          </div>
-          <button class="add-to-cart-btn" onclick="addToCart(this)">เพิ่มลงตะกร้า</button>
-        </div>
-        <div class="product-card" data-product="ยาฝาแดง" data-price="90">
-          <h3>ยาฝาแดง</h3>
-          <span class="price">90 บาท/ขวด</span>
-          <input type="hidden" name="mix-ยาฝาแดง" value="ไม่มี">
-          <div class="quantity-control">
-            <button onclick="changeQuantity(this, -1)">-</button>
-            <input type="number" value="0" min="0" class="quantity-input">
-            <button onclick="changeQuantity(this, 1)">+</button>
-          </div>
-          <button class="add-to-cart-btn" onclick="addToCart(this)">เพิ่มลงตะกร้า</button>
-        </div>
-        <div class="product-card" data-product="ยาไก่" data-price="80">
-          <h3>ยาไก่</h3>
-          <span class="price">80 บาท/ขวด</span>
-          <input type="hidden" name="mix-ยาไก่" value="ไม่มี">
-          <div class="quantity-control">
-            <button onclick="changeQuantity(this, -1)">-</button>
-            <input type="number" value="0" min="0" class="quantity-input">
-            <button onclick="changeQuantity(this, 1)">+</button>
-          </div>
-          <button class="add-to-cart-btn" onclick="addToCart(this)">เพิ่มลงตะกร้า</button>
-        </div>
-        <div class="product-card" data-product="ยาซี" data-price="80">
-          <h3>ยาซี</h3>
-          <span class="price">80 บาท/ขวด</span>
-          <input type="hidden" name="mix-ยาซี" value="ไม่มี">
-          <div class="quantity-control">
-            <button onclick="changeQuantity(this, -1)">-</button>
-            <input type="number" value="0" min="0" class="quantity-input">
-            <button onclick="changeQuantity(this, 1)">+</button>
-          </div>
-          <button class="add-to-cart-btn" onclick="addToCart(this)">เพิ่มลงตะกร้า</button>
-        </div>
+      <div class="product-list" id="product-list-med">
+        <!-- เช่นเดียวกัน -->
       </div>
-      <div class="cart-icon" onclick="showCartModal()">
+
+      <div class="cart-icon" id="cart-icon">
         <i class="fas fa-shopping-basket"></i>
         <span class="cart-count" id="cart-count">0</span>
       </div>
     </div>
 
+    <!-- Cart Modal -->
     <div id="cart-modal" class="modal">
       <div class="modal-content">
         <div class="modal-header">
@@ -773,22 +94,19 @@
         <div id="modal-items"></div>
         <div class="modal-total">รวมทั้งหมด: <span id="modal-cart-total">0</span> บาท</div>
         <div class="modal-actions">
-          <button class="confirm-btn" onclick="confirmSale()">
-            <i class="fas fa-check"></i> ยืนยันการขาย
-          </button>
-          <button class="cancel-btn" onclick="closeCartModal()">
-            <i class="fas fa-times"></i> ล้างตะกร้า
-          </button>
+          <button class="confirm-btn" id="confirm-sale-btn"><i class="fas fa-check"></i> ยืนยันการขาย</button>
+          <button class="cancel-btn" id="clear-cart-btn"><i class="fas fa-times"></i> ล้างตะกร้า</button>
         </div>
       </div>
     </div>
 
+    <!-- Summary -->
     <div id="summary-page" class="page container summary-page">
       <h1>สรุปยอดขาย</h1>
       <div class="date-filter">
         <label for="report-date">วันที่:</label>
         <input type="date" id="report-date">
-        <button onclick="loadReport()">ดูรายงาน</button>
+        <button id="load-report-btn">ดูรายงาน</button>
       </div>
       <div class="summary-box-container">
         <div class="summary-box">
@@ -819,663 +137,72 @@
         </thead>
         <tbody id="report-body"></tbody>
       </table>
-      <div id="no-data" class="no-data" style="display: none;">ไม่พบข้อมูลการขายในวันที่เลือก</div>
+      <div id="no-data" class="no-data" style="display:none;">ไม่พบข้อมูลการขายในวันที่เลือก</div>
     </div>
 
+    <!-- Compare -->
     <div id="compare-page" class="page container summary-page">
       <h1>เปรียบเทียบยอดขาย</h1>
       <div class="compare-mode-selection">
-          <label for="compare-mode-select">เลือกโหมดเปรียบเทียบ:</label>
-          <select id="compare-mode-select" onchange="switchCompareMode(this.value)">
-              <option value="day-to-day">วันต่อวัน</option>
-              <option value="date-range">ช่วงวัน</option>
-          </select>
-          <button onclick="clearComparison()">ล้างข้อมูล</button>
+        <label for="compare-mode-select">เลือกโหมดเปรียบเทียบ:</label>
+        <select id="compare-mode-select">
+          <option value="day-to-day">วันต่อวัน</option>
+          <option value="date-range">ช่วงวัน</option>
+        </select>
+        <button id="clear-compare-btn">ล้างข้อมูล</button>
       </div>
 
       <div class="comparison-input-group">
         <div id="day-to-day-mode" class="compare-mode-form active">
-            <div class="comparison-date-group">
-                <label for="compare-date-1">วันที่ 1:</label>
-                <input type="date" id="compare-date-1">
-            </div>
-            <div class="comparison-date-group">
-                <label for="compare-date-2">วันที่ 2:</label>
-                <input type="date" id="compare-date-2">
-            </div>
+          <div class="comparison-date-group">
+            <label for="compare-date-1">วันที่ 1:</label>
+            <input type="date" id="compare-date-1">
+          </div>
+          <div class="comparison-date-group">
+            <label for="compare-date-2">วันที่ 2:</label>
+            <input type="date" id="compare-date-2">
+          </div>
         </div>
 
         <div id="date-range-mode" class="compare-mode-form">
-            <div class="comparison-date-group">
-                <label for="start-date-1">ช่วงที่ 1 เริ่ม:</label>
-                <input type="date" id="start-date-1">
-                <label for="end-date-1">ถึง:</label>
-                <input type="date" id="end-date-1">
-            </div>
-            <div class="comparison-date-group">
-                <label for="start-date-2">ช่วงที่ 2 เริ่ม:</label>
-                <input type="date" id="start-date-2">
-                <label for="end-date-2">ถึง:</label>
-                <input type="date" id="end-date-2">
-            </div>
+          <div class="comparison-date-group">
+            <label for="start-date-1">ช่วงที่ 1 เริ่ม:</label>
+            <input type="date" id="start-date-1">
+            <label for="end-date-1">ถึง:</label>
+            <input type="date" id="end-date-1">
+          </div>
+          <div class="comparison-date-group">
+            <label for="start-date-2">ช่วงที่ 2 เริ่ม:</label>
+            <input type="date" id="start-date-2">
+            <label for="end-date-2">ถึง:</label>
+            <input type="date" id="end-date-2">
+          </div>
         </div>
-        
+
         <div class="date-filter compare-style">
-            <label for="product-select">เลือกสินค้า:</label>
-            <select id="product-select"></select>
-            <button onclick="compareSales()">เปรียบเทียบ</button>
+          <label for="product-select">เลือกสินค้า:</label>
+          <select id="product-select"></select>
+          <button id="compare-btn">เปรียบเทียบ</button>
         </div>
       </div>
-      
+
       <div id="detailed-comparison-result" style="margin-top: 20px;"></div>
-      <div id="no-comparison-data" class="no-data" style="display: none;">
-        ไม่พบข้อมูลสำหรับเปรียบเทียบ
-      </div>
+      <div id="no-comparison-data" class="no-data" style="display:none;">ไม่พบข้อมูลสำหรับเปรียบเทียบ</div>
       <div class="chart-container">
         <canvas id="comparisonChart"></canvas>
       </div>
     </div>
   </div>
 
-  <script>
-    // ** เปลี่ยนค่าใน firebaseConfig ให้เป็นของโปรเจกต์ของคุณ **
-    const firebaseConfig = {
-      apiKey: "AIzaSyC8yYWxiOH6HRHtBpPA5Qe3_ryV5BKS8m8",
-      authDomain: "tomstom-8.firebaseapp.com",
-      projectId: "tomstom-8",
-      databaseURL: "https://tomstom-8-default-rtdb.asia-southeast1.firebasedatabase.app",
-      storageBucket: "tomstom-8.firebasestorage.app",
-      messagingSenderId: "595696774612",
-      appId: "1:595696774612:web:83f068cfa637f7a26d3a41"
-    };
-
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const database = firebase.database();
-    
-    // Check authentication state
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        // User is signed in.
-        document.getElementById('auth-container').style.display = 'none';
-        document.getElementById('app-container').style.display = 'block';
-        document.querySelector('.main-nav').style.display = 'flex';
-        document.querySelector('.cart-icon').style.display = 'flex';
-        document.getElementById('logout-btn').style.display = 'block';
-        showPage('sale');
-      } else {
-        // User is signed out.
-        document.getElementById('auth-container').style.display = 'flex';
-        document.getElementById('app-container').style.display = 'none';
-      }
-    });
-
-    // Handle Login
-    document.getElementById('login-form').addEventListener('submit', (event) => {
-      event.preventDefault();
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-      const errorDiv = document.getElementById('auth-error-message');
-      errorDiv.textContent = '';
-      
-      auth.signInWithEmailAndPassword(email, password)
-        .then(() => {
-          // Logged in successfully
-          console.log("Logged in successfully!");
-        })
-        .catch((error) => {
-          // Handle Errors here.
-          const errorCode = error.code;
-          const errorMessage = error.message;
-          console.error("Login failed:", errorCode, errorMessage);
-          if (errorCode === 'auth/user-not-found' || errorCode === 'auth/wrong-password') {
-            errorDiv.textContent = 'อีเมลหรือรหัสผ่านไม่ถูกต้อง';
-          } else {
-            errorDiv.textContent = 'เกิดข้อผิดพลาดในการเข้าสู่ระบบ: ' + errorMessage;
-          }
-        });
-    });
-
-    // Handle Logout
-    function logout() {
-      auth.signOut().then(() => {
-        console.log("Logged out successfully!");
-      }).catch((error) => {
-        console.error("Logout failed:", error);
-      });
-    }
-
-    let cart = {};
-    let salesData = {};
-
-    function updateTime() {
-      const now = new Date();
-      const timeString = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-      const dateString = now.toLocaleDateString('th-TH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-      document.getElementById('current-time').textContent = timeString;
-      document.getElementById('current-date').textContent = dateString;
-    }
-
-    document.addEventListener('DOMContentLoaded', (event) => {
-      updateTime();
-      setInterval(updateTime, 1000);
-    });
-
-    function showPage(pageId) {
-      const pages = document.querySelectorAll('.page');
-      pages.forEach(p => p.style.display = 'none');
-      document.getElementById(`${pageId}-page`).style.display = 'block';
-
-      const navButtons = document.querySelectorAll('.nav-btn');
-      navButtons.forEach(btn => btn.classList.remove('active'));
-      document.querySelector(`.nav-btn[onclick="showPage('${pageId}')"]`).classList.add('active');
-      
-      if (pageId === 'summary') {
-        const today = new Date().toISOString().slice(0, 10);
-        document.getElementById('report-date').value = today;
-        loadReport();
-      }
-      if (pageId === 'compare') {
-          populateProductSelect();
-          switchCompareMode('day-to-day');
-          document.getElementById('day-to-day-mode').classList.add('active');
-      }
-    }
-
-    function changeQuantity(button, change) {
-      const input = button.parentNode.querySelector('.quantity-input');
-      let quantity = parseInt(input.value) + change;
-      if (quantity < 0) quantity = 0;
-      input.value = quantity;
-      updateCartCount();
-    }
-
-    function addToCart(button) {
-      const productCard = button.closest('.product-card');
-      const product = productCard.dataset.product;
-      const quantityInput = productCard.querySelector('.quantity-input');
-      const quantity = parseInt(quantityInput.value);
-
-      if (quantity <= 0) {
-        alert("กรุณาใส่จำนวนสินค้าก่อน");
-        return;
-      }
-
-      let mixRadio = productCard.querySelector(`input[name="mix-${product}"]:checked`);
-      let mix = mixRadio ? mixRadio.value : 'ไม่มี';
-      let pricePerUnit = parseFloat(mixRadio ? mixRadio.dataset.price : productCard.dataset.price);
-
-      let totalPrice = pricePerUnit * quantity;
-      if (product === 'น้ำดิบ') {
-        totalPrice = Math.floor(quantity / 2) * 120 + (quantity % 2) * 65;
-      }
-
-      const key = `${product}-${mix}`;
-      
-      if (cart[key]) {
-        cart[key].quantity += quantity;
-        cart[key].totalPrice += totalPrice;
-      } else {
-        cart[key] = {
-          product: product,
-          mix: mix,
-          quantity: quantity,
-          pricePerUnit: pricePerUnit,
-          totalPrice: totalPrice
-        };
-      }
-      
-      quantityInput.value = 0;
-      updateCartCount();
-      alert(`เพิ่ม ${quantity} ขวด ลงในตะกร้าแล้ว`);
-    }
-
-    function updateCartCount() {
-        let totalItems = 0;
-        for (const key in cart) {
-            totalItems += cart[key].quantity;
-        }
-        document.getElementById('cart-count').textContent = totalItems;
-    }
-
-    function showCartModal() {
-      const modalItems = document.getElementById('modal-items');
-      modalItems.innerHTML = '';
-      let totalCartPrice = 0;
-      for (const key in cart) {
-        const item = cart[key];
-        totalCartPrice += item.totalPrice;
-        const itemDiv = document.createElement('div');
-        itemDiv.classList.add('modal-item');
-        itemDiv.innerHTML = `
-          <div class="item-details">
-            <div>${item.product} ${item.mix !== 'ไม่มี' ? `(${item.mix})` : ''}</div>
-            <small>${item.quantity} ขวด × ${item.pricePerUnit}฿</small>
-          </div>
-          <span class="item-total">${item.totalPrice.toLocaleString()}฿</span>
-        `;
-        modalItems.appendChild(itemDiv);
-      }
-      document.getElementById('modal-cart-total').textContent = totalCartPrice.toLocaleString();
-      document.getElementById('cart-modal').style.display = 'flex';
-    }
-
-    function closeCartModal() {
-      document.getElementById('cart-modal').style.display = 'none';
-      cart = {};
-      updateCartCount();
-    }
-
-    function confirmSale() {
-      if (Object.keys(cart).length === 0) {
-        alert("ไม่มีรายการในตะกร้า!");
-        return;
-      }
-      
-      const userId = auth.currentUser.uid;
-      const salesRef = database.ref('sales/' + userId);
-      
-      for (const key in cart) {
-        const item = cart[key];
-        const newSaleRef = salesRef.push();
-        newSaleRef.set({
-          timestamp: firebase.database.ServerValue.TIMESTAMP,
-          product: item.product,
-          mix: item.mix,
-          quantity: item.quantity,
-          pricePerUnit: item.pricePerUnit,
-          totalPrice: item.totalPrice
-        });
-      }
-      
-      closeCartModal();
-      alert("บันทึกการขายเรียบร้อย!");
-    }
-
-    function isSameDay(date1, date2) {
-        const d1 = new Date(date1);
-        const d2 = new Date(date2);
-        return d1.getFullYear() === d2.getFullYear() &&
-               d1.getMonth() === d2.getMonth() &&
-               d1.getDate() === d2.getDate();
-    }
-    
-    // Fetch data from Firebase Realtime Database
-    function loadReport() {
-      const selectedDateStr = document.getElementById('report-date').value;
-      const reportBody = document.getElementById('report-body');
-      const totalRevenueEl = document.getElementById('total-revenue');
-      const totalQuantityEl = document.getElementById('total-quantity');
-      const productSummaryListEl = document.getElementById('product-summary-list');
-      const noDataEl = document.getElementById('no-data');
-
-      reportBody.innerHTML = '';
-      productSummaryListEl.innerHTML = '';
-      totalRevenueEl.textContent = '0';
-      totalQuantityEl.textContent = '0';
-
-      const userId = auth.currentUser.uid;
-      const salesRef = database.ref('sales/' + userId);
-
-      salesRef.once('value', (snapshot) => {
-        const salesData = snapshot.val();
-        if (!salesData) {
-          noDataEl.style.display = 'block';
-          return;
-        }
-
-        const filteredData = Object.keys(salesData).map(key => ({
-            id: key,
-            ...salesData[key]
-        })).filter(item => {
-            return isSameDay(new Date(item.timestamp), new Date(selectedDateStr));
-        });
-
-        if (filteredData.length === 0) {
-            noDataEl.style.display = 'block';
-            return;
-        }
-        noDataEl.style.display = 'none';
-
-        let totalRevenue = 0;
-        let totalQuantity = 0;
-        const productSummary = {};
-
-        filteredData.forEach(item => {
-            totalRevenue += item.totalPrice;
-            totalQuantity += item.quantity;
-
-            const key = `${item.product} (${item.mix})`;
-            if (productSummary[key]) {
-                productSummary[key] += item.quantity;
-            } else {
-                productSummary[key] = item.quantity;
-            }
-
-            const tr = document.createElement('tr');
-            const displayDate = new Date(item.timestamp).toLocaleString('th-TH', { day: 'numeric', month: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-            
-            let productClass = '';
-            if (item.product.includes('แลกขวดฟรี')) {
-                productClass = 'report-free';
-            }
-
-            tr.innerHTML = `
-                <td>${displayDate}</td>
-                <td class="${productClass}">
-                    ${item.product} ${item.mix !== 'ไม่มี' ? `(${item.mix})` : ''}
-                </td>
-                <td>${item.quantity}</td>
-                <td>${item.pricePerUnit}</td>
-                <td>${item.totalPrice.toLocaleString()}</td>
-                <td class="summary-actions">
-                    <button class="edit-btn" onclick="editSaleItem('${item.id}')">แก้</button>
-                    <button class="delete-btn" onclick="deleteSaleItem('${item.id}')">ลบ</button>
-                </td>
-            `;
-            reportBody.appendChild(tr);
-        });
-
-        totalRevenueEl.textContent = totalRevenue.toLocaleString();
-        totalQuantityEl.textContent = totalQuantity.toLocaleString();
-
-        for (const key in productSummary) {
-            const li = document.createElement('li');
-            li.textContent = `${key}: ${productSummary[key]} ขวด`;
-            if (key.includes('แลกขวดฟรี')) {
-                li.classList.add('report-free');
-            }
-            productSummaryListEl.appendChild(li);
-        }
-      });
-    }
-
-    function editSaleItem(itemId) {
-      const newQuantity = prompt("แก้ไขจำนวน:");
-      const parsedQuantity = parseInt(newQuantity);
-      if (isNaN(parsedQuantity) || parsedQuantity <= 0) {
-        alert("จำนวนไม่ถูกต้อง");
-        return;
-      }
-      
-      const userId = auth.currentUser.uid;
-      const itemRef = database.ref('sales/' + userId + '/' + itemId);
-      itemRef.once('value', (snapshot) => {
-        const item = snapshot.val();
-        if (item) {
-          itemRef.update({
-            quantity: parsedQuantity,
-            totalPrice: parsedQuantity * item.pricePerUnit
-          }).then(() => {
-            loadReport();
-            alert("แก้ไขรายการเรียบร้อย!");
-          }).catch(error => {
-            console.error("Error updating data:", error);
-          });
-        }
-      });
-    }
-
-    function deleteSaleItem(itemId) {
-      if (confirm("ต้องการลบรายการนี้ใช่ไหม?")) {
-        const userId = auth.currentUser.uid;
-        const itemRef = database.ref('sales/' + userId + '/' + itemId);
-        itemRef.remove().then(() => {
-          loadReport();
-          alert("ลบรายการเรียบร้อย!");
-        }).catch(error => {
-          console.error("Error deleting data:", error);
-        });
-      }
-    }
-    
-    function populateProductSelect() {
-        const productSelect = document.getElementById('product-select');
-        productSelect.innerHTML = ''; 
-        
-        const allProducts = new Set();
-        const userId = auth.currentUser.uid;
-        const salesRef = database.ref('sales/' + userId);
-        salesRef.once('value', (snapshot) => {
-          const data = snapshot.val();
-          if (data) {
-            Object.values(data).forEach(sale => {
-              allProducts.add(sale.product);
-            });
-          }
-          
-          const defaultOption = document.createElement('option');
-          defaultOption.textContent = 'เลือกสินค้า...';
-          defaultOption.value = '';
-          productSelect.appendChild(defaultOption);
-
-          const allItemsOption = document.createElement('option');
-          allItemsOption.textContent = 'สินค้าทั้งหมด';
-          allItemsOption.value = 'all';
-          productSelect.appendChild(allItemsOption);
-
-          allProducts.forEach(product => {
-              const option = document.createElement('option');
-              option.textContent = product;
-              option.value = product;
-              productSelect.appendChild(option);
-          });
-        });
-    }
-
-    function switchCompareMode(mode) {
-        document.querySelectorAll('.compare-mode-form').forEach(form => {
-            form.classList.remove('active');
-        });
-        document.getElementById(mode + '-mode').classList.add('active');
-        clearComparison();
-    }
-    
-    function clearComparison() {
-        document.getElementById('detailed-comparison-result').innerHTML = '';
-        document.getElementById('no-comparison-data').style.display = 'block';
-    }
-
-    function compareSales() {
-        const mode = document.getElementById('compare-mode-select').value;
-        const selectedProduct = document.getElementById('product-select').value;
-        document.getElementById('no-comparison-data').style.display = 'none';
-
-        if (!selectedProduct) {
-            alert('กรุณาเลือกสินค้าที่ต้องการเปรียบเทียบ');
-            return;
-        }
-
-        const userId = auth.currentUser.uid;
-        const salesRef = database.ref('sales/' + userId);
-
-        salesRef.once('value', (snapshot) => {
-            const salesData = snapshot.val();
-            if (!salesData) {
-                document.getElementById('no-comparison-data').style.display = 'block';
-                return;
-            }
-            
-            let salesData1, salesData2, label1, label2;
-            let comparisonProducts;
-
-            if (mode === 'day-to-day') {
-                const date1Str = document.getElementById('compare-date-1').value;
-                const date2Str = document.getElementById('compare-date-2').value;
-                if (!date1Str || !date2Str) {
-                    alert('กรุณาเลือกวันที่ทั้งสองวัน');
-                    return;
-                }
-                const date1 = new Date(date1Str);
-                const date2 = new Date(date2Str);
-                
-                salesData1 = Object.values(salesData).filter(item => isSameDay(new Date(item.timestamp), date1));
-                salesData2 = Object.values(salesData).filter(item => isSameDay(new Date(item.timestamp), date2));
-                label1 = formatDateThai(date1Str);
-                label2 = formatDateThai(date2Str);
-            } else if (mode === 'date-range') {
-                const startDate1Str = document.getElementById('start-date-1').value;
-                const endDate1Str = document.getElementById('end-date-1').value;
-                const startDate2Str = document.getElementById('start-date-2').value;
-                const endDate2Str = document.getElementById('end-date-2').value;
-                
-                if (!startDate1Str || !endDate1Str || !startDate2Str || !endDate2Str) {
-                    alert('กรุณาเลือกช่วงวันที่ทั้งสองช่วง');
-                    return;
-                }
-                const startDate1 = new Date(startDate1Str);
-                const endDate1 = new Date(endDate1Str);
-                const startDate2 = new Date(startDate2Str);
-                const endDate2 = new Date(endDate2Str);
-                
-                salesData1 = Object.values(salesData).filter(item => {
-                    const saleDate = new Date(item.timestamp);
-                    return saleDate >= startDate1 && saleDate <= new Date(endDate1.getFullYear(), endDate1.getMonth(), endDate1.getDate(), 23, 59, 59);
-                });
-                
-                salesData2 = Object.values(salesData).filter(item => {
-                    const saleDate = new Date(item.timestamp);
-                    return saleDate >= startDate2 && saleDate <= new Date(endDate2.getFullYear(), endDate2.getMonth(), endDate2.getDate(), 23, 59, 59);
-                });
-                label1 = `ช่วงที่ 1`;
-                label2 = `ช่วงที่ 2`;
-            }
-            
-            if (selectedProduct === 'all') {
-                const allProducts = new Set();
-                salesData1.forEach(item => allProducts.add(item.product));
-                salesData2.forEach(item => allProducts.add(item.product));
-                comparisonProducts = Array.from(allProducts);
-            } else {
-                comparisonProducts = [selectedProduct];
-            }
-
-            const comparisonData = {
-                [label1]: comparisonProducts.map(p => calculateSales(salesData1, p)),
-                [label2]: comparisonProducts.map(p => calculateSales(salesData2, p))
-            };
-            
-            updateComparisonDisplay(comparisonProducts, comparisonData, [label1, label2]);
-        });
-    }
-
-    function calculateSales(data, productName) {
-        let totalQuantity = 0;
-        let totalRevenue = 0;
-        
-        const filteredData = data.filter(item => {
-            return item.product === productName;
-        });
-        
-        filteredData.forEach(item => {
-            totalQuantity += item.quantity;
-            totalRevenue += item.totalPrice;
-        });
-        
-        return { quantity: totalQuantity, revenue: totalRevenue };
-    }
-    
-    function updateComparisonDisplay(products, data, labels) {
-        const resultDiv = document.getElementById('detailed-comparison-result');
-        const noDataEl = document.getElementById('no-comparison-data');
-        resultDiv.innerHTML = '';
-        
-        const sales1 = data[labels[0]];
-        const sales2 = data[labels[1]];
-
-        const hasData = sales1.some(s => s.quantity > 0) || sales2.some(s => s.quantity > 0);
-
-        if (!hasData) {
-            noDataEl.style.display = 'block';
-            return;
-        }
-
-        const table = document.createElement('table');
-        table.classList.add('comparison-result-table');
-        const header = `
-            <thead>
-                <tr>
-                    <th rowspan="2">สินค้า</th>
-                    <th colspan="2">${labels[0]}</th>
-                    <th colspan="2">${labels[1]}</th>
-                </tr>
-                <tr>
-                    <th>จำนวน</th>
-                    <th>เงิน</th>
-                    <th>จำนวน</th>
-                    <th>เงิน</th>
-                </tr>
-            </thead>
-        `;
-        let body = `<tbody>`;
-        products.forEach((product, index) => {
-            body += `
-                <tr>
-                    <td>${product}</td>
-                    <td>${sales1[index].quantity}</td>
-                    <td>${sales1[index].revenue.toLocaleString()}</td>
-                    <td>${sales2[index].quantity}</td>
-                    <td>${sales2[index].revenue.toLocaleString()}</td>
-                </tr>
-            `;
-        });
-        body += `</tbody>`;
-        table.innerHTML = header + body;
-        resultDiv.appendChild(table);
-
-        const chartCanvas = document.createElement('canvas');
-        chartCanvas.id = 'comparisonChart';
-        const chartContainer = document.querySelector('.chart-container');
-        if (chartContainer) {
-            chartContainer.innerHTML = '';
-            chartContainer.appendChild(chartCanvas);
-        }
-
-        const chartData = {
-            labels: products,
-            datasets: [
-                {
-                    label: `ยอดขาย (บาท) - ${labels[0]}`,
-                    data: sales1.map(s => s.revenue),
-                    backgroundColor: 'rgba(106, 90, 205, 0.6)',
-                    borderColor: 'rgba(106, 90, 205, 1)',
-                    borderWidth: 1
-                },
-                {
-                    label: `ยอดขาย (บาท) - ${labels[1]}`,
-                    data: sales2.map(s => s.revenue),
-                    backgroundColor: 'rgba(255, 99, 71, 0.6)',
-                    borderColor: 'rgba(255, 99, 71, 1)',
-                    borderWidth: 1
-                }
-            ]
-        };
-
-        new Chart(chartCanvas, {
-            type: 'bar',
-            data: chartData,
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: 'ยอดขาย (บาท)'
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    function formatDateThai(dateStr) {
-      if (!dateStr) return '';
-      const date = new Date(dateStr);
-      const options = { year: 'numeric', month: 'long', day: 'numeric' };
-      return date.toLocaleDateString('th-TH', options);
-    }
-  </script>
+  <!-- App Scripts (module) -->
+  <script type="module" src="./assets/js/config.js"></script>
+  <script type="module" src="./assets/js/firebase.js"></script>
+  <script type="module" src="./assets/js/auth.js"></script>
+  <script type="module" src="./assets/js/ui.js"></script>
+  <script type="module" src="./assets/js/cart.js"></script>
+  <script type="module" src="./assets/js/sales.js"></script>
+  <script type="module" src="./assets/js/report.js"></script>
+  <script type="module" src="./assets/js/compare.js"></script>
+  <script type="module" src="./assets/js/main.js"></script>
 </body>
 </html>
