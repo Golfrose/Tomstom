@@ -157,3 +157,47 @@ body {
 }
 #cart-modal .modal-item .remove-item:hover { filter: brightness(1.1); transform: translateY(-50%) scale(1.08); }
 #cart-modal .modal-item .remove-item:active { transform: translateY(-50%) scale(.95); }
+
+/* ===== Summary table: responsive fix ===== */
+
+/* กันตารางล้นจอเล็ก */
+#summary-page .table-wrap, 
+#summary-page .summary-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* คอลัมน์สุดท้าย = ปุ่มจัดการ */
+#summary-page table th:last-child,
+#summary-page table td:last-child {
+  white-space: nowrap;          /* ไม่ตัดคำปุ่ม */
+  width: 1%;                    /* ให้กินที่เท่าที่จำเป็น */
+}
+
+/* จัดปุ่มให้อยู่ขวาเสมอ */
+#summary-page table td:last-child{
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+}
+
+/* มือถือ: ย่อปุ่มให้พอดี ไม่ดันตารางล้น */
+@media (max-width: 768px){
+  #summary-page table{ font-size: 14px; }
+  #summary-page table td, 
+  #summary-page table th{ padding: 10px 8px; }
+
+  #summary-page table td:last-child .btn,
+  #summary-page table td:last-child button{
+    font-size: 12px;
+    padding: 6px 10px;
+    border-radius: 8px;
+  }
+
+  /* ถ้ายังแน่น ให้สลับเรียงปุ่มเป็นแนวตั้ง */
+  #summary-page table td:last-child{
+    flex-direction: column;
+    gap: 6px;
+  }
+}
