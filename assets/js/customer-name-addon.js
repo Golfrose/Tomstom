@@ -1,18 +1,16 @@
 /* ==============================================================
-   Customer Name Add-on v3 (stable, no-Firebase)
-   - ใส่ช่อง "ชื่อลูกค้า" ใต้ราคาทุกการ์ด (น้ำ/ยา)
-   - ตะกร้า: แทนชื่อเฉพาะ "แถวสินค้า" ไม่แตะหัว/ท้ายโมดัล
-   - ยืนยันการขาย: ไปแทนในตารางบันทึก และบล็อก "รายการสินค้าที่ขายได้ (สรุป)"
-   - ไม่แตะฐานข้อมูล, ไม่ชนโค้ดเดิม
+   Customer Name Add-on v3.2 (stable, no-Firebase)
+   - มือถือ/เดสก์ท็อป: เปลี่ยนชื่อเฉพาะ "แถวสินค้า" ในตะกร้า (ไม่แตะหัว/ท้าย)
+   - ยืนยันการขาย: แทนชื่อในตารางบันทึก (จับแถวล่าสุด) + บล็อกสรุปด้านบน
    ============================================================== */
 (function () {
   const $  = (s, c=document)=>c.querySelector(s);
   const $$ = (s, c=document)=>Array.from(c.querySelectorAll(s));
 
-  // คิวจำข้อมูลตามลำดับที่ "เพิ่มลงตะกร้า"
+  // คิวตามลำดับ "เพิ่มลงตะกร้า"
   const queue = [];
 
-  /* ---------- UI: ช่องชื่อลูกค้าใต้ปุ่มเพิ่ม ---------- */
+  /* ---------- ใส่ช่องชื่อลูกค้าใต้ปุ่มเพิ่ม ---------- */
   function mkBox(id){
     const wrap=document.createElement('div'); wrap.className='customer-box';
     const lab=document.createElement('label'); lab.className='sr-only'; lab.htmlFor=`customer-${id}`; lab.textContent='ชื่อลูกค้า';
@@ -36,22 +34,39 @@
   /* ---------- Helpers ---------- */
   const makeDisplay=(name,right)=>name?`${name} (${(right||'').trim()||'ไม่ระบุ'})`:null;
 
-  // เลือก “แถวสินค้า” ในโมดัลให้แม่น (กันหัว/ท้าย)
+  // ปุ่มลบในทุกรูปแบบ
+  function isRemoveControl(el){
+    if(!el) return false;
+    const t=(el.textContent||'').trim();
+    const aria=(el.getAttribute('aria-label')||'')+(el.title||'');
+    const cls=el.className||'';
+    return /x|×|ลบ/.test(t) ||
+           /ลบ|remove|delete/i.test(aria+cls);
+  }
+
+  // เลือก “แถวสินค้า” ในโมดัลให้แม่น
   function getCartItemRows(container){
-    const scope = container.querySelector('.cart-list') || container;
-    const blocks=[...scope.querySelectorAll('.cart-item, li, .item, .row, .card, div')];
+    // 1) ถ้ามี .cart-list → ใช้ลูกโดยตรง (กันหัว/ท้ายชัวร์)
+    const list = container.querySelector('.cart-list');
+    if (list) return Array.from(list.children).filter(el => {
+      // กัน element ว่าง/หัวข้อ
+      const txt=(el.textContent||'').trim();
+      return !!txt && !/สรุปรายการสั่งซื้อ|ยืนยันการขาย|ล้างตะกร้า/.test(txt);
+    });
+
+    // 2) fallback: ต้องมี "ปุ่มลบ" อยู่ในแถวนั้น
+    const blocks=[...container.querySelectorAll('.cart-item, li, .item, .row, .card, div')];
     return blocks.filter(b=>{
       const txt=(b.textContent||'').trim();
       if(!txt) return false;
       if(/สรุปรายการสั่งซื้อ|ยืนยันการขาย|ล้างตะกร้า/.test(txt)) return false;
+
+      // หา control ที่เป็นปุ่มลบในหลายรูปแบบ
+      const hasRemove = !![...b.querySelectorAll('button,a,div[role="button"]')]
+        .find(isRemoveControl);
+      // มีราคา/บาทด้วย เพื่อกันบล็อกที่ไม่ใช่แถว
       const hasPrice   = /฿/.test(txt) || /บาท/.test(txt);
-      const hasQtyLine = /[x×]\s*\d+/.test(txt) || /×/.test(txt);
-      const rmBtn = !![...b.querySelectorAll('button')].find(x=>{
-        const t=(x.textContent||'').trim();
-        const aria=(x.getAttribute('aria-label')||'')+(x.title||'');
-        return /x|×|ลบ/.test(t) || /ลบ|remove|delete/i.test(aria);
-      });
-      return (hasPrice && hasQtyLine) || (hasPrice && rmBtn);
+      return hasRemove && hasPrice;
     });
   }
 
@@ -93,6 +108,7 @@
     }catch{}
 
     queue.push({ name, option, rawProduct, ts: Date.now() });
+    // อัปเดตหลังโมดัลเรนเดอร์
     setTimeout(updateCartNames, 120);
   });
 
@@ -101,8 +117,7 @@
     const containers=$$('.modal, .cart-modal, [data-cart], .swal2-popup, .drawer');
     if(!containers.length) return;
 
-    // ใช้สำเนาคิวเพื่อจับตามลำดับ (แต่ไม่ทำให้คิวจริงหาย)
-    const q = queue.slice();
+    const q = queue.slice(); // สำเนาเพื่ออ่านตามลำดับ
 
     containers.forEach(c=>{
       const rows=getCartItemRows(c);
@@ -129,20 +144,21 @@
   document.addEventListener('click', (ev)=>{
     const btn=ev.target.closest('button'); if(!btn||!/ยืนยันการขาย/.test(btn.textContent||'')) return;
 
-    // ประมาณจำนวนแถวจากตะกร้า แล้วดึงของคิวออกตามนั้น
+    // จำนวนชิ้นจากตะกร้าปัจจุบัน
     let count=1;
     const cont=$$('.modal, .cart-modal, [data-cart], .swal2-popup, .drawer')[0];
     if(cont) count = getCartItemRows(cont).length || 1;
 
-    const used = queue.splice(0, count);  // ของที่เพิ่งขายไป
+    const used = queue.splice(0, count);
 
-    // รอให้หน้า "บันทึก" เรนเดอร์ แล้วแทนชื่อ
+    // รอให้หน้า “สรุปยอดขาย” เรนเดอร์
     setTimeout(()=>{
       patchReportTable(used);
       patchSoldSummary(used);
     }, 360);
   });
 
+  // — ตารางบันทึก: จับ "คอลัมน์สินค้า" ของแถวล่าสุด —
   function patchReportTable(used){
     if(!used.length) return;
 
@@ -152,60 +168,58 @@
       const ths=[...table.querySelectorAll('thead th, tr th')];
       const idx=ths.findIndex(th=>/สินค้า/.test((th.textContent||'')));
       if(idx===-1) return;
-      const tds=[...table.querySelectorAll(`tbody tr td:nth-child(${idx+1})`)];
-      let i=0;
-      tds.forEach(td=>{
-        if(i>=used.length) return;
-        if(td.dataset.custApplied==='1') return;
 
+      const tds=[...table.querySelectorAll(`tbody tr td:nth-child(${idx+1})`)];
+      const targetCells = tds.slice(-used.length); // ← จับแถวล่าสุดเท่านั้น
+      targetCells.forEach((td, i)=>{
+        if(!used[i]) return;
         const text=(td.textContent||'').trim();
         const m=text.match(/^(.*?)\s*\((.+)\)$/);
         const opt=m?m[2]:text;
-        const u=used[i++];
+        const u=used[i];
         const disp=makeDisplay(u.name, u.option || opt);
         if(disp){ td.textContent=disp; td.dataset.custApplied='1'; }
       });
     });
 
-    // 2) div-list fallback
+    // 2) div-list fallback (ถ้าไม่มี table)
     const scopes=$$('#report, .report, #sales-report, .sales-report, #summary-page, .summary-page, body');
     scopes.forEach(scope=>{
-      let i=0;
       const rows=[...scope.querySelectorAll('.row, .item, li, article, .card')].filter(r=>{
         const t=(r.textContent||'');
         const hasMeta=/(ราคา|รวม|จำนวน|ต่อหน่วย|บาท|฿)/.test(t);
         const nameEl=pickNameElement(r);
         return hasMeta && nameEl;
       });
-      rows.forEach(r=>{
-        if(i>=used.length) return;
+      const latest = rows.slice(-used.length);
+      latest.forEach((r,i)=>{
+        if(!used[i]) return;
         const nameEl=pickNameElement(r);
-        if(!nameEl || nameEl.dataset.custApplied==='1') return;
-
         const text=(nameEl.textContent||'').trim();
         const m=text.match(/^(.*?)\s*\((.+)\)$/);
         const opt=m?m[2]:text;
-        const u=used[i++];
+        const u=used[i];
         const disp=makeDisplay(u.name, u.option || opt);
         if(disp){ nameEl.textContent=disp; nameEl.dataset.custApplied='1'; }
       });
     });
   }
 
+  // — บล็อก “รายการสินค้าที่ขายได้ (สรุป)” —
   function patchSoldSummary(used){
     if(!used.length) return;
     const heads=$$('h1,h2,h3,h4').filter(h=>/รายการสินค้าที่ขายได้/.test((h.textContent||'').trim()));
     heads.forEach(h=>{
       const box=h.parentElement; if(!box) return;
       const lines=[...box.querySelectorAll('li, p, div')].filter(el=>/ขวด/.test((el.textContent||'')));
-      const take=used.slice(0, lines.length);
-      take.forEach((u,i)=>{
-        const line=lines[i]; if(!line) return;
+      const latest = lines.slice(-used.length);
+      latest.forEach((line,i)=>{
+        const u=used[i]; if(!u) return;
         const txt=(line.textContent||'').trim();
         const m=txt.match(/\((.+)\)/);
         const opt=u.option || (m?m[1]:txt);
         const tail=txt.includes(':')?txt.split(':').slice(1).join(':').trim():'';
-        const disp=makeDisplay(u.name, opt);
+        const disp=makeDisplay(u.name,opt);
         line.textContent=disp+(tail?`: ${tail}`:'');
       });
     });
