@@ -864,3 +864,21 @@ body {
 }
 
 /* === END: โค้ดปรับ Layout หน้าขาย === */
+
+
+/* === START: โค้ดแก้ปัญหาช่องว่างในคอลัมน์ (วิธีที่ 1 - แนะนำ) === */
+.sale-column,
+.sale-column .product-list {
+  display: contents;
+}
+
+.product-card {
+  break-inside: avoid;
+}
+
+.sale-grid {
+  grid-auto-rows: auto;
+  gap: 10px;
+}
+
+/* === END: โค้ดแก้ปัญหาช่องว่าง === */
