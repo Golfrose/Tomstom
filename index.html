@@ -1,28 +1,228 @@
-<!-- ... (โค้ดส่วน head และ body ทั้งหมดยังเหมือนเดิม) ... -->
+<!DOCTYPE html>
+<html lang="th">
 
-    <!-- Compare Page -->
-    <div id="compare-page" class="page container summary-page">
-       <h1>เปรียบเทียบยอดขาย</h1>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบขายสินค้า - แยกไฟล์โครงสร้าง</title>
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="./assets/css/styles.css">
+
+  <!-- Firebase SDK (compat to match original) -->
+  <script src="assets/js/firebase-init.js"></script>
+  <script src="assets/js/fetch-shim.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+  <!-- Auth -->
+  <div id="auth-container" class="auth-container">
+    <div class="auth-card">
+      <h2>เข้าสู่ระบบ</h2>
+      <form id="login-form" class="auth-form">
+        <input type="email" id="email" placeholder="อีเมล" required>
+        <input type="password" id="password" placeholder="รหัสผ่าน" required>
+        <button type="submit">เข้าสู่ระบบ</button>
+      </form>
+      <div id="auth-error-message" class="auth-error"></div>
     </div>
   </div>
 
-  <!-- START: แก้ไขส่วนนี้ -->
-  <!-- ลบของเก่าทั้งหมดออก -->
-  <!--
+  <!-- App -->
+  <div id="app-container" style="display:none;">
+    <button id="logout-btn" class="logout-btn">ออกจากระบบ</button>
+
+    <div class="dashboard">
+      <p>ระบบขายสินค้า</p>
+      <h1 id="current-time">00:00:00</h1>
+      <p id="current-date"></p>
+    </div>
+
+    <div class="main-nav">
+      <div class="nav-btn active" data-page="sale">
+        <i class="fas fa-shopping-cart"></i>
+        <span>หน้าขาย</span>
+      </div>
+      <div class="nav-btn" data-page="summary">
+        <i class="fas fa-chart-bar"></i>
+        <span>สรุปยอด</span>
+      </div>
+      <div class="nav-btn" data-page="compare">
+        <i class="fas fa-chart-line"></i>
+        <span>เปรียบเทียบ</span>
+      </div>
+    </div>
+
+    <!-- Sale Page -->
+    <div id="sale-page" class="page container">
+
+      <!-- START: เพิ่มส่วนเลือกหมวดหมู่ -->
+      <div class="category-selector">
+        <div class="category-card active">
+          <i class="fas fa-cocktail"></i>
+          <span>หมวดน้ำ</span>
+        </div>
+        <div class="category-card">
+          <i class="fas fa-pills"></i>
+          <span>หมวดยา</span>
+        </div>
+      </div>
+      <!-- END: เพิ่มส่วนเลือกหมวดหมู่ -->
+
+      <!-- โครงสร้าง 2 คอลัมน์สำหรับรายการสินค้า -->
+      <div class="sale-grid">
+        <!-- คอลัมน์ซ้าย: หมวดน้ำ -->
+        <div class="sale-column">
+          <div class="product-list" id="product-list-water">
+            <!-- JavaScript จะเติมสินค้าหมวดน้ำที่นี่เหมือนเดิม -->
+          </div>
+        </div>
+
+        <!-- คอลัมน์ขวา: หมวดยา -->
+        <div class="sale-column">
+          <div class="product-list" id="product-list-med">
+            <!-- JavaScript จะเติมสินค้าหมวดยาที่นี่เหมือนเดิม -->
+          </div>
+        </div>
+      </div>
+
+      <div class="cart-icon" id="cart-icon">
+        <i class="fas fa-shopping-basket"></i>
+        <span class="cart-count" id="cart-count">0</span>
+      </div>
+    </div>
+
+    <!-- Cart Modal -->
+    <div id="cart-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3><i class="fas fa-shopping-basket"></i> สรุปรายการสั่งซื้อ</h3>
+        </div>
+        <div id="modal-items"></div>
+        <div class="modal-total">รวมทั้งหมด: <span id="modal-cart-total">0</span> บาท</div>
+        <div class="modal-actions">
+          <button class="confirm-btn" id="confirm-sale-btn"><i class="fas fa-check"></i> ยืนยันการขาย</button>
+          <button class="cancel-btn" id="clear-cart-btn"><i class="fas fa-times"></i> ล้างตะกร้า</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Summary -->
+    <div id="summary-page" class="page container summary-page">
+      <h1>สรุปยอดขาย</h1>
+      <div class="date-filter">
+        <label for="report-date">วันที่:</label>
+        <input type="date" id="report-date">
+        <button id="load-report-btn">ดูรายงาน</button>
+      </div>
+      <div class="summary-box-container">
+        <div class="summary-box">
+          <h3>ยอดรวมเงินทั้งหมด</h3>
+          <span id="total-revenue" class="value money">0</span>
+          <span>บาท</span>
+        </div>
+        <div class="summary-box">
+          <h3>ยอดรวมสินค้าที่ขายได้</h3>
+          <span id="total-quantity" class="value">0</span>
+          <span>ขวด</span>
+        </div>
+        <div class="summary-box">
+          <h3>รายการสินค้าที่ขายได้ (สรุป)</h3>
+          <ul id="product-summary-list"></ul>
+        </div>
+      </div>
+      <table class="summary-table">
+        <thead>
+          <tr>
+            <th>วันที่และเวลา</th>
+            <th>สินค้า</th>
+            <th>จำนวน</th>
+            <th>ราคาต่อหน่วย</th>
+            <th>รวม</th>
+            <th>จัดการ</th>
+          </tr>
+        </thead>
+        <tbody id="report-body"></tbody>
+      </table>
+      <div id="no-data" class="no-data" style="display:none;">ไม่พบข้อมูลการขายในวันที่เลือก</div>
+    </div>
+
+    <!-- Compare -->
+    <div id="compare-page" class="page container summary-page">
+      <h1>เปรียบเทียบยอดขาย</h1>
+      <div class="compare-mode-selection">
+        <label for="compare-mode-select">เลือกโหมดเปรียบเทียบ:</label>
+        <select id="compare-mode-select">
+          <option value="day-to-day">วันต่อวัน</option>
+          <option value="date-range">ช่วงวัน</option>
+        </select>
+        <button id="clear-compare-btn">ล้างข้อมูล</button>
+      </div>
+
+      <div class="comparison-input-group">
+        <div id="day-to-day-mode" class="compare-mode-form active">
+          <div class="comparison-date-group">
+            <label for="compare-date-1">วันที่ 1:</label>
+            <input type="date" id="compare-date-1">
+          </div>
+          <div class="comparison-date-group">
+            <label for="compare-date-2">วันที่ 2:</label>
+            <input type="date" id="compare-date-2">
+          </div>
+        </div>
+
+        <div id="date-range-mode" class="compare-mode-form">
+          <div class="comparison-date-group">
+            <label for="start-date-1">ช่วงที่ 1 เริ่ม:</label>
+            <input type="date" id="start-date-1">
+            <label for="end-date-1">ถึง:</label>
+            <input type="date" id="end-date-1">
+          </div>
+          <div class="comparison-date-group">
+            <label for="start-date-2">ช่วงที่ 2 เริ่ม:</label>
+            <input type="date" id="start-date-2">
+            <label for="end-date-2">ถึง:</label>
+            <input type="date" id="end-date-2">
+          </div>
+        </div>
+
+        <div class="date-filter compare-style">
+          <label for="product-select">เลือกสินค้า:</label>
+          <select id="product-select"></select>
+          <button id="compare-btn">เปรียบเทียบ</button>
+        </div>
+      </div>
+
+      <div id="detailed-comparison-result" style="margin-top: 20px;"></div>
+      <div id="no-comparison-data" class="no-data" style="display:none;">ไม่พบข้อมูลสำหรับเปรียบเทียบ</div>
+      <div class="chart-container">
+        <canvas id="comparisonChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- App Scripts (module) -->
   <script type="module" src="./assets/js/config.js"></script>
   <script type="module" src="./assets/js/firebase.js"></script>
   <script type="module" src="./assets/js/auth.js"></script>
-  <script type="module" src="./assets/js/cart.js"></script>
   <script type="module" src="./assets/js/ui.js"></script>
+  <script type="module" src="./assets/js/cart.js"></script>
   <script type="module" src="./assets/js/sales.js"></script>
   <script type="module" src="./assets/js/report.js"></script>
   <script type="module" src="./assets/js/compare.js"></script>
   <script type="module" src="./assets/js/main.js"></script>
-  -->
-  
-  <!-- เพิ่มบรรทัดนี้เข้ามาแทนที่ (สำคัญ: ไม่มี type="module") -->
-  <script src="./assets/js/app.js"></script>
-  <!-- END: แก้ไขส่วนนี้ -->
-
 </body>
+
 </html>
