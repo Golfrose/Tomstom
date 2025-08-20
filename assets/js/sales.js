@@ -1,15 +1,6 @@
-import {
-    getCart,
-    clearCart
-} from './cart.js';
-import {
-    products
-} from './config.js';
-import {
-    db
-} from './firebase.js';
-
-const confirmSaleBtn = document.getElementById('confirm-sale-btn');
+import { getCart, clearCart } from './cart.js';
+import { products } from './config.js';
+import { db } from './firebase.js';
 
 function confirmSale() {
     const cart = getCart();
@@ -20,7 +11,7 @@ function confirmSale() {
 
     const now = new Date();
     const saleId = now.getTime();
-    const dateStr = now.toISOString().split('T')[0]; // YYYY-MM-DD
+    const dateStr = now.toISOString().split('T')[0];
 
     const saleData = {
         timestamp: saleId,
@@ -34,22 +25,19 @@ function confirmSale() {
         const product = products.find(p => p.id === item.productId);
         const itemTotal = product.price * item.quantity;
         totalSaleAmount += itemTotal;
-
-        const saleItem = {
+        saleData.items[`item_${index}`] = {
             productId: item.productId,
             productName: product.name,
             mix: product.mixes[item.mix],
             quantity: item.quantity,
             price: product.price,
             total: itemTotal,
-            customerName: item.customerName || '' // บันทึกชื่อลูกค้า
+            customerName: item.customerName || ''
         };
-        saleData.items[`item_${index}`] = saleItem;
     });
 
     saleData.total = totalSaleAmount;
 
-    // Save to Firebase Realtime Database
     db.ref(`sales/${dateStr}/${saleId}`).set(saleData)
         .then(() => {
             alert('บันทึกการขายสำเร็จ!');
@@ -61,7 +49,9 @@ function confirmSale() {
         });
 }
 
-
 export function initializeSales() {
-    confirmSaleBtn.addEventListener('click', confirmSale);
+    const confirmSaleBtn = document.getElementById('confirm-sale-btn');
+    if (confirmSaleBtn) {
+        confirmSaleBtn.addEventListener('click', confirmSale);
+    }
 }
