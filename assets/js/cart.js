@@ -85,12 +85,17 @@ export function renderCartModal() {
     const item = cart[key];
     totalCartPrice += item.totalPrice;
 
+    // ✅ ใช้ displayName ถ้ามี (เช่น "กอล์ฟ (ผสมเงิน)")
+    const lineName = (item.displayName && item.displayName.trim())
+      ? item.displayName.trim()
+      : `${item.product}${item.mix !== 'ไม่มี' ? ` (${item.mix})` : ''}`;
+
     const itemDiv = document.createElement('div');
     itemDiv.classList.add('modal-item');
     itemDiv.innerHTML = `
       <button class="remove-item" data-key="${key}" aria-label="ลบรายการ">×</button>
       <div class="item-details">
-        <div>${item.product} ${item.mix !== 'ไม่มี' ? `(${item.mix})` : ''}</div>
+        <div>${lineName}</div>
         <small>${item.quantity} ขวด × ${item.pricePerUnit}฿</small>
       </div>
       <span class="item-total">${item.totalPrice.toLocaleString()}฿</span>
@@ -101,12 +106,11 @@ export function renderCartModal() {
   document.getElementById('modal-cart-total').textContent = totalCartPrice.toLocaleString();
   document.getElementById('cart-modal').style.display = 'flex';
 
-  // bind ปุ่มลบทุกรายการ
+  // ปุ่มลบ
   modalItems.querySelectorAll('.remove-item').forEach(btn => {
     btn.addEventListener('click', (e) => removeFromCart(e.currentTarget.dataset.key));
   });
 }
-
 export function clearCart() {
   cart = {};
   updateCartCount();
