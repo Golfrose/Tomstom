@@ -1,28 +1,25 @@
 /* ==============================================================
-   Customer Name Add-on (DOM-driven / module-safe)
-   - ใส่ช่อง "ชื่อลูกค้า" ใต้ราคาของสินค้า (ทุกการ์ด ทั้งน้ำ/ยา)
-   - ตอนกด "เพิ่มลงตะกร้า" เก็บชื่อลูกค้า+ตัวเลือกเข้าคิว
-   - อัปเดตชื่อในตะกร้า และในตารางบันทึก เป็น "ชื่อ(ตัวเลือก)"
-   - ไม่แตะ Firebase และไม่ต้อง wrap ฟังก์ชันใน ES modules
+   Customer Name Add-on v2.2 (DOM-driven / module-safe)
+   - รองรับทั้งหมวดน้ำ/ยา + หน้า "บันทึก/สรุป" ที่ทำด้วย table หรือ div
+   - ถ้าไม่มีวงเล็บในชื่อเดิม (เช่น "ยาไก่") จะเป็น "ชื่อลูกค้า (ยาไก่)"
+   - ไม่แตะ Firebase/โค้ดหลัก
    ============================================================== */
 
 (function () {
   const $ = (sel, ctx = document) => ctx.querySelector(sel);
   const $$ = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
 
-  // คิวสำหรับชื่อที่เพิ่มเข้าตะกร้า ตามลำดับการกด
+  // เก็บคิวตามลำดับการ "เพิ่มลงตะกร้า"
   const custQueue = [];
 
-  // ---------- สร้างกล่อง input ใต้ราคาทุกการ์ด ----------
+  /* ---------- ใส่ input ใต้ราคาทุกการ์ด ---------- */
   function makeCustomerBox(productId) {
     const box = document.createElement('div');
     box.className = 'customer-box';
-
     const label = document.createElement('label');
     label.className = 'sr-only';
     label.setAttribute('for', `customer-${productId}`);
     label.textContent = 'ชื่อลูกค้า';
-
     const input = document.createElement('input');
     input.id = `customer-${productId}`;
     input.className = 'customer-input';
@@ -41,32 +38,22 @@
     const cards = $$('.product-card, .card, .product, [data-product-id]');
     cards.forEach((card) => {
       if (card.__hasCustomerBox) return;
-
       const pid = card.getAttribute('data-product-id') || card.id || cryptoRandom();
       const addBtn = Array.from(card.querySelectorAll('button'))
         .find((b) => /เพิ่มลงตะกร้า/.test(b.textContent || ''));
-
       const box = makeCustomerBox(pid);
-      if (addBtn && addBtn.parentElement) {
-        addBtn.parentElement.insertBefore(box, addBtn);
-      } else {
-        card.appendChild(box);
-      }
+      if (addBtn && addBtn.parentElement) addBtn.parentElement.insertBefore(box, addBtn);
+      else card.appendChild(box);
       card.__hasCustomerBox = true;
     });
   }
 
   function cryptoRandom() {
-    try {
-      const arr = new Uint32Array(1);
-      crypto.getRandomValues(arr);
-      return arr[0].toString(36);
-    } catch {
-      return Math.random().toString(36).slice(2, 9);
-    }
+    try { const a = new Uint32Array(1); crypto.getRandomValues(a); return a[0].toString(36); }
+    catch { return Math.random().toString(36).slice(2, 9); }
   }
 
-  // ---------- จับการกด "เพิ่มลงตะกร้า" เพื่อเก็บชื่อ+ตัวเลือก ----------
+  /* ---------- เวลา “เพิ่มลงตะกร้า” เก็บชื่อลูกค้า + ตัวเลือก ---------- */
   document.addEventListener('click', (ev) => {
     const btn = ev.target.closest('button');
     if (!btn) return;
@@ -75,120 +62,144 @@
     const card = btn.closest('.product-card, .card, .product, [data-product-id]');
     const name = (card && $('.customer-input', card) && $('.customer-input', card).value.trim()) || '';
 
-    // ดึงชื่อ "ตัวเลือก" ที่ถูกเลือก (เช่น ผสมเงิน / ยาฝาแดง)
+    let rawProduct = '';
+    const titleGuess = card && (card.querySelector('h3, h2, .title, .name, .product-title'));
+    if (titleGuess) rawProduct = titleGuess.textContent.trim();
+
     let option = '';
     try {
-      // มี input[type=radio]:checked ใกล้ ๆ ไหม
       const checked = card.querySelector('input[type="radio"]:checked');
       if (checked) {
-        // พยายามอ่าน label ข้าง ๆ
         const labelEl = checked.closest('label') || checked.parentElement;
         if (labelEl && labelEl.textContent.trim()) option = labelEl.textContent.trim();
-        // ถ้า label ไม่ชัด ลองอ่าน sibling text
-        if (!option) {
-          const sib = checked.nextElementSibling;
-          if (sib && sib.textContent.trim()) option = sib.textContent.trim();
-        }
-      }
-      // กันกรณี UI เขียนตัวเลือกเป็น text ธรรมดาพร้อมวงกลม
-      if (!option) {
-        const maybe = Array.from(card.querySelectorAll('label, .option, .variant, span, p'))
-          .find(el => el.matches('.selected, [aria-checked="true"]'));
-        if (maybe) option = maybe.textContent.trim();
+        if (!option && checked.nextElementSibling && checked.nextElementSibling.textContent)
+          option = checked.nextElementSibling.textContent.trim();
       }
     } catch {}
 
-    // เก็บเข้าคิว (ถ้าไม่มีชื่อ ให้เก็บว่างไว้—เราจะไม่แทนชื่อในภายหลัง)
-    custQueue.push({ name, option, ts: Date.now() });
-
-    // หลังกดแล้วอาจจะเปิด modal ตะกร้า → รอสักครู่แล้วอัปเดตชื่อใน modal
+    custQueue.push({ name, option, rawProduct, ts: Date.now() });
     setTimeout(updateCartNames, 200);
   });
 
-  // ---------- อัปเดตชื่อใน "ตะกร้า" ให้เป็น ชื่อลูกค้า(ตัวเลือก) ----------
+  /* ---------- อัปเดตชื่อใน “ตะกร้า” ---------- */
   function updateCartNames() {
-    // หา modal/กล่องตะกร้าที่เปิดอยู่
-    const cartContainers = $$('.modal, .cart-modal, .cart, [data-cart], .swal2-popup, .drawer');
-    if (!cartContainers.length) return;
+    const containers = $$('.modal, .cart-modal, .cart, [data-cart], .swal2-popup, .drawer');
+    if (!containers.length) return;
 
-    cartContainers.forEach((container) => {
-      // หา element ที่เป็นชื่อรายการ (มักอยู่ซ้ายของราคา)
+    containers.forEach((container) => {
       const nameEls =
         $$('.name', container).length ? $$('.name', container)
         : $$('.title', container).length ? $$('.title', container)
         : Array.from(container.querySelectorAll('div, p, span')).filter(el => {
             const t = (el.textContent || '').trim();
-            // ต้องมีวงเล็บตัวเลือกอยู่แล้ว เช่น "น้ำผสมเงิน (ผสมเงิน)"
-            return /\(.*\)/.test(t) && !/บาท/.test(t);
+            const priceLike = /บาท|฿|\d+\s*[x×]/.test(t);
+            return t && !priceLike;
           });
 
       nameEls.forEach((el) => {
-        if (el.dataset.custApplied === '1') return; // กันแทนซ้ำ
-        const original = (el.textContent || '').trim();
+        if (el.dataset.custApplied === '1') return;
+        const original = (el.textContent || '').trim();   // เช่น "น้ำผสมเงิน (ผสมเงิน)" หรือ "ยาไก่"
+
+        const qIndex = custQueue.findIndex(e => e.name);  // จับคิวตัวแรกที่มีชื่อจริง
+        if (qIndex === -1) return;
+        const q = custQueue.splice(qIndex, 1)[0];
+
         const m = original.match(/^(.*?)\s*\((.+)\)$/);
-        if (!m) return; // ไม่ใช่รูปแบบ "ชื่อ (ตัวเลือก)" ก็ข้าม
-        const optionFromText = m[2];
-
-        // ดูคิวล่าสุดที่มี "name" จริง
-        const idx = custQueue.findIndex(q => q.name);
-        if (idx === -1) return;
-        const { name, option } = custQueue.splice(idx, 1)[0];
-
-        // ใช้ option จากคิว ถ้ามี ไม่งั้นใช้ของเดิมในวงเล็บ
-        const finalOption = option || optionFromText;
-        el.textContent = `${name} (${finalOption})`;
+        const option = q.option || (m ? m[2] : original); // ถ้าไม่เจอวงเล็บ → ใช้ original เป็น option
+        el.textContent = `${q.name} (${option})`;
         el.dataset.custApplied = '1';
       });
     });
   }
 
-  // เฝ้าดู DOM ถ้ามีการอัปเดตตะกร้า ให้พยายามแทนชื่ออีกครั้ง
   const moCart = new MutationObserver(() => updateCartNames());
   moCart.observe(document.body, { childList: true, subtree: true });
 
-  // ---------- ตอน "ยืนยันการขาย" → ไปแทนชื่อในตารางบันทึก ----------
+  /* ---------- กด “ยืนยันการขาย” แล้วไปแทนชื่อในหน้า “บันทึก/สรุป” ---------- */
   document.addEventListener('click', (ev) => {
     const btn = ev.target.closest('button');
     if (!btn) return;
     if (!/ยืนยันการขาย/.test(btn.textContent || '')) return;
-
-    // หลังกดยืนยัน มักจะปิด modal และเรนเดอร์ตารางบันทึก → รอแล้วค่อยแทน
-    setTimeout(updateSalesTableNames, 300);
+    // ให้เวลาหน้าบันทึกเรนเดอร์ก่อน
+    setTimeout(updateSalesPageNames, 400);
   });
 
-  function updateSalesTableNames() {
-    // หา section ตารางสรุป/บันทึก (ลองจับกว้าง ๆ ตามโครงยอดนิยม)
-    const tables = $$('table');
-    tables.forEach((table) => {
-      // หาหัวคอลัมน์ที่มีคำว่า "สินค้า"
-      const ths = Array.from(table.querySelectorAll('thead th, tr th'));
-      const productColIndex = ths.findIndex(th => /สินค้า/.test((th.textContent || '')));
-      if (productColIndex === -1) return;
+  // หา “โซนสรุป/บันทึก” ให้ครอบทั้ง table และ div‑list
+  function getReportScopes() {
+    const scopes = [];
+    // ลองจับด้วย id/class ที่พบบ่อย
+    scopes.push(...$$('#summary-page, .summary-page, #sales-report, .sales-report, #report, .report'));
+    // เผื่อหน้าไม่มี class เฉพาะ ให้หา section ที่หัวเรื่องมีคำว่า "สรุปยอดขาย" หรือ "รายการสินค้าที่ขายได้"
+    const headings = $$('h1,h2,h3,h4').filter(h =>
+      /สรุปยอดขาย|รายการสินค้าที่ขายได้/.test((h.textContent || '').trim())
+    );
+    headings.forEach(h => scopes.push(h.closest('section') || h.parentElement));
+    // อย่างน้อยส่ง body กลับไป (สุดท้าย)
+    if (!scopes.length) scopes.push(document.body);
+    return Array.from(new Set(scopes.filter(Boolean)));
+  }
 
-      const rows = Array.from(table.querySelectorAll('tbody tr'));
-      rows.forEach((tr) => {
-        const tds = Array.from(tr.children);
-        const cell = tds[productColIndex];
-        if (!cell || cell.dataset.custApplied === '1') return;
+  function updateSalesPageNames() {
+    const scopes = getReportScopes();
+    scopes.forEach(scope => {
+      // เคสจริงอาจเป็น table หรือ div-row
+      const productCells = [];
 
-        const text = (cell.textContent || '').trim();
-        const m = text.match(/^(.*?)\s*\((.+)\)$/);
-        if (!m) return;
-        const optionFromText = m[2];
+      // 1) table: หาคอลัมน์ "สินค้า"
+      const tables = $$('table', scope);
+      tables.forEach((table) => {
+        const ths = Array.from(table.querySelectorAll('thead th, tr th'));
+        const col = ths.findIndex(th => /สินค้า/.test((th.textContent || '')));
+        if (col !== -1) {
+          const rows = Array.from(table.querySelectorAll('tbody tr'));
+          rows.forEach(tr => {
+            const td = tr.children[col];
+            if (td) productCells.push(td);
+          });
+        }
+      });
 
-        // ใช้ชื่อจากคิวสุดท้ายที่ยังเหลืออยู่ (ถ้ายืนยันทีละชิ้นคิวจะเหลือตามจำนวน)
-        const idx = custQueue.findIndex(q => q.name);
-        if (idx === -1) return;
-        const { name, option } = custQueue.splice(idx, 1)[0];
+      // 2) div‑list: หาแถวที่ดูเป็นรายการขาย (มีราคา/จำนวน/รวมข้าง ๆ)
+      if (!productCells.length) {
+        const rows = Array.from(scope.querySelectorAll('div, li, article')).filter(el => {
+          const t = (el.textContent || '').trim();
+          // ต้องมีตัวเลข/ราคาอยู่ใกล้ ๆ (แบบหน้าในรูป)
+          return /\b\d+\b/.test(t) && /บาท|฿/.test(t) || /ราคา|รวม|จำนวน|ต่อหน่วย/.test(t);
+        });
+        // ในแต่ละ row เลือก element ที่น่าจะเป็น "ชื่อสินค้า"
+        rows.forEach(row => {
+          // เลือกบล็อกที่มีข้อความหลายบรรทัด (ชื่อ + วงเล็บ)
+          const candidates = Array.from(row.querySelectorAll('div, p, span')).filter(el => {
+            const t = (el.textContent || '').trim();
+            if (!t) return false;
+            // ตัดตัวเลข/ราคา/ปุ่ม
+            if (/บาท|฿|\b\d+\b/.test(t)) return false;
+            // มักอยู่คอลัมน์ชื่อ ซึ่งเป็นข้อความไทยยาว ๆ
+            return /[ก-๙A-Za-z]/.test(t);
+          });
+          // เลือกตัวแรกพอ
+          if (candidates[0]) productCells.push(candidates[0]);
+        });
+      }
 
-        const finalOption = option || optionFromText;
-        cell.textContent = `${name} (${finalOption})`;
+      // แทนชื่อใน cell ที่หาได้ ตามคิว
+      productCells.forEach(cell => {
+        if (cell.dataset.custApplied === '1') return;
+
+        const original = (cell.textContent || '').trim(); // "น้ำผสมเงิน (ผสมเงิน)" หรือ "ยาไก่"
+        const qIndex = custQueue.findIndex(e => e.name);
+        if (qIndex === -1) return;
+        const q = custQueue.splice(qIndex, 1)[0];
+
+        const m = original.match(/^(.*?)\s*\((.+)\)$/);
+        const option = q.option || (m ? m[2] : original);
+        cell.textContent = `${q.name} (${option})`;
         cell.dataset.custApplied = '1';
       });
     });
   }
 
-  // ---------- เริ่มงาน ----------
+  /* ---------- start ---------- */
   function start() {
     injectInputs();
     const mo = new MutationObserver(() => injectInputs());
