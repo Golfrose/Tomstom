@@ -12,55 +12,36 @@ export function changeQuantity(inputEl, change) {
 export function addToCart(productCard) {
   const product = productCard.dataset.product;
   const quantityInput = productCard.querySelector('.quantity-input');
-  const quantity = parseInt(quantityInput.value || '0', 10);
+  const quantity = parseInt(quantityInput.value || '0');
 
-  if (!quantity || quantity <= 0) {
-    alert('กรุณาเลือกจำนวนให้ถูกต้อง');
+  if (quantity <= 0) {
+    alert('กรุณาใส่จำนวนสินค้าก่อน');
     return;
   }
 
-  // mix/ราคา
   const mixRadio = productCard.querySelector(`input[name="mix-${product}"]:checked`);
   const mix = mixRadio ? mixRadio.value : 'ไม่มี';
   const pricePerUnit = parseFloat(mixRadio ? mixRadio.dataset.price : productCard.dataset.price);
 
-  // ✅ อ่านชื่อลูกค้าจากช่องที่เราใส่ไว้บนการ์ด
-  const customerInput = productCard.querySelector('.customer-input');
-  const customerName = (customerInput?.value || '').trim();
-
-  // แสดงผลในตะกร้า
-  const displayName = customerName
-    ? `${customerName}${mix !== 'ไม่มี' ? ` (${mix})` : ''}`
-    : `${product}${mix !== 'ไม่มี' ? ` (${mix})` : ''}`;
-
-  // คิดเงินตาม logic เดิม
   let totalPrice = pricePerUnit * quantity;
+  // โปรโมชัน: น้ำดิบ 2 ขวด 120
   if (product === 'น้ำดิบ') {
     totalPrice = Math.floor(quantity / 2) * 120 + (quantity % 2) * 65;
   }
 
-  // ใช้ key เดิม (ระวังอย่าชน) — เพิ่มชื่อลูกค้าเข้าไปเพื่อแยกรายการให้ถูก
-  const key = `${product}::${mix}::${customerName || '-'}`;
-
+  const key = `${product}-${mix}`;
   if (cart[key]) {
     cart[key].quantity += quantity;
     cart[key].totalPrice += totalPrice;
   } else {
-    cart[key] = {
-      product,          // ชื่อสินค้าแท้
-      mix,
-      quantity,
-      pricePerUnit,
-      totalPrice,
-      customerName,     // ✅ เก็บชื่อลูกค้า
-      displayName       // ✅ เก็บชื่อที่ต้องการแสดงผล
-    };
+    cart[key] = { product, mix, quantity, pricePerUnit, totalPrice };
   }
 
   quantityInput.value = 0;
   updateCartCount();
   alert(`เพิ่ม ${quantity} ขวด ลงในตะกร้าแล้ว`);
 }
+
 export function updateCartCount() {
   let totalItems = 0;
   for (const k in cart) totalItems += cart[k].quantity;
@@ -85,17 +66,12 @@ export function renderCartModal() {
     const item = cart[key];
     totalCartPrice += item.totalPrice;
 
-    // ✅ ใช้ displayName ถ้ามี (เช่น "กอล์ฟ (ผสมเงิน)")
-    const lineName = (item.displayName && item.displayName.trim())
-      ? item.displayName.trim()
-      : `${item.product}${item.mix !== 'ไม่มี' ? ` (${item.mix})` : ''}`;
-
     const itemDiv = document.createElement('div');
     itemDiv.classList.add('modal-item');
     itemDiv.innerHTML = `
       <button class="remove-item" data-key="${key}" aria-label="ลบรายการ">×</button>
       <div class="item-details">
-        <div>${lineName}</div>
+        <div>${item.product} ${item.mix !== 'ไม่มี' ? `(${item.mix})` : ''}</div>
         <small>${item.quantity} ขวด × ${item.pricePerUnit}฿</small>
       </div>
       <span class="item-total">${item.totalPrice.toLocaleString()}฿</span>
@@ -106,96 +82,14 @@ export function renderCartModal() {
   document.getElementById('modal-cart-total').textContent = totalCartPrice.toLocaleString();
   document.getElementById('cart-modal').style.display = 'flex';
 
-  // ปุ่มลบ
+  // bind ปุ่มลบทุกรายการ
   modalItems.querySelectorAll('.remove-item').forEach(btn => {
     btn.addEventListener('click', (e) => removeFromCart(e.currentTarget.dataset.key));
   });
 }
+
 export function clearCart() {
   cart = {};
   updateCartCount();
   document.getElementById('cart-modal').style.display = 'none';
 }
-/* ===== CustomerName :: CART – APPEND-ONLY (ไม่แตะของเดิม) ===== */
-(function(){
-  const CND = window.CustomerNameData;
-
-  // อ่านชื่อ/ตัวเลือกจากการ์ด (จากหน้าขาย) — ใช้ตอนกดเพิ่ม
-  function getCustomerNameFromCard(cardEl){
-    const el = cardEl && cardEl.querySelector('.customer-input');
-    return el ? el.value.trim() : '';
-  }
-  function getOptionFromCard(cardEl){
-    try{
-      const chk = cardEl && cardEl.querySelector('input[type="radio"]:checked');
-      if(!chk) return '';
-      const lbl = chk.closest('label') || chk.parentElement;
-      if (lbl && lbl.textContent) return lbl.textContent.trim();
-      if (chk.nextElementSibling && chk.nextElementSibling.textContent) return chk.nextElementSibling.textContent.trim();
-    }catch{}
-    return '';
-  }
-
-  // ถ้าระบบคุณมี global CART (Array) เราจะ "ครอบ" ให้ auto-decorate ตอน push
-  function wrapCartArrayWhenReady(){
-    const tryWrap = ()=>{
-      const root = window;
-      const CART = root.CART;
-      if (!Array.isArray(CART) || CART.__wrappedByCustomerName) return false;
-
-      // เก็บของเดิม
-      const _push = CART.push.bind(CART);
-      Object.defineProperty(CART, '__wrappedByCustomerName', { value: true });
-
-      // ครอบ push: ถ้า item ขาดฟิลด์ → เติมให้
-      CART.push = function(...items){
-        const patched = items.map(it=>{
-          try{
-            // ถ้ามีอยู่แล้วก็ข้าม
-            if (it && (it.displayName || it.customerName)) return it;
-
-            const product = {
-              id: it?.productId || it?.id,
-              name: it?.productName || it?.name
-            };
-            const option = it?.option || '';
-            const qty    = it?.qty ?? 1;
-            const price  = it?.price ?? 0;
-
-            // พยายามอ่าน customerName จากการ์ดสุดท้ายที่กด (ถ้ามี event)
-            let customerName = '';
-            if (window.__lastAddCardEl) {
-              customerName = getCustomerNameFromCard(window.__lastAddCardEl) || '';
-            }
-
-            const withName = CND.makeCartItemBase({ product, option, qty, price, customerName });
-
-            // ผสานกลับกับฟิลด์เดิม (เช่น discount ฯลฯ)
-            return Object.assign({}, it, withName);
-          }catch(e){ return it; }
-        });
-        return _push(...patched);
-      };
-
-      return true;
-    };
-    // ลองครอบทันที และลองอีกสักพักเผื่อ CART ถูกกำหนดทีหลัง
-    if (!tryWrap()){
-      let n = 0;
-      const t = setInterval(()=>{ if (tryWrap() || ++n>50) clearInterval(t); }, 200);
-    }
-  }
-
-  // เวลา "กดเพิ่มลงตะกร้า" ให้บันทึกการ์ดที่กดล่าสุดไว้ เพื่ออ่านชื่อลูกค้า
-  document.addEventListener('click', (ev)=>{
-    const btn = ev.target.closest('button');
-    if (!btn || !/เพิ่มลงตะกร้า/.test(btn.textContent||'')) return;
-    window.__lastAddCardEl = btn.closest('.product-card, .card, .product, [data-product-id]') || null;
-    // ถ้าระบบคุณเรียก addToCart(product) ภายใน handler เดิม → CART.push จะโดนครอบแล้ว
-    // ถ้าระบบคุณ "ไม่ใช้ CART" ให้บอกชื่อฟังก์ชัน addToCart มา เดี๋ยวผมเขียน wrapper ให้ตรงชื่อ
-  });
-
-  // ตอน render ตะกร้า ถ้าโค้ดเดิมใช้ item.productName → เราพยายามเปลี่ยน textcontent เป็น displayName ให้ “ก่อนสร้าง HTML”
-  // วิธีนี้ขึ้นกับโค้ดเดิม — แต่เมื่อ CART มี displayName แล้ว โค้ดเดิมส่วนใหญ่จะหยิบมาใช้เอง
-  wrapCartArrayWhenReady();
-})();
