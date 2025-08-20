@@ -68,14 +68,23 @@
     <!-- Sale Page -->
     <div id="sale-page" class="page container">
 
-      <!-- START: โครงสร้างใหม่สำหรับแบ่ง 2 คอลัมน์ -->
+      <!-- START: เพิ่มส่วนเลือกหมวดหมู่ -->
+      <div class="category-selector">
+        <div class="category-card active">
+          <i class="fas fa-cocktail"></i>
+          <span>หมวดน้ำ</span>
+        </div>
+        <div class="category-card">
+          <i class="fas fa-pills"></i>
+          <span>หมวดยา</span>
+        </div>
+      </div>
+      <!-- END: เพิ่มส่วนเลือกหมวดหมู่ -->
+
+      <!-- โครงสร้าง 2 คอลัมน์สำหรับรายการสินค้า -->
       <div class="sale-grid">
         <!-- คอลัมน์ซ้าย: หมวดน้ำ -->
         <div class="sale-column">
-          <div class="category-card">
-            <i class="fas fa-cocktail"></i>
-            <span>หมวดน้ำ</span>
-          </div>
           <div class="product-list" id="product-list-water">
             <!-- JavaScript จะเติมสินค้าหมวดน้ำที่นี่เหมือนเดิม -->
           </div>
@@ -83,16 +92,11 @@
 
         <!-- คอลัมน์ขวา: หมวดยา -->
         <div class="sale-column">
-          <div class="category-card">
-            <i class="fas fa-pills"></i>
-            <span>หมวดยา</span>
-          </div>
           <div class="product-list" id="product-list-med">
             <!-- JavaScript จะเติมสินค้าหมวดยาที่นี่เหมือนเดิม -->
           </div>
         </div>
       </div>
-      <!-- END: โครงสร้างใหม่ -->
 
       <div class="cart-icon" id="cart-icon">
         <i class="fas fa-shopping-basket"></i>
