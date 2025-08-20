@@ -659,7 +659,6 @@ body {
 
 #cart-modal .modal-item .item-total {
   margin-right: 18px;
-  /* กันไม่ให้เลขโดนทับ */
 }
 
 #cart-modal .modal-item .remove-item {
@@ -679,7 +678,6 @@ body {
   line-height: 1;
   color: #fff;
   background: #ff4d4f;
-  /* แดง */
   box-shadow: 0 2px 6px rgba(0, 0, 0, .15);
   z-index: 2;
 }
@@ -694,15 +692,12 @@ body {
 }
 
 /* ===== Summary table: responsive fix ===== */
-
-/* กันตารางล้นจอเล็ก */
 #summary-page .table-wrap,
 #summary-page .summary-table-wrap {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
 
-/* จัดปุ่มให้อยู่ขวาเสมอ */
 #summary-page table td:last-child {
   display: flex;
   justify-content: flex-end;
@@ -710,7 +705,6 @@ body {
   gap: 8px;
 }
 
-/* มือถือ: ย่อปุ่มให้พอดี ไม่ดันตารางล้น */
 @media (max-width: 768px) {
   #summary-page table {
     font-size: 14px;
@@ -728,7 +722,6 @@ body {
     border-radius: 8px;
   }
 
-  /* ถ้ายังแน่น ให้สลับเรียงปุ่มเป็นแนวตั้ง */
   #summary-page table td:last-child {
     flex-direction: column;
     gap: 6px;
@@ -736,52 +729,38 @@ body {
 }
 
 /* === START: โค้ดสำหรับ Layout 2 คอลัมน์ (แสดงผลเหมือนกันทุกหน้าจอ) === */
-
-/* 1. สร้าง Grid Container สำหรับแบ่ง 2 คอลัมน์ */
 .sale-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  /* แบ่งเป็น 2 คอลัมน์เท่าๆ กัน */
   gap: 20px;
-  /* ระยะห่างระหว่างคอลัมน์ */
 }
 
-/* 2. จัดการ product-list ที่ตอนนี้อยู่ในคอลัมน์แล้ว */
 .sale-column .product-list {
   display: flex;
-  /* เปลี่ยนเป็น flex เพื่อให้สินค้าเรียงจากบนลงล่าง */
   flex-direction: column;
   gap: 20px;
 }
 
-/* 3. ปรับสไตล์ Product Card ให้เหมือนในรูปตัวอย่าง */
 .product-card {
   text-align: center;
-  /* จัดทุกอย่างให้อยู่ตรงกลาง */
   background-color: #f7f9fc;
-  /* สีพื้นหลังการ์ด */
   border: 1px solid #e0e9ff;
-  /* เพิ่มเส้นขอบสีอ่อนๆ */
 }
 
 .product-card h3 {
   font-size: 1.5em;
-  /* ปรับขนาดชื่อสินค้า */
   margin-bottom: 10px;
 }
 
 .product-card .price {
   font-size: 1.2em;
   color: #007bff;
-  /* เปลี่ยนสีราคาเป็นสีฟ้า */
   font-weight: bold;
   margin-bottom: 20px;
 }
 
-/* 4. ปรับปุ่ม เพิ่ม/ลด จำนวน */
 .quantity-control button {
   background: #007bff;
-  /* เปลี่ยนเป็นสีฟ้าทึบ */
   width: 40px;
   height: 40px;
 }
@@ -792,12 +771,96 @@ body {
   width: 50px;
 }
 
-/* 5. ปรับปุ่ม "เพิ่มลงตะกร้า" */
 .add-to-cart-btn {
   background: linear-gradient(135deg, #6a5acd, #4d51d9);
-  /* ไล่สีม่วง-น้ำเงิน */
   font-size: 1.1em;
   padding: 12px;
 }
 
 /* === END: โค้ดสำหรับ Layout 2 คอลัมน์ === */
+
+
+/* === START: โค้ดปรับ Layout หน้าขายให้พอดีกับจอมือถือ (2 คอลัมน์) === */
+#sale-page.container {
+  padding: 15px 10px;
+}
+
+.category-selector {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.category-selector .category-card {
+  flex: 1;
+  margin-bottom: 0;
+  padding: 12px;
+  font-size: 1em;
+  border: 1px solid transparent;
+}
+
+.category-selector .category-card.active {
+  background: var(--primary-color);
+  color: white;
+}
+
+.sale-grid {
+  gap: 10px;
+}
+
+.product-card {
+  padding: 15px;
+}
+
+.product-card h3 {
+  font-size: 1.2em;
+  margin-bottom: 5px;
+}
+
+.product-card .price {
+  font-size: 1em;
+  margin-bottom: 10px;
+}
+
+.mix-options {
+  gap: 8px;
+}
+
+.mix-option {
+  font-size: 0.9em;
+  gap: 8px;
+}
+
+.mix-option input[type="radio"] {
+  width: 18px;
+  height: 18px;
+}
+
+.mix-option input[type="radio"]:checked {
+  box-shadow: 0 0 0 3px #fff, 0 0 0 5px var(--primary-color);
+}
+
+.quantity-control {
+  margin-top: 15px;
+  gap: 10px;
+}
+
+.quantity-control button {
+  width: 36px;
+  height: 36px;
+  font-size: 1.2em;
+}
+
+.quantity-control input {
+  width: 40px;
+  height: 36px;
+  font-size: 1.1em;
+}
+
+.add-to-cart-btn {
+  padding: 10px;
+  font-size: 1em;
+  margin-top: 15px;
+}
+
+/* === END: โค้ดปรับ Layout หน้าขาย === */
