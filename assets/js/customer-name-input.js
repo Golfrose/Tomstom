@@ -1,4 +1,4 @@
-/* Customer Name – UI injector */
+/* Customer Name – UI injector (สร้างช่องชื่อลูกค้าใต้ปุ่มเพิ่มลงตะกร้า) */
 (function(){
   const $  = (s,c=document)=>c.querySelector(s);
   const $$ = (s,c=document)=>Array.from(c.querySelectorAll(s));
@@ -22,20 +22,14 @@
   }
 
   function injectInputs(){
-    // พยายามจับการ์ดให้กว้าง ๆ เพื่อรองรับ layout ของคุณ
-    const cards = $$('.product-card, .card, .product, [data-product]');
+    const cards = $$('.product-card, .card, .product, [data-product], [data-product-id]');
     cards.forEach(card=>{
       if(card.__hasCustomerInput) return;
-
       const addBtn=[...card.querySelectorAll('button')].find(b=>/เพิ่มลงตะกร้า/.test(b.textContent||''));
       const id = card.getAttribute('data-product') || card.getAttribute('data-product-id') || card.id || Math.random().toString(36).slice(2,9);
       const box = makeBox(id);
-
-      if(addBtn && addBtn.parentElement){
-        addBtn.parentElement.insertBefore(box, addBtn);   // วาง “เหนือปุ่มเพิ่มลงตะกร้า”
-      }else{
-        card.appendChild(box);
-      }
+      if(addBtn && addBtn.parentElement) addBtn.parentElement.insertBefore(box, addBtn);
+      else card.appendChild(box);
       card.__hasCustomerInput = true;
     });
   }
