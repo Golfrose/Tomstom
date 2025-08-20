@@ -55,3 +55,8 @@
     getDisplayNameForRender
   };
 })(window);
+
+/* data hub (optional, harmless) */
+window.CustomerNameData = window.CustomerNameData || {
+  last: '', set(n){ this.last = (n||'').trim(); }, get(){ return this.last || ''; }
+};
