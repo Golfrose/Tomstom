@@ -1,4 +1,4 @@
-/* Customer Name – tiny UI injector (เฉพาะช่องกรอกชื่อ) */
+/* Customer Name – UI injector */
 (function(){
   const $  = (s,c=document)=>c.querySelector(s);
   const $$ = (s,c=document)=>Array.from(c.querySelectorAll(s));
@@ -22,20 +22,17 @@
   }
 
   function injectInputs(){
-    const cards = $$('.product-card, .card, .product, [data-product-id]');
+    // พยายามจับการ์ดให้กว้าง ๆ เพื่อรองรับ layout ของคุณ
+    const cards = $$('.product-card, .card, .product, [data-product]');
     cards.forEach(card=>{
       if(card.__hasCustomerInput) return;
 
-      // หา button “เพิ่มลงตะกร้า”
       const addBtn=[...card.querySelectorAll('button')].find(b=>/เพิ่มลงตะกร้า/.test(b.textContent||''));
-
-      // id สำหรับ input
-      const id = card.getAttribute('data-product-id') || card.id || Math.random().toString(36).slice(2,9);
+      const id = card.getAttribute('data-product') || card.getAttribute('data-product-id') || card.id || Math.random().toString(36).slice(2,9);
       const box = makeBox(id);
 
-      // แทรกกล่องไว้ “เหนือปุ่มเพิ่มลงตะกร้า” (หรือท้ายการ์ดถ้าหาไม่เจอ)
       if(addBtn && addBtn.parentElement){
-        addBtn.parentElement.insertBefore(box, addBtn);
+        addBtn.parentElement.insertBefore(box, addBtn);   // วาง “เหนือปุ่มเพิ่มลงตะกร้า”
       }else{
         card.appendChild(box);
       }
@@ -43,7 +40,6 @@
     });
   }
 
-  // inject ครั้งแรก + เฝ้าหน้าเผื่อมีการ์ดถูกโหลดเพิ่ม
   function start(){
     injectInputs();
     new MutationObserver(injectInputs).observe(document.body,{childList:true,subtree:true});
