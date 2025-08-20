@@ -1,103 +1,60 @@
-// sales.js
+// sales.js — ฉบับสมบูรณ์ (ก๊อปวางทับได้เลย)
 import { auth, database } from './firebase.js';
 import { cart, clearCart } from './cart.js';
 
+function hasName(item){
+  return !!(item && item.customerName && item.customerName.trim());
+}
+
 export function confirmSale() {
-  if (Object.keys(cart).length === 0) {
-    alert('ไม่มีรายการในตะกร้า!');
-    return;
-  }
-  const user = auth.currentUser;
-  if (!user) {
-    alert('กรุณาเข้าสู่ระบบก่อน');
-    return;
-  }
-  const salesRef = database.ref('sales/' + user.uid);
+  try {
+    // 1) ตรวจตะกร้า & การล็อกอิน
+    if (Object.keys(cart).length === 0) {
+      alert('ไม่มีรายการในตะกร้า!');
+      return;
+    }
+    const user = auth.currentUser;
+    if (!user) {
+      alert('กรุณาเข้าสู่ระบบก่อน!');
+      return;
+    }
 
-  for (const key in cart) {
-  const item = cart[key];
-
-  // ถ้ามี customerName ให้ใช้แทน product
-  const productToSave = (item.customerName && item.customerName.trim())
-    ? item.customerName.trim()
-    : item.product;
-
-  const newSaleRef = salesRef.push();
-  newSaleRef.set({
-    timestamp: firebase.database.ServerValue.TIMESTAMP,
-    product: productToSave,   // ✅ ใช้ชื่อที่ลูกค้ากรอก ถ้าไม่มีใช้ product
-    mix: item.mix,
-    quantity: item.quantity,
-    pricePerUnit: item.pricePerUnit,
-    totalPrice: item.totalPrice
-  });
-}
-  clearCart();
-  alert('บันทึกการขายเรียบร้อย!');
-}
-/* ===== CustomerName :: SALES – APPEND-ONLY (ไม่แตะของเดิม) ===== */
-(function(){
-  const CND = window.CustomerNameData;
-
-  // ช่วยตกแต่ง saleItems ก่อน save
-  function decorateSaleItem(item){
-    try{
-      // ถ้ามีแล้วก็คืนเดิม
-      if (item.displayName && (item.customerName || item.option || item.productName)) return item;
-
-      const patched = CND.cartItemToSaleItem({
-        productId   : item.productId || item.id,
-        productName : item.productName || item.name,
-        option      : item.option || '',
-        qty         : item.qty ?? 1,
-        price       : item.price ?? 0,
-        customerName: item.customerName || ''
-      });
-      // ผสานกับฟิลด์เดิม (เช่น barcode, discount ฯลฯ)
-      return Object.assign({}, item, patched);
-    }catch(e){ return item; }
-  }
-
-  // เฝ้าการคลิก "ยืนยันการขาย" แล้วพยายามตกแต่งข้อมูลที่กำลังจะ save
-  document.addEventListener('click', (ev)=>{
-    const btn = ev.target.closest('button');
-    if (!btn || !/ยืนยันการขาย/.test(btn.textContent||'')) return;
-
-    // เผื่อโค้ดเดิมดึงจาก window.CART หรือตัวแปร global อื่น—เราจะตกแต่งทันที
-    setTimeout(()=>{
-      if (Array.isArray(window.CART)) {
-        window.CART = window.CART.map(it=>{
-          if (it?.displayName) return it;
-          const product = { id: it?.productId || it?.id, name: it?.productName || it?.name };
-          const patched = CND.makeCartItemBase({
-            product, option: it?.option || '', qty: it?.qty ?? 1, price: it?.price ?? 0, customerName: it?.customerName || ''
-          });
-        return Object.assign({}, it, patched);
-        });
+    // 2) (เลือกได้) บังคับให้กรอกชื่อลูกค้าทุกชิ้นก่อนขาย
+    //    ถ้าไม่อยากบังคับ: ลบบล็อก for ตรวจสอบนี้ออกได้
+    for (const key in cart) {
+      const it = cart[key];
+      if (!hasName(it)) {
+        alert('กรุณากรอกชื่อลูกค้าก่อนยืนยันการขาย');
+        return;
       }
-    }, 0);
-  });
+    }
 
-  // 👉 ถ้าคุณมีฟังก์ชัน save/checkout แบบชัดเจน เช่น window.saveSales(items)
-  // ปรับเป็น wrapper อัตโนมัติ:
-  function wrapSaveFunction(name){
-    const root = window;
-    const fn = root[name];
-    if (typeof fn !== 'function' || fn.__wrappedByCustomerName) return;
-    const wrapped = function(items, ...rest){
-      try{
-        if (Array.isArray(items)) {
-          items = items.map(decorateSaleItem);
-        } else if (items && Array.isArray(items.items)) {
-          items.items = items.items.map(decorateSaleItem);
-        }
-      } catch {}
-      return fn.call(this, items, ...rest);
-    };
-    Object.defineProperty(wrapped, '__wrappedByCustomerName', { value: true });
-    root[name] = wrapped;
+    // 3) อ้าง path ใน Realtime Database
+    const salesRef = database.ref('sales/' + user.uid);
+
+    // 4) บันทึกรายการขาย: product = ชื่อลูกค้า (ถ้ามี), mix คงเดิม
+    for (const key in cart) {
+      const item = cart[key];
+
+      const productToSave = hasName(item) ? item.customerName.trim() : item.product;
+
+      const newSaleRef = salesRef.push();
+      newSaleRef.set({
+        // ใช้ Date.now() ให้ชัวร์กับ module (ถ้าใช้ firebase v8 global จะเปลี่ยนเป็น ServerValue.TIMESTAMP ก็ได้)
+        timestamp   : Date.now(),
+        product     : productToSave,          // << สำคัญ: ให้รายงานโชว์เป็น "ชื่อลูกค้า"
+        mix         : item.mix,               //      แล้วค่อยเอา mix ไปต่อวงเล็บในหน้ารายงาน
+        quantity    : item.quantity,
+        pricePerUnit: item.pricePerUnit,
+        totalPrice  : item.totalPrice
+      });
+    }
+
+    // 5) เคลียร์ตะกร้า & แจ้งผล
+    clearCart();
+    alert('บันทึกการขายเรียบร้อยแล้ว');
+  } catch (err) {
+    console.error(err);
+    alert('เกิดข้อผิดพลาดในการบันทึกการขาย');
   }
-
-  // ลองครอบชื่อที่พบบ่อย
-  ['saveSales', 'confirmSale', 'checkout', 'finalizeSale'].forEach(wrapSaveFunction);
-})();
+}
