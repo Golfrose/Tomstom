@@ -112,3 +112,58 @@ export function deleteSaleItem(itemId) {
     alert('ลบรายการเรียบร้อย!');
   });
 }
+
+/* ===== CustomerName :: REPORT – APPEND-ONLY (ไม่แตะของเดิม) ===== */
+(function(){
+  const CND = window.CustomerNameData;
+  if (!CND) return;
+
+  // ถ้าระบบคุณมี hook ตอน "แปลงเอกสาร → แถวตาราง"
+  // เราครอบฟังก์ชันที่พบบ่อยเพื่อแทนชื่อแสดง:
+  function wrapRenderRow(name){
+    const root = window;
+    const fn = root[name];
+    if (typeof fn !== 'function' || fn.__wrappedByCustomerName) return;
+    const wrapped = function(item, ...rest){
+      try{
+        if (item) item = Object.assign({}, item, {
+          // ให้คอลัมน์สินค้าใช้ displayName
+          displayName: CND.getDisplayNameForRender(item)
+        });
+      } catch {}
+      return fn.call(this, item, ...rest);
+    };
+    Object.defineProperty(wrapped, '__wrappedByCustomerName', { value: true });
+    root[name] = wrapped;
+  }
+
+  // ชื่อที่พบบ่อยในการเรนเดอร์
+  ['renderReportRow', 'renderSaleRow', 'appendReportRow', 'renderTableRow'].forEach(wrapRenderRow);
+
+  // สำหรับโค้ดที่สร้าง HTML เป็นสตริงในลูป:
+  // เราครอบฟังก์ชันประกอบแถว (เช่น buildRowHtml(items)) ถ้ามี:
+  function wrapRowBuilder(name){
+    const root = window;
+    const fn = root[name];
+    if (typeof fn !== 'function' || fn.__wrappedByCustomerName) return;
+    const wrapped = function(items, ...rest){
+      try{
+        if (Array.isArray(items)) {
+          items = items.map(it => {
+            if (!it) return it;
+            const dn = CND.getDisplayNameForRender(it);
+            // ฝังค่าเพื่อให้เทมเพลตเดิมหยิบไปใช้
+            return Object.assign({}, it, { displayName: dn });
+          });
+        }
+      } catch {}
+      return fn.call(this, items, ...rest);
+    };
+    Object.defineProperty(wrapped, '__wrappedByCustomerName', { value: true });
+    root[name] = wrapped;
+  }
+  ['buildReportRows', 'buildSaleRows', 'rowsToHtml'].forEach(wrapRowBuilder);
+
+  // สุดท้าย: เฝ้าตาราง—ถ้าหน้าใช้ onSnapshot/โหลดช้า ก็จะมี displayName มาตั้งแต่ข้อมูล ไม่ต้องแก้อีก
+  // (ส่วนนี้ไม่ยุ่ง DOM text แต่เผื่อคุณมีเรนเดอร์ callback แบบกำหนดเอง)
+})();
