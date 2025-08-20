@@ -1,95 +1,116 @@
-// cart.js — เวอร์ชันใส่ปุ่มกากบาทลบรายการในโมดัล
-export let cart = {};
+import {
+    products
+} from './config.js';
 
-export function changeQuantity(inputEl, change) {
-  const input = inputEl.closest('.quantity-control').querySelector('.quantity-input');
-  let quantity = parseInt(input.value || '0') + change;
-  if (quantity < 0) quantity = 0;
-  input.value = quantity;
-  updateCartCount();
+let cart = [];
+
+const cartIcon = document.getElementById('cart-icon');
+const cartCount = document.getElementById('cart-count');
+const cartModal = document.getElementById('cart-modal');
+const modalItems = document.getElementById('modal-items');
+const modalCartTotal = document.getElementById('modal-cart-total');
+const clearCartBtn = document.getElementById('clear-cart-btn');
+
+function updateCartDisplay() {
+    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+    cartCount.textContent = totalItems;
+
+    if (totalItems > 0) {
+        cartIcon.classList.add('visible');
+    } else {
+        cartIcon.classList.remove('visible');
+    }
 }
 
-export function addToCart(productCard) {
-  const product = productCard.dataset.product;
-  const quantityInput = productCard.querySelector('.quantity-input');
-  const quantity = parseInt(quantityInput.value || '0');
+function updateCartModal() {
+    modalItems.innerHTML = '';
+    let total = 0;
 
-  if (quantity <= 0) {
-    alert('กรุณาใส่จำนวนสินค้าก่อน');
-    return;
-  }
+    cart.forEach((item, index) => {
+        const product = products.find(p => p.id === item.productId);
+        const itemTotal = product.price * item.quantity;
+        total += itemTotal;
 
-  const mixRadio = productCard.querySelector(`input[name="mix-${product}"]:checked`);
-  const mix = mixRadio ? mixRadio.value : 'ไม่มี';
-  const pricePerUnit = parseFloat(mixRadio ? mixRadio.dataset.price : productCard.dataset.price);
+        // --- START: สร้างชื่อแสดงผลแบบใหม่ ---
+        const mixName = product.mixes[item.mix];
+        const displayName = item.customerName ?
+            `${item.customerName} (${mixName})` :
+            `${product.name} (${mixName})`;
+        // --- END: สร้างชื่อแสดงผลแบบใหม่ ---
 
-  let totalPrice = pricePerUnit * quantity;
-  // โปรโมชัน: น้ำดิบ 2 ขวด 120
-  if (product === 'น้ำดิบ') {
-    totalPrice = Math.floor(quantity / 2) * 120 + (quantity % 2) * 65;
-  }
+        const itemHTML = `
+            <div class="modal-item" data-index="${index}">
+                <div class="item-details">
+                    <strong>${displayName}</strong><br>
+                    <span>${item.quantity} ขวด × ${product.price}฿</span>
+                </div>
+                <div class="item-total">${itemTotal}฿</div>
+                <button class="remove-item" data-index="${index}">×</button>
+            </div>
+        `;
+        modalItems.innerHTML += itemHTML;
+    });
 
-  const key = `${product}-${mix}`;
-  if (cart[key]) {
-    cart[key].quantity += quantity;
-    cart[key].totalPrice += totalPrice;
-  } else {
-    cart[key] = { product, mix, quantity, pricePerUnit, totalPrice };
-  }
-
-  quantityInput.value = 0;
-  updateCartCount();
-  alert(`เพิ่ม ${quantity} ขวด ลงในตะกร้าแล้ว`);
+    modalCartTotal.textContent = total;
+    addRemoveItemListeners();
 }
 
-export function updateCartCount() {
-  let totalItems = 0;
-  for (const k in cart) totalItems += cart[k].quantity;
-  document.getElementById('cart-count').textContent = totalItems;
+
+function addRemoveItemListeners() {
+    document.querySelectorAll('.remove-item').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const index = parseInt(e.target.dataset.index);
+            removeItemFromCart(index);
+        });
+    });
 }
 
-/* ---------- ใหม่: ลบรายการจากตะกร้า ---------- */
-export function removeFromCart(key){
-  if(!cart[key]) return;
-  delete cart[key];
-  updateCartCount();
-  renderCartModal();  // รีเฟรช modal และยอดรวม
+function removeItemFromCart(index) {
+    cart.splice(index, 1);
+    updateCartDisplay();
+    updateCartModal();
 }
 
-/* ---------- อัปเดต: ใส่ปุ่มกากบาท × ในแต่ละแถว ---------- */
-export function renderCartModal() {
-  const modalItems = document.getElementById('modal-items');
-  modalItems.innerHTML = '';
-  let totalCartPrice = 0;
 
-  for (const key in cart) {
-    const item = cart[key];
-    totalCartPrice += item.totalPrice;
+export function addToCart(productId, mix, quantity, customerName) {
+    const item = {
+        productId,
+        mix,
+        quantity,
+        customerName // เพิ่ม customerName เข้าไปใน object
+    };
+    cart.push(item);
+    updateCartDisplay();
+    alert(`เพิ่ม '${customerName || products.find(p=>p.id===productId).name}' ลงในตะกร้าแล้ว`);
+}
 
-    const itemDiv = document.createElement('div');
-    itemDiv.classList.add('modal-item');
-    itemDiv.innerHTML = `
-      <button class="remove-item" data-key="${key}" aria-label="ลบรายการ">×</button>
-      <div class="item-details">
-        <div>${item.product} ${item.mix !== 'ไม่มี' ? `(${item.mix})` : ''}</div>
-        <small>${item.quantity} ขวด × ${item.pricePerUnit}฿</small>
-      </div>
-      <span class="item-total">${item.totalPrice.toLocaleString()}฿</span>
-    `;
-    modalItems.appendChild(itemDiv);
-  }
-
-  document.getElementById('modal-cart-total').textContent = totalCartPrice.toLocaleString();
-  document.getElementById('cart-modal').style.display = 'flex';
-
-  // bind ปุ่มลบทุกรายการ
-  modalItems.querySelectorAll('.remove-item').forEach(btn => {
-    btn.addEventListener('click', (e) => removeFromCart(e.currentTarget.dataset.key));
-  });
+export function getCart() {
+    return cart;
 }
 
 export function clearCart() {
-  cart = {};
-  updateCartCount();
-  document.getElementById('cart-modal').style.display = 'none';
+    cart = [];
+    updateCartDisplay();
+    cartModal.style.display = 'none';
+}
+
+export function initializeCart() {
+    cartIcon.addEventListener('click', () => {
+        if (cart.length > 0) {
+            updateCartModal();
+            cartModal.style.display = 'flex';
+        }
+    });
+
+    cartModal.addEventListener('click', (e) => {
+        if (e.target === cartModal) {
+            cartModal.style.display = 'none';
+        }
+    });
+
+    clearCartBtn.addEventListener('click', () => {
+        if (confirm('คุณต้องการล้างตะกร้าทั้งหมดใช่หรือไม่?')) {
+            clearCart();
+        }
+    });
 }
