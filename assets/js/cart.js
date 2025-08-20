@@ -1,4 +1,3 @@
-import { auth, database } from './firebase.js';
 // cart.js — เวอร์ชันใส่ปุ่มกากบาทลบรายการในโมดัล
 export let cart = {};
 
@@ -58,35 +57,25 @@ export function addToCart(productCard) {
     };
   }
 
-  // บันทึกลงฐานข้อมูลเพื่อให้ข้อมูล sync ข้ามอุปกรณ์
-  if (auth.currentUser) {
-    database.ref('cart/' + auth.currentUser.uid).child(key).set(cart[key]);
-  }
-
   quantityInput.value = 0;
   updateCartCount();
   alert(`เพิ่ม ${quantity} ขวด ลงในตะกร้าแล้ว`);
 }
-
 export function updateCartCount() {
   let totalItems = 0;
-  for (const k in cart) {
-    totalItems += cart[k].quantity;
-  }
+  for (const k in cart) totalItems += cart[k].quantity;
   document.getElementById('cart-count').textContent = totalItems;
 }
 
-export function removeFromCart(key) {
-  if (!cart[key]) return;
+/* ---------- ใหม่: ลบรายการจากตะกร้า ---------- */
+export function removeFromCart(key){
+  if(!cart[key]) return;
   delete cart[key];
-  // ลบจากฐานข้อมูลด้วยเพื่อให้ข้อมูลตรงกันแบบเรียลไทม์
-  if (auth.currentUser) {
-    database.ref('cart/' + auth.currentUser.uid + '/' + key).remove();
-  }
   updateCartCount();
   renderCartModal();  // รีเฟรช modal และยอดรวม
 }
 
+/* ---------- อัปเดต: ใส่ปุ่มกากบาท × ในแต่ละแถว ---------- */
 export function renderCartModal() {
   const modalItems = document.getElementById('modal-items');
   modalItems.innerHTML = '';
@@ -122,49 +111,91 @@ export function renderCartModal() {
     btn.addEventListener('click', (e) => removeFromCart(e.currentTarget.dataset.key));
   });
 }
-
 export function clearCart() {
   cart = {};
   updateCartCount();
   document.getElementById('cart-modal').style.display = 'none';
-  // ล้างข้อมูลตะกร้าในฐานข้อมูลเมื่อยืนยันคำสั่งซื้อเสร็จ
-  if (auth.currentUser) {
-    database.ref('cart/' + auth.currentUser.uid).remove();
-  }
 }
+/* ===== CustomerName :: CART – APPEND-ONLY (ไม่แตะของเดิม) ===== */
+(function(){
+  const CND = window.CustomerNameData;
 
-export function initCartSync() {
-  const user = auth.currentUser;
-  if (!user) return;
-  const cartRef = database.ref('cart/' + user.uid);
-  // รวมรายการที่อาจอยู่ใน local ก่อนล็อกอิน เข้ากับของในฐานข้อมูล
-  cartRef.once('value').then(snapshot => {
-    const serverCart = snapshot.val() || {};
-    for (const key in cart) {
-      if (serverCart[key]) {
-        serverCart[key].quantity += cart[key].quantity;
-        serverCart[key].totalPrice += cart[key].totalPrice;
-      } else {
-        serverCart[key] = cart[key];
-      }
+  // อ่านชื่อ/ตัวเลือกจากการ์ด (จากหน้าขาย) — ใช้ตอนกดเพิ่ม
+  function getCustomerNameFromCard(cardEl){
+    const el = cardEl && cardEl.querySelector('.customer-input');
+    return el ? el.value.trim() : '';
+  }
+  function getOptionFromCard(cardEl){
+    try{
+      const chk = cardEl && cardEl.querySelector('input[type="radio"]:checked');
+      if(!chk) return '';
+      const lbl = chk.closest('label') || chk.parentElement;
+      if (lbl && lbl.textContent) return lbl.textContent.trim();
+      if (chk.nextElementSibling && chk.nextElementSibling.textContent) return chk.nextElementSibling.textContent.trim();
+    }catch{}
+    return '';
+  }
+
+  // ถ้าระบบคุณมี global CART (Array) เราจะ "ครอบ" ให้ auto-decorate ตอน push
+  function wrapCartArrayWhenReady(){
+    const tryWrap = ()=>{
+      const root = window;
+      const CART = root.CART;
+      if (!Array.isArray(CART) || CART.__wrappedByCustomerName) return false;
+
+      // เก็บของเดิม
+      const _push = CART.push.bind(CART);
+      Object.defineProperty(CART, '__wrappedByCustomerName', { value: true });
+
+      // ครอบ push: ถ้า item ขาดฟิลด์ → เติมให้
+      CART.push = function(...items){
+        const patched = items.map(it=>{
+          try{
+            // ถ้ามีอยู่แล้วก็ข้าม
+            if (it && (it.displayName || it.customerName)) return it;
+
+            const product = {
+              id: it?.productId || it?.id,
+              name: it?.productName || it?.name
+            };
+            const option = it?.option || '';
+            const qty    = it?.qty ?? 1;
+            const price  = it?.price ?? 0;
+
+            // พยายามอ่าน customerName จากการ์ดสุดท้ายที่กด (ถ้ามี event)
+            let customerName = '';
+            if (window.__lastAddCardEl) {
+              customerName = getCustomerNameFromCard(window.__lastAddCardEl) || '';
+            }
+
+            const withName = CND.makeCartItemBase({ product, option, qty, price, customerName });
+
+            // ผสานกลับกับฟิลด์เดิม (เช่น discount ฯลฯ)
+            return Object.assign({}, it, withName);
+          }catch(e){ return it; }
+        });
+        return _push(...patched);
+      };
+
+      return true;
+    };
+    // ลองครอบทันที และลองอีกสักพักเผื่อ CART ถูกกำหนดทีหลัง
+    if (!tryWrap()){
+      let n = 0;
+      const t = setInterval(()=>{ if (tryWrap() || ++n>50) clearInterval(t); }, 200);
     }
-    cart = serverCart;
-    cartRef.set(serverCart);
-    // เริ่มฟังการเปลี่ยนแปลงแบบเรียลไทม์ของตะกร้าสินค้า
-    cartRef.on('value', snap => {
-      cart = snap.val() || {};
-      updateCartCount();
-      // ถ้า modal ตะกร้ากำลังเปิดอยู่ ให้รีเฟรชรายการใน modal
-      if (document.getElementById('cart-modal').style.display === 'flex') {
-        renderCartModal();
-      }
-    });
-  });
-}
-
-export function detachCartSync() {
-  const user = auth.currentUser;
-  if (user) {
-    database.ref('cart/' + user.uid).off('value');
   }
-}
+
+  // เวลา "กดเพิ่มลงตะกร้า" ให้บันทึกการ์ดที่กดล่าสุดไว้ เพื่ออ่านชื่อลูกค้า
+  document.addEventListener('click', (ev)=>{
+    const btn = ev.target.closest('button');
+    if (!btn || !/เพิ่มลงตะกร้า/.test(btn.textContent||'')) return;
+    window.__lastAddCardEl = btn.closest('.product-card, .card, .product, [data-product-id]') || null;
+    // ถ้าระบบคุณเรียก addToCart(product) ภายใน handler เดิม → CART.push จะโดนครอบแล้ว
+    // ถ้าระบบคุณ "ไม่ใช้ CART" ให้บอกชื่อฟังก์ชัน addToCart มา เดี๋ยวผมเขียน wrapper ให้ตรงชื่อ
+  });
+
+  // ตอน render ตะกร้า ถ้าโค้ดเดิมใช้ item.productName → เราพยายามเปลี่ยน textcontent เป็น displayName ให้ “ก่อนสร้าง HTML”
+  // วิธีนี้ขึ้นกับโค้ดเดิม — แต่เมื่อ CART มี displayName แล้ว โค้ดเดิมส่วนใหญ่จะหยิบมาใช้เอง
+  wrapCartArrayWhenReady();
+})();
