@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,14 +17,15 @@
 
   <!-- Firebase SDK (compat to match original) -->
   <script src="assets/js/firebase-init.js"></script>
-<script src="assets/js/fetch-shim.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="assets/js/fetch-shim.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body>
   <!-- Auth -->
   <div id="auth-container" class="auth-container">
@@ -65,21 +67,32 @@
 
     <!-- Sale Page -->
     <div id="sale-page" class="page container">
-      <div class="category-card">
-        <i class="fas fa-cocktail"></i>
-        <span>หมวดน้ำ</span>
-      </div>
-      <div class="product-list" id="product-list-water">
-        <!-- ใส่ด้วย server-side หรือ static HTML ก็ได้: ใช้โครงจาก original -->
-      </div>
 
-      <div class="category-card" style="margin-top:20px;">
-        <i class="fas fa-pills"></i>
-        <span>หมวดยา</span>
+      <!-- START: โครงสร้างใหม่สำหรับแบ่ง 2 คอลัมน์ -->
+      <div class="sale-grid">
+        <!-- คอลัมน์ซ้าย: หมวดน้ำ -->
+        <div class="sale-column">
+          <div class="category-card">
+            <i class="fas fa-cocktail"></i>
+            <span>หมวดน้ำ</span>
+          </div>
+          <div class="product-list" id="product-list-water">
+            <!-- JavaScript จะเติมสินค้าหมวดน้ำที่นี่เหมือนเดิม -->
+          </div>
+        </div>
+
+        <!-- คอลัมน์ขวา: หมวดยา -->
+        <div class="sale-column">
+          <div class="category-card">
+            <i class="fas fa-pills"></i>
+            <span>หมวดยา</span>
+          </div>
+          <div class="product-list" id="product-list-med">
+            <!-- JavaScript จะเติมสินค้าหมวดยาที่นี่เหมือนเดิม -->
+          </div>
+        </div>
       </div>
-      <div class="product-list" id="product-list-med">
-        <!-- เช่นเดียวกัน -->
-      </div>
+      <!-- END: โครงสร้างใหม่ -->
 
       <div class="cart-icon" id="cart-icon">
         <i class="fas fa-shopping-basket"></i>
@@ -207,4 +220,5 @@
   <script type="module" src="./assets/js/compare.js"></script>
   <script type="module" src="./assets/js/main.js"></script>
 </body>
+
 </html>
