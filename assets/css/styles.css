@@ -1,5 +1,5 @@
 :root {
-  --bg-color: #e0e9ff;
+  --bg-color: #f0f4ff;
   --card-bg: #fff;
   --primary-color: #6a5acd;
   --secondary-color: #ff6347;
@@ -9,8 +9,8 @@
   --button-text-color: #fff;
   --border-radius-large: 20px;
   --border-radius-small: 12px;
-  --shadow-light: 0 4px 15px rgba(0, 0, 0, 0.1);
-  --shadow-medium: 0 8px 25px rgba(0, 0, 0, 0.15);
+  --shadow-light: 0 4px 15px rgba(0, 0, 0, 0.08);
+  --shadow-medium: 0 8px 25px rgba(0, 0, 0, 0.12);
 }
 
 * {
@@ -51,18 +51,20 @@ body {
 }
 
 .main-nav {
-  display: none;
+  display: flex; /* เปลี่ยนเป็น flex เพื่อให้แสดงผล */
   justify-content: center;
   gap: 15px;
   margin-top: -60px;
   position: relative;
+  padding: 0 15px;
 }
 
 .nav-btn {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20px;
+  justify-content: center;
+  padding: 15px;
   background-color: #f7f9fc;
   border-radius: var(--border-radius-large);
   text-align: center;
@@ -70,7 +72,8 @@ body {
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease-in-out;
-  width: 100px;
+  flex: 1;
+  max-width: 120px;
   box-shadow: var(--shadow-light);
 }
 
@@ -97,9 +100,9 @@ body {
 }
 
 .container {
-  max-width: 90%;
+  max-width: 95%;
   margin: 20px auto;
-  padding: 25px;
+  padding: 20px;
   background-color: var(--card-bg);
   border-radius: var(--border-radius-large);
   box-shadow: var(--shadow-light);
@@ -109,29 +112,22 @@ body {
 .page {
   display: none;
 }
-
-.category-card {
-  background-color: var(--bg-color);
-  padding: 15px 25px;
-  border-radius: var(--border-radius-small);
-  text-align: center;
-  font-size: 1.2em;
-  font-weight: 500;
-  color: var(--primary-color);
-  margin-bottom: 20px;
-  box-shadow: var(--shadow-light);
+#sale-page {
+    display: block; /* หน้าขายแสดงเป็น default */
 }
+
 
 .product-list {
   display: grid;
-  gap: 20px;
+  gap: 15px;
 }
 
 .product-card {
-  background-color: #f7f9fc;
+  background-color: #fdfdff;
   padding: 20px;
   border-radius: var(--border-radius-large);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  border: 1px solid #eef2ff;
 }
 
 .product-card h3 {
@@ -147,6 +143,28 @@ body {
   margin-bottom: 15px;
   display: block;
 }
+
+/* === START: รูปแบบช่องใส่ชื่อลูกค้า === */
+.customer-name-container {
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+
+.customer-name-input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: var(--border-radius-small);
+  font-size: 1em;
+  font-family: 'Prompt', sans-serif;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+.customer-name-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(106, 90, 205, 0.2);
+}
+/* === END: รูปแบบช่องใส่ชื่อลูกค้า === */
 
 .mix-options {
   display: flex;
@@ -197,6 +215,9 @@ body {
   font-size: 1.5em;
   cursor: pointer;
   transition: all 0.3s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .quantity-control button:hover {
@@ -211,7 +232,14 @@ body {
   border: 1px solid #ddd;
   border-radius: var(--border-radius-small);
   font-size: 1.2em;
+  -moz-appearance: textfield;
 }
+.quantity-control input::-webkit-outer-spin-button,
+.quantity-control input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
 
 .add-to-cart-btn {
   width: 100%;
@@ -225,7 +253,13 @@ body {
   cursor: pointer;
   margin-top: 20px;
   box-shadow: var(--shadow-light);
+  transition: all 0.3s ease;
 }
+.add-to-cart-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-medium);
+}
+
 
 .cart-icon {
   position: fixed;
@@ -236,7 +270,7 @@ body {
   background: var(--button-bg-1);
   border-radius: 50%;
   color: #fff;
-  display: none;
+  display: flex; /* แก้ไขเป็น flex เพื่อให้แสดงผล */
   justify-content: center;
   align-items: center;
   font-size: 1.5em;
@@ -244,6 +278,11 @@ body {
   cursor: pointer;
   z-index: 100;
   animation: bounce 2s infinite;
+  transform: scale(0);
+  transition: transform 0.3s ease-out;
+}
+.cart-icon.visible {
+    transform: scale(1);
 }
 
 .cart-count {
@@ -253,9 +292,12 @@ body {
   background-color: var(--secondary-color);
   color: white;
   border-radius: 50%;
-  padding: 5px 8px;
+  padding: 3px 7px;
   font-size: 0.8em;
   font-weight: bold;
+  line-height: 1;
+  min-width: 22px;
+  text-align: center;
   animation: pulse 1s infinite;
 }
 
@@ -651,7 +693,7 @@ body {
   text-align: center;
 }
 
-/* === Remove button (X) — version สะอาดตัวเดียวจบ === */
+/* === Remove button (X) === */
 #cart-modal .modal-item {
   position: relative;
   padding-right: 72px;
@@ -692,53 +734,37 @@ body {
 }
 
 /* ===== Summary table: responsive fix ===== */
-#summary-page .table-wrap,
 #summary-page .summary-table-wrap {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
 
 #summary-page table td:last-child {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 8px;
+  white-space: nowrap;
 }
 
-@media (max-width: 768px) {
-  #summary-page table {
-    font-size: 14px;
-  }
-
-  #summary-page table td,
-  #summary-page table th {
-    padding: 10px 8px;
-  }
-
-  #summary-page table td:last-child .btn,
-  #summary-page table td:last-child button {
-    font-size: 12px;
-    padding: 6px 10px;
-    border-radius: 8px;
-  }
-
-  #summary-page table td:last-child {
-    flex-direction: column;
-    gap: 6px;
-  }
-}
 
 /* === START: โค้ดสำหรับ Layout 2 คอลัมน์ (แสดงผลเหมือนกันทุกหน้าจอ) === */
 .sale-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  grid-template-columns: 1fr; /* Default to 1 column */
+  gap: 15px;
 }
+
+@media (min-width: 768px) {
+    .sale-grid {
+        grid-template-columns: 1fr 1fr; /* 2 columns on larger screens */
+    }
+    #product-column-med {
+        display: block !important; /* Always show both columns on desktop */
+    }
+}
+
 
 .sale-column .product-list {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 15px;
 }
 
 .product-card {
@@ -754,13 +780,13 @@ body {
 
 .product-card .price {
   font-size: 1.2em;
-  color: #007bff;
+  color: var(--primary-color);
   font-weight: bold;
   margin-bottom: 20px;
 }
 
 .quantity-control button {
-  background: #007bff;
+  background: var(--primary-color);
   width: 40px;
   height: 40px;
 }
@@ -777,10 +803,7 @@ body {
   padding: 12px;
 }
 
-/* === END: โค้ดสำหรับ Layout 2 คอลัมน์ === */
-
-
-/* === START: โค้ดปรับ Layout หน้าขายให้พอดีกับจอมือถือ (2 คอลัมน์) === */
+/* === START: โค้ดปรับ Layout หน้าขายให้พอดีกับจอมือถือ === */
 #sale-page.container {
   padding: 15px 10px;
 }
@@ -789,6 +812,7 @@ body {
   display: flex;
   gap: 10px;
   margin-bottom: 15px;
+  cursor: pointer;
 }
 
 .category-selector .category-card {
@@ -796,16 +820,26 @@ body {
   margin-bottom: 0;
   padding: 12px;
   font-size: 1em;
-  border: 1px solid transparent;
+  border: 1px solid #e0e9ff;
+  background-color: #f7f9fc;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .category-selector .category-card.active {
   background: var(--primary-color);
   color: white;
+  border-color: var(--primary-color);
+  box-shadow: var(--shadow-light);
 }
 
-.sale-grid {
-  gap: 10px;
+@media (min-width: 768px) {
+    .category-selector {
+        display: none; /* Hide selector on desktop as both columns are shown */
+    }
 }
 
 .product-card {
@@ -862,23 +896,3 @@ body {
   font-size: 1em;
   margin-top: 15px;
 }
-
-/* === END: โค้ดปรับ Layout หน้าขาย === */
-
-
-/* === START: โค้ดแก้ปัญหาช่องว่างในคอลัมน์ (วิธีที่ 1 - แนะนำ) === */
-.sale-column,
-.sale-column .product-list {
-  display: contents;
-}
-
-.product-card {
-  break-inside: avoid;
-}
-
-.sale-grid {
-  grid-auto-rows: auto;
-  gap: 10px;
-}
-
-/* === END: โค้ดแก้ปัญหาช่องว่าง === */
