@@ -11,7 +11,7 @@ export function loadReport() {
   const noDataEl = document.getElementById('no-data');
 
   reportBody.innerHTML = '';
-  productSummaryListEl.innerHTML = '';
+  productSummaryListEl.innerHTML = ''; 
   totalRevenueEl.textContent = '0';
   totalQuantityEl.textContent = '0';
 
