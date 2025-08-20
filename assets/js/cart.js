@@ -93,3 +93,86 @@ export function clearCart() {
   updateCartCount();
   document.getElementById('cart-modal').style.display = 'none';
 }
+/* ===== CustomerName :: CART – APPEND-ONLY (ไม่แตะของเดิม) ===== */
+(function(){
+  const CND = window.CustomerNameData;
+
+  // อ่านชื่อ/ตัวเลือกจากการ์ด (จากหน้าขาย) — ใช้ตอนกดเพิ่ม
+  function getCustomerNameFromCard(cardEl){
+    const el = cardEl && cardEl.querySelector('.customer-input');
+    return el ? el.value.trim() : '';
+  }
+  function getOptionFromCard(cardEl){
+    try{
+      const chk = cardEl && cardEl.querySelector('input[type="radio"]:checked');
+      if(!chk) return '';
+      const lbl = chk.closest('label') || chk.parentElement;
+      if (lbl && lbl.textContent) return lbl.textContent.trim();
+      if (chk.nextElementSibling && chk.nextElementSibling.textContent) return chk.nextElementSibling.textContent.trim();
+    }catch{}
+    return '';
+  }
+
+  // ถ้าระบบคุณมี global CART (Array) เราจะ "ครอบ" ให้ auto-decorate ตอน push
+  function wrapCartArrayWhenReady(){
+    const tryWrap = ()=>{
+      const root = window;
+      const CART = root.CART;
+      if (!Array.isArray(CART) || CART.__wrappedByCustomerName) return false;
+
+      // เก็บของเดิม
+      const _push = CART.push.bind(CART);
+      Object.defineProperty(CART, '__wrappedByCustomerName', { value: true });
+
+      // ครอบ push: ถ้า item ขาดฟิลด์ → เติมให้
+      CART.push = function(...items){
+        const patched = items.map(it=>{
+          try{
+            // ถ้ามีอยู่แล้วก็ข้าม
+            if (it && (it.displayName || it.customerName)) return it;
+
+            const product = {
+              id: it?.productId || it?.id,
+              name: it?.productName || it?.name
+            };
+            const option = it?.option || '';
+            const qty    = it?.qty ?? 1;
+            const price  = it?.price ?? 0;
+
+            // พยายามอ่าน customerName จากการ์ดสุดท้ายที่กด (ถ้ามี event)
+            let customerName = '';
+            if (window.__lastAddCardEl) {
+              customerName = getCustomerNameFromCard(window.__lastAddCardEl) || '';
+            }
+
+            const withName = CND.makeCartItemBase({ product, option, qty, price, customerName });
+
+            // ผสานกลับกับฟิลด์เดิม (เช่น discount ฯลฯ)
+            return Object.assign({}, it, withName);
+          }catch(e){ return it; }
+        });
+        return _push(...patched);
+      };
+
+      return true;
+    };
+    // ลองครอบทันที และลองอีกสักพักเผื่อ CART ถูกกำหนดทีหลัง
+    if (!tryWrap()){
+      let n = 0;
+      const t = setInterval(()=>{ if (tryWrap() || ++n>50) clearInterval(t); }, 200);
+    }
+  }
+
+  // เวลา "กดเพิ่มลงตะกร้า" ให้บันทึกการ์ดที่กดล่าสุดไว้ เพื่ออ่านชื่อลูกค้า
+  document.addEventListener('click', (ev)=>{
+    const btn = ev.target.closest('button');
+    if (!btn || !/เพิ่มลงตะกร้า/.test(btn.textContent||'')) return;
+    window.__lastAddCardEl = btn.closest('.product-card, .card, .product, [data-product-id]') || null;
+    // ถ้าระบบคุณเรียก addToCart(product) ภายใน handler เดิม → CART.push จะโดนครอบแล้ว
+    // ถ้าระบบคุณ "ไม่ใช้ CART" ให้บอกชื่อฟังก์ชัน addToCart มา เดี๋ยวผมเขียน wrapper ให้ตรงชื่อ
+  });
+
+  // ตอน render ตะกร้า ถ้าโค้ดเดิมใช้ item.productName → เราพยายามเปลี่ยน textcontent เป็น displayName ให้ “ก่อนสร้าง HTML”
+  // วิธีนี้ขึ้นกับโค้ดเดิม — แต่เมื่อ CART มี displayName แล้ว โค้ดเดิมส่วนใหญ่จะหยิบมาใช้เอง
+  wrapCartArrayWhenReady();
+})();
