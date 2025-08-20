@@ -12,36 +12,55 @@ export function changeQuantity(inputEl, change) {
 export function addToCart(productCard) {
   const product = productCard.dataset.product;
   const quantityInput = productCard.querySelector('.quantity-input');
-  const quantity = parseInt(quantityInput.value || '0');
+  const quantity = parseInt(quantityInput.value || '0', 10);
 
-  if (quantity <= 0) {
-    alert('กรุณาใส่จำนวนสินค้าก่อน');
+  if (!quantity || quantity <= 0) {
+    alert('กรุณาเลือกจำนวนให้ถูกต้อง');
     return;
   }
 
+  // mix/ราคา
   const mixRadio = productCard.querySelector(`input[name="mix-${product}"]:checked`);
   const mix = mixRadio ? mixRadio.value : 'ไม่มี';
   const pricePerUnit = parseFloat(mixRadio ? mixRadio.dataset.price : productCard.dataset.price);
 
+  // ✅ อ่านชื่อลูกค้าจากช่องที่เราใส่ไว้บนการ์ด
+  const customerInput = productCard.querySelector('.customer-input');
+  const customerName = (customerInput?.value || '').trim();
+
+  // แสดงผลในตะกร้า
+  const displayName = customerName
+    ? `${customerName}${mix !== 'ไม่มี' ? ` (${mix})` : ''}`
+    : `${product}${mix !== 'ไม่มี' ? ` (${mix})` : ''}`;
+
+  // คิดเงินตาม logic เดิม
   let totalPrice = pricePerUnit * quantity;
-  // โปรโมชัน: น้ำดิบ 2 ขวด 120
   if (product === 'น้ำดิบ') {
     totalPrice = Math.floor(quantity / 2) * 120 + (quantity % 2) * 65;
   }
 
-  const key = `${product}-${mix}`;
+  // ใช้ key เดิม (ระวังอย่าชน) — เพิ่มชื่อลูกค้าเข้าไปเพื่อแยกรายการให้ถูก
+  const key = `${product}::${mix}::${customerName || '-'}`;
+
   if (cart[key]) {
     cart[key].quantity += quantity;
     cart[key].totalPrice += totalPrice;
   } else {
-    cart[key] = { product, mix, quantity, pricePerUnit, totalPrice };
+    cart[key] = {
+      product,          // ชื่อสินค้าแท้
+      mix,
+      quantity,
+      pricePerUnit,
+      totalPrice,
+      customerName,     // ✅ เก็บชื่อลูกค้า
+      displayName       // ✅ เก็บชื่อที่ต้องการแสดงผล
+    };
   }
 
   quantityInput.value = 0;
   updateCartCount();
   alert(`เพิ่ม ${quantity} ขวด ลงในตะกร้าแล้ว`);
 }
-
 export function updateCartCount() {
   let totalItems = 0;
   for (const k in cart) totalItems += cart[k].quantity;
