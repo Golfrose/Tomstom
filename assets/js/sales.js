@@ -15,17 +15,23 @@ export function confirmSale() {
   const salesRef = database.ref('sales/' + user.uid);
 
   for (const key in cart) {
-    const item = cart[key];
-    const newSaleRef = salesRef.push();
-    newSaleRef.set({
-      timestamp: firebase.database.ServerValue.TIMESTAMP,
-      product: item.product,
-      mix: item.mix,
-      quantity: item.quantity,
-      pricePerUnit: item.pricePerUnit,
-      totalPrice: item.totalPrice
-    });
-  }
+  const item = cart[key];
+
+  // ถ้ามี customerName ให้ใช้แทน product
+  const productToSave = (item.customerName && item.customerName.trim())
+    ? item.customerName.trim()
+    : item.product;
+
+  const newSaleRef = salesRef.push();
+  newSaleRef.set({
+    timestamp: firebase.database.ServerValue.TIMESTAMP,
+    product: productToSave,   // ✅ ใช้ชื่อที่ลูกค้ากรอก ถ้าไม่มีใช้ product
+    mix: item.mix,
+    quantity: item.quantity,
+    pricePerUnit: item.pricePerUnit,
+    totalPrice: item.totalPrice
+  });
+}
   clearCart();
   alert('บันทึกการขายเรียบร้อย!');
 }
