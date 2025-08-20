@@ -1,3 +1,4 @@
+// Import ฟังก์ชันเริ่มต้นจากทุกไฟล์
 import { initializeAuth } from './auth.js';
 import { initializeUI } from './ui.js';
 import { initializeCart } from './cart.js';
@@ -5,24 +6,19 @@ import { initializeSales } from './sales.js';
 import { initializeReport } from './report.js';
 import { initializeCompare } from './compare.js';
 
-// รอให้ HTML โหลดเสร็จก่อนเริ่มทำงาน JavaScript ทั้งหมด
+// รอให้ HTML โหลดเสร็จสมบูรณ์ก่อน
 document.addEventListener('DOMContentLoaded', () => {
-    // ตรวจสอบว่าอยู่ในหน้าแอปหลัก ไม่ใช่หน้า login
-    const appContainer = document.getElementById('app-container');
-    if (appContainer) {
-        initializeAuth();
-        initializeUI();
-        initializeCart();
-        initializeSales();
-        initializeReport();
-        initializeCompare();
-        setupClock();
-        setupNavigation();
-        showPage('sale'); // แสดงหน้าขายเป็นหน้าแรก
-    } else {
-        // ถ้าอยู่ในหน้า login ก็ให้เริ่มแค่ auth
-        initializeAuth();
-    }
+    // 1. เริ่มระบบ Auth เป็นอันดับแรกเสมอ
+    initializeAuth();
+
+    // 2. เริ่มการทำงานของส่วนอื่นๆ
+    initializeUI();
+    initializeCart();
+    initializeSales();
+    initializeReport();
+    initializeCompare();
+    setupClock();
+    setupNavigation();
 });
 
 function showPage(pageId) {
@@ -33,15 +29,13 @@ function showPage(pageId) {
     if (activePage) {
         activePage.style.display = 'block';
     }
-
     document.querySelectorAll('.main-nav .nav-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.page === pageId);
     });
 }
 
 function setupNavigation() {
-    const navButtons = document.querySelectorAll('.main-nav .nav-btn');
-    navButtons.forEach(button => {
+    document.querySelectorAll('.main-nav .nav-btn').forEach(button => {
         button.addEventListener('click', () => {
             const pageId = button.dataset.page;
             showPage(pageId);
@@ -52,17 +46,12 @@ function setupNavigation() {
 function setupClock() {
     const timeEl = document.getElementById('current-time');
     const dateEl = document.getElementById('current-date');
-
     if (!timeEl || !dateEl) return;
-
     function updateTime() {
         const now = new Date();
-        const timeString = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
-        const dateString = now.toLocaleDateString('th-TH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-        timeEl.textContent = timeString;
-        dateEl.textContent = dateString;
+        timeEl.textContent = now.toLocaleTimeString('th-TH');
+        dateEl.textContent = now.toLocaleDateString('th-TH', { dateStyle: 'full' });
     }
-
     updateTime();
     setInterval(updateTime, 1000);
 }
