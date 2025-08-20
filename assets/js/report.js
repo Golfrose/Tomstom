@@ -1,49 +1,47 @@
-import {
-    db
-} from './firebase.js';
+import { db } from './firebase.js';
 
-const reportDateInput = document.getElementById('report-date');
-const loadReportBtn = document.getElementById('load-report-btn');
-const reportBody = document.getElementById('report-body');
-const totalRevenueEl = document.getElementById('total-revenue');
-const totalQuantityEl = document.getElementById('total-quantity');
-const productSummaryList = document.getElementById('product-summary-list');
-const noDataEl = document.getElementById('no-data');
+let currentReportDate = '';
 
 function formatTime(timestamp) {
-    return new Date(timestamp).toLocaleTimeString('th-TH', {
-        hour: '2-digit',
-        minute: '2-digit'
-    });
+    return new Date(timestamp).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
 }
 
 function loadReport() {
+    const reportDateInput = document.getElementById('report-date');
+    const reportBody = document.getElementById('report-body');
+    const totalRevenueEl = document.getElementById('total-revenue');
+    const totalQuantityEl = document.getElementById('total-quantity');
+    const productSummaryList = document.getElementById('product-summary-list');
+    const noDataEl = document.getElementById('no-data');
+
+    if (!reportDateInput) return; // Exit if not on the summary page
+
     const date = reportDateInput.value;
     if (!date) {
         alert('กรุณาเลือกวันที่');
         return;
     }
+    currentReportDate = date;
 
     const salesRef = db.ref(`sales/${date}`);
-    salesRef.on('value', (snapshot) => {
+    salesRef.on('value', snapshot => {
+        // Only update if the user is still viewing the same date's report
+        if (date !== currentReportDate) return;
+
         const salesData = snapshot.val();
         reportBody.innerHTML = '';
         productSummaryList.innerHTML = '';
         totalRevenueEl.textContent = '0';
         totalQuantityEl.textContent = '0';
+        noDataEl.style.display = 'none';
 
         if (!salesData) {
             noDataEl.style.display = 'block';
             return;
         }
 
-        noDataEl.style.display = 'none';
-
-        let grandTotalRevenue = 0;
-        let grandTotalQuantity = 0;
+        let grandTotalRevenue = 0, grandTotalQuantity = 0;
         const productSummary = {};
-
-        // Sort sales by timestamp
         const sortedSales = Object.entries(salesData).sort((a, b) => a[1].timestamp - b[1].timestamp);
 
         for (const [saleId, sale] of sortedSales) {
@@ -51,13 +49,7 @@ function loadReport() {
             for (const itemId in sale.items) {
                 const item = sale.items[itemId];
                 grandTotalQuantity += item.quantity;
-
-                // --- START: สร้างชื่อแสดงผลแบบใหม่สำหรับสรุป ---
-                const displayName = item.customerName ?
-                    `${item.customerName} (${item.mix})` :
-                    `${item.productName} (${item.mix})`;
-                // --- END: สร้างชื่อแสดงผลแบบใหม่สำหรับสรุป ---
-
+                const displayName = item.customerName ? `${item.customerName} (${item.mix})` : `${item.productName} (${item.mix})`;
                 productSummary[displayName] = (productSummary[displayName] || 0) + item.quantity;
 
                 const row = `
@@ -67,22 +59,17 @@ function loadReport() {
                         <td>${item.quantity}</td>
                         <td>${item.price}</td>
                         <td>${item.total}</td>
-                        <td>
-                            <button class="delete-btn" title="ลบรายการนี้">ลบ</button>
-                        </td>
-                    </tr>
-                `;
+                        <td><button class="delete-btn">ลบ</button></td>
+                    </tr>`;
                 reportBody.innerHTML += row;
             }
         }
 
         totalRevenueEl.textContent = grandTotalRevenue.toLocaleString();
         totalQuantityEl.textContent = grandTotalQuantity;
-
         for (const [name, qty] of Object.entries(productSummary)) {
             productSummaryList.innerHTML += `<li>${name}: ${qty} ขวด</li>`;
         }
-
         addDeleteListeners();
     });
 }
@@ -91,11 +78,7 @@ function addDeleteListeners() {
     document.querySelectorAll('.delete-btn').forEach(button => {
         button.addEventListener('click', (e) => {
             const row = e.target.closest('tr');
-            const {
-                saleId,
-                itemId,
-                date
-            } = row.dataset;
+            const { saleId, itemId, date } = row.dataset;
             if (confirm('คุณแน่ใจหรือไม่ว่าต้องการลบรายการนี้?')) {
                 deleteSaleItem(date, saleId, itemId);
             }
@@ -108,20 +91,14 @@ async function deleteSaleItem(date, saleId, itemId) {
     try {
         const snapshot = await saleRef.once('value');
         const saleData = snapshot.val();
-
         if (!saleData) return;
-
         const itemToDelete = saleData.items[itemId];
-        const newTotal = saleData.total - itemToDelete.total;
-
-        // ถ้ามี item เหลือมากกว่า 1, แค่ลบ item และอัพเดท total
         if (Object.keys(saleData.items).length > 1) {
             await saleRef.update({
-                total: newTotal,
+                total: saleData.total - itemToDelete.total,
                 [`items/${itemId}`]: null
             });
         } else {
-            // ถ้าเป็น item สุดท้าย, ลบ sale record ทั้งหมด
             await saleRef.remove();
         }
         alert('ลบรายการสำเร็จ');
@@ -131,9 +108,11 @@ async function deleteSaleItem(date, saleId, itemId) {
     }
 }
 
-
 export function initializeReport() {
-    reportDateInput.valueAsDate = new Date();
-    loadReportBtn.addEventListener('click', loadReport);
-    loadReport(); // Load report for today on initial load
+    const reportDateInput = document.getElementById('report-date');
+    const loadReportBtn = document.getElementById('load-report-btn');
+    if (reportDateInput && loadReportBtn) {
+        reportDateInput.valueAsDate = new Date();
+        loadReportBtn.addEventListener('click', loadReport);
+    }
 }
