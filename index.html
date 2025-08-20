@@ -70,11 +70,11 @@
 
       <!-- START: เพิ่มส่วนเลือกหมวดหมู่ -->
       <div class="category-selector">
-        <div class="category-card active">
+        <div class="category-card active" data-category="water">
           <i class="fas fa-cocktail"></i>
           <span>หมวดน้ำ</span>
         </div>
-        <div class="category-card">
+        <div class="category-card" data-category="med">
           <i class="fas fa-pills"></i>
           <span>หมวดยา</span>
         </div>
@@ -84,16 +84,16 @@
       <!-- โครงสร้าง 2 คอลัมน์สำหรับรายการสินค้า -->
       <div class="sale-grid">
         <!-- คอลัมน์ซ้าย: หมวดน้ำ -->
-        <div class="sale-column">
+        <div class="sale-column" id="product-column-water">
           <div class="product-list" id="product-list-water">
-            <!-- JavaScript จะเติมสินค้าหมวดน้ำที่นี่เหมือนเดิม -->
+            <!-- JavaScript จะเติมสินค้าหมวดน้ำที่นี่ -->
           </div>
         </div>
 
         <!-- คอลัมน์ขวา: หมวดยา -->
-        <div class="sale-column">
+        <div class="sale-column" id="product-column-med" style="display: none;">
           <div class="product-list" id="product-list-med">
-            <!-- JavaScript จะเติมสินค้าหมวดยาที่นี่เหมือนเดิม -->
+            <!-- JavaScript จะเติมสินค้าหมวดยาที่นี่ -->
           </div>
         </div>
       </div>
@@ -143,19 +143,21 @@
           <ul id="product-summary-list"></ul>
         </div>
       </div>
-      <table class="summary-table">
-        <thead>
-          <tr>
-            <th>วันที่และเวลา</th>
-            <th>สินค้า</th>
-            <th>จำนวน</th>
-            <th>ราคาต่อหน่วย</th>
-            <th>รวม</th>
-            <th>จัดการ</th>
-          </tr>
-        </thead>
-        <tbody id="report-body"></tbody>
-      </table>
+      <div class="summary-table-wrap">
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th>วันที่และเวลา</th>
+              <th>สินค้า</th>
+              <th>จำนวน</th>
+              <th>ราคาต่อหน่วย</th>
+              <th>รวม</th>
+              <th>จัดการ</th>
+            </tr>
+          </thead>
+          <tbody id="report-body"></tbody>
+        </table>
+      </div>
       <div id="no-data" class="no-data" style="display:none;">ไม่พบข้อมูลการขายในวันที่เลือก</div>
     </div>
 
