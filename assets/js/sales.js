@@ -29,3 +29,4 @@ export function confirmSale() {
   clearCart();
   alert('บันทึกการขายเรียบร้อย!');
 }
+
