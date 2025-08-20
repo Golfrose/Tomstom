@@ -1,86 +1,67 @@
-// main.js
-import { auth } from './firebase.js';
-import { changeQuantity, addToCart, renderCartModal, updateCartCount, clearCart } from './cart.js';
-import { confirmSale } from './sales.js';
-import { loadReport } from './report.js';
-import { populateProductSelect, switchCompareMode, clearComparison, compareSales } from './compare.js';
+import { onAuthStateChanged } from './auth.js';
+import { setupUI } from './ui.js';
+import { renderProducts } from './sales.js';
+import { addToCart } from './cart.js';
+import { initReportPage } from './report.js';
+import { initComparePage } from './compare.js';
 
-export function showPage(pageId) {
-  document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
-  document.getElementById(`${pageId}-page`).style.display = 'block';
-  if (pageId === 'summary') {
-    const today = new Date().toISOString().slice(0,10);
-    document.getElementById('report-date').value = today;
-    loadReport();
-  }
-  if (pageId === 'compare') {
-    populateProductSelect();
-    switchCompareMode('day-to-day');
-    document.getElementById('day-to-day-mode').classList.add('active');
-  }
-}
+function handleSalePageInteractions(e) {
+    const target = e.target;
+    const card = target.closest('.product-card');
+    if (!card) return;
 
-// Seed products (static as per original)
-function createProductCard({name, price, mixes, promo}) {
-  const card = document.createElement('div');
-  card.className = 'product-card';
-  card.dataset.product = name;
-  card.dataset.price = price;
-  const mixesHTML = mixes && mixes.length ? mixes.map((m,i)=>`
-    <label class="mix-option">
-      <input type="radio" name="mix-${name}" value="${m.label}" data-price="${m.price}" ${i===0?'checked':''}> ${m.label}
-    </label>`).join('') : `<input type="hidden" name="mix-${name}" value="ไม่มี">`;
+    // จัดการปุ่ม เพิ่ม/ลด จำนวน
+    if (target.classList.contains('quantity-btn')) {
+        const input = card.querySelector('.quantity-input');
+        let value = parseInt(input.value);
+        if (target.dataset.action === 'increase') {
+            value++;
+        } else {
+            value = Math.max(1, value - 1);
+        }
+        input.value = value;
+    }
 
-  card.innerHTML = `
-    <h3>${name}</h3>
-    <span class="price">${price} บาท/ขวด${promo?` (${promo})`:''}</span>
-    <div class="mix-options">${mixesHTML}</div>
-    <div class="quantity-control">
-      <button class="qty-minus">-</button>
-      <input type="number" value="0" min="0" class="quantity-input">
-      <button class="qty-plus">+</button>
-    </div>
-    <button class="add-to-cart-btn">เพิ่มลงตะกร้า</button>
-  `;
-  // bind
-  card.querySelector('.qty-minus').addEventListener('click', (e)=> changeQuantity(e.currentTarget, -1));
-  card.querySelector('.qty-plus').addEventListener('click', (e)=> changeQuantity(e.currentTarget, 1));
-  card.querySelector('.add-to-cart-btn').addEventListener('click', ()=> addToCart(card));
-  return card;
-}
+    // จัดการปุ่ม "เพิ่มลงตะกร้า"
+    if (target.classList.contains('add-to-cart-btn')) {
+        const selectedMixInput = card.querySelector('input[name^="mix-"]:checked');
+        
+        // สำหรับสินค้าที่ไม่มี mix options
+        const mixValue = selectedMixInput ? selectedMixInput.value : 'standard';
 
-function mountProducts() {
-  const water = [
-    { name:'น้ำผสมเงิน', price:100, mixes:[{label:'ผสมเงิน', price:100},{label:'ผสมเงินซิ', price:100},{label:'ผสมเงินน้ำตาลสด', price:100}]},
-    { name:'น้ำผสมแดง', price:100, mixes:[{label:'ผสมแดง', price:100},{label:'ผสมแดงซิ', price:100},{label:'ผสมแดงน้ำตาลสด', price:100}]},
-    { name:'น้ำผสมไก่', price:100, mixes:[{label:'ผสมไก่', price:100},{label:'ผสมไก่ซิ', price:100},{label:'ผสมไก่น้ำตาลสด', price:100}]},
-    { name:'น้ำผสมซี', price:100, mixes:[{label:'ผสมซี', price:100},{label:'ผสมซีซิ', price:100},{label:'ผสมซีน้ำตาลสด', price:100}]},
-    { name:'น้ำดิบ', price:65, mixes:[], promo:'2 ขวด 120 บาท' },
-    { name:'แลกขวดฟรี', price:0, mixes:[{label:'แลกฟรี', price:0},{label:'แลกฟรีผสมซิ', price:20},{label:'แลกฟรีผสมน้ำตาลสด', price:20}]}
-  ];
-  const med = [
-    { name:'ยาฝาเงิน', price:80, mixes:[] },
-    { name:'ยาฝาแดง', price:90, mixes:[] },
-    { name:'ยาไก่', price:80, mixes:[] },
-    { name:'ยาซี', price:80, mixes:[] }
-  ];
-  const waterList = document.getElementById('product-list-water');
-  const medList = document.getElementById('product-list-med');
-  water.forEach(p => waterList.appendChild(createProductCard(p)));
-  med.forEach(p => medList.appendChild(createProductCard(p)));
+        if (!mixValue && card.querySelector('.mix-options')) {
+            alert('กรุณาเลือกชนิดของสินค้า');
+            return;
+        }
+
+        const productData = {
+            id: card.dataset.id,
+            name: card.dataset.name,
+            price: parseInt(card.dataset.price),
+            quantity: parseInt(card.querySelector('.quantity-input').value),
+            mix: mixValue,
+            customerName: card.querySelector('.customer-name-input').value.trim(),
+            paymentMethod: 'cash' // ค่าเริ่มต้นเป็นเงินสด
+        };
+
+        addToCart(productData);
+        // รีเซ็ตค่าใน card หลังจากเพิ่มลงตะกร้า
+        card.querySelector('.quantity-input').value = 1;
+        card.querySelector('.customer-name-input').value = '';
+    }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  mountProducts();
-  updateCartCount();
-
-  document.getElementById('cart-icon').addEventListener('click', renderCartModal);
-  document.getElementById('confirm-sale-btn').addEventListener('click', confirmSale);
-  document.getElementById('clear-cart-btn').addEventListener('click', clearCart);
-
-  document.getElementById('load-report-btn').addEventListener('click', loadReport);
-
-  document.getElementById('compare-mode-select').addEventListener('change', (e)=> switchCompareMode(e.target.value));
-  document.getElementById('clear-compare-btn').addEventListener('click', clearComparison);
-  document.getElementById('compare-btn').addEventListener('click', compareSales);
+    onAuthStateChanged(user => {
+        setupUI(user);
+        if (user) {
+            renderProducts();
+            initReportPage();
+            initComparePage();
+            
+            // เพิ่ม Event Listener หลักสำหรับหน้าขาย
+            const salePage = document.getElementById('sale-page');
+            salePage.addEventListener('click', handleSalePageInteractions);
+        }
+    });
 });
