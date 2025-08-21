@@ -1,4 +1,4 @@
-// sales.js — modified to save customer names
+// sales.js — ensure transfer flag is saved
 import { auth, database } from './firebase.js';
 import { cart, clearCart } from './cart.js';
 
@@ -23,8 +23,9 @@ export function confirmSale() {
       quantity: item.quantity,
       pricePerUnit: item.pricePerUnit,
       totalPrice: item.totalPrice,
-      // NEW: store customerName for later display
       customerName: item.customerName || '',
+      // บันทึกสถานะ transfer เป็น boolean
+      transfer: !!item.transfer,
     });
   }
   clearCart();
