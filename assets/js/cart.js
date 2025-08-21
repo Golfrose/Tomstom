@@ -1,4 +1,4 @@
-// cart.js — modified to support customer names and transfer flag
+// cart.js — รองรับชื่อลูกค้า แยกโอน/สด ป้องกัน scroll ด้านหลัง และลบ/แก้ไขได้
 export let cart = {};
 
 export function changeQuantity(inputEl, change) {
@@ -34,7 +34,7 @@ export function addToCart(productCard) {
     cart[key].quantity += quantity;
     cart[key].totalPrice += totalPrice;
   } else {
-    // เพิ่มฟิลด์ transfer เพื่อบ่งชี้ว่าโอนหรือไม่ (เริ่มต้น false)
+    // include transfer flag defaulting to false
     cart[key] = { product, mix, quantity, pricePerUnit, totalPrice, customerName, transfer: false };
   }
   quantityInput.value = 0;
@@ -53,7 +53,7 @@ export function removeFromCart(key) {
   if (!cart[key]) return;
   delete cart[key];
   updateCartCount();
-  renderCartModal();
+  renderCartModal(); // refresh modal and totals
 }
 
 export function renderCartModal() {
@@ -65,6 +65,7 @@ export function renderCartModal() {
     totalCartPrice += item.totalPrice;
     const itemDiv = document.createElement('div');
     itemDiv.classList.add('modal-item');
+    // Determine display label: use customer name if provided, fallback to product & mix
     const displayName = item.customerName
       ? `${item.customerName} (${item.mix !== 'ไม่มี' ? item.mix : item.product})`
       : `${item.product}${item.mix !== 'ไม่มี' ? ` (${item.mix})` : ''}`;
@@ -74,7 +75,7 @@ export function renderCartModal() {
         <small>${item.quantity} ขวด × ${item.pricePerUnit}฿</small>
       </div>
       <span class="item-total">${item.totalPrice.toLocaleString()}฿</span>
-      <!-- เช็คบ็อกซ์สำหรับระบุว่าเป็นการโอนหรือไม่ -->
+      <!-- เช็คบ็อกซ์เพื่อระบุว่าเป็นการโอนหรือไม่ -->
       <input type="checkbox" class="transfer-checkbox" data-key="${key}" ${item.transfer ? 'checked' : ''} aria-label="โอน">
       <!-- ปุ่มลบรายการ -->
       <button class="remove-item" data-key="${key}" aria-label="ลบรายการ">×</button>
@@ -82,12 +83,17 @@ export function renderCartModal() {
     modalItems.appendChild(itemDiv);
   }
   document.getElementById('modal-cart-total').textContent = totalCartPrice.toLocaleString();
-  document.getElementById('cart-modal').style.display = 'flex';
-  // ติดตั้งอีเวนต์ให้กับปุ่มลบ
+  const cartModal = document.getElementById('cart-modal');
+  cartModal.style.display = 'flex';
+  // เมื่อเปิดตะกร้า ให้ปิดการ scroll ของ body
+  document.body.style.overflow = 'hidden';
+
+  // bind delete buttons
   modalItems.querySelectorAll('.remove-item').forEach(btn => {
     btn.addEventListener('click', e => removeFromCart(e.currentTarget.dataset.key));
   });
-  // ติดตั้งอีเวนต์ให้กับเช็คบ็อกซ์ เพื่ออัปเดตค่า transfer
+
+  // bind transfer checkboxes to update transfer flag
   modalItems.querySelectorAll('.transfer-checkbox').forEach(cb => {
     cb.addEventListener('change', e => {
       const key = e.currentTarget.dataset.key;
@@ -101,5 +107,8 @@ export function renderCartModal() {
 export function clearCart() {
   cart = {};
   updateCartCount();
-  document.getElementById('cart-modal').style.display = 'none';
+  const cartModal = document.getElementById('cart-modal');
+  cartModal.style.display = 'none';
+  // คืนการ scroll ให้กับ body เมื่อปิดตะกร้า
+  document.body.style.overflow = '';
 }
