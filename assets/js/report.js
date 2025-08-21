@@ -77,7 +77,7 @@ export function loadReport() {
       `;
       reportBody.appendChild(tr);
     });
-    // แสดงยอดรวม / ยอดโอนเสมอ โดยทำให้ยอดโอนเป็นสีแดงด้วย inline style
+    // แสดงยอดรวม / ยอดโอนเสมอ และทำให้ยอดโอนเป็นสีแดง
     totalRevenueEl.innerHTML = `${totalRevenue.toLocaleString()} / <span style="color: red; font-weight: bold;">${transferRevenue.toLocaleString()}</span>`;
     totalQuantityEl.textContent = totalQuantity.toLocaleString();
     for (const k in productSummary) {
@@ -86,7 +86,7 @@ export function loadReport() {
       if (k.includes('แลกขวดฟรี')) li.classList.add('report-free');
       productSummaryListEl.appendChild(li);
     }
-    // ผูกปุ่มแก้ไข/ลบด้วย function ปกติ เพื่อให้ this.dataset.id ทำงานถูกต้อง
+    // ผูกปุ่มแก้ไข/ลบ โดยใช้ function ปกติ เพื่อให้ this.dataset.id ทำงานถูกต้อง
     reportBody.querySelectorAll('.edit-btn').forEach(btn =>
       btn.addEventListener('click', function () {
         editSaleItem(this.dataset.id);
