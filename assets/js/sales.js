@@ -1,4 +1,4 @@
-// sales.js
+// sales.js — modified to save customer names
 import { auth, database } from './firebase.js';
 import { cart, clearCart } from './cart.js';
 
@@ -13,7 +13,6 @@ export function confirmSale() {
     return;
   }
   const salesRef = database.ref('sales/' + user.uid);
-
   for (const key in cart) {
     const item = cart[key];
     const newSaleRef = salesRef.push();
@@ -23,7 +22,9 @@ export function confirmSale() {
       mix: item.mix,
       quantity: item.quantity,
       pricePerUnit: item.pricePerUnit,
-      totalPrice: item.totalPrice
+      totalPrice: item.totalPrice,
+      // NEW: store customerName for later display
+      customerName: item.customerName || '',
     });
   }
   clearCart();
