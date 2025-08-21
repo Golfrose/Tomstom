@@ -1,6 +1,12 @@
 {
   "hosting": {
     "public": ".",
-    "ignore": ["**/.*", "**/node_modules/**"]
+    "ignore": ["**/.*", "**/node_modules/**"],
+    "rewrites": [
+      {
+        "source": "/api/**",
+        "function": "apiProxy"
+      }
+    ]
   }
 }
