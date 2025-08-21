@@ -1,4 +1,4 @@
-// cart.js — modified to support customer names
+// cart.js — modified to support customer names and transfer flag
 export let cart = {};
 
 export function changeQuantity(inputEl, change) {
@@ -26,7 +26,7 @@ export function addToCart(productCard) {
   if (product === 'น้ำดิบ') {
     totalPrice = Math.floor(quantity / 2) * 120 + (quantity % 2) * 65;
   }
-  // NEW: read customer name
+  // read customer name
   const nameInput = productCard.querySelector('.customer-name-input');
   const customerName = nameInput ? nameInput.value.trim() : '';
   const key = `${product}-${mix}-${customerName}`;
@@ -34,10 +34,8 @@ export function addToCart(productCard) {
     cart[key].quantity += quantity;
     cart[key].totalPrice += totalPrice;
   } else {
-    // include transfer flag defaulting to false
     cart[key] = { product, mix, quantity, pricePerUnit, totalPrice, customerName, transfer: false };
   }
-  // reset quantity after adding
   quantityInput.value = 0;
   updateCartCount();
   alert(`เพิ่ม ${quantity} ขวด ลงในตะกร้าแล้ว`);
@@ -50,15 +48,13 @@ export function updateCartCount() {
   if (counter) counter.textContent = totalItems;
 }
 
-/* ---------- ใหม่: ลบรายการจากตะกร้า ---------- */
 export function removeFromCart(key) {
   if (!cart[key]) return;
   delete cart[key];
   updateCartCount();
-  renderCartModal(); // refresh modal and totals
+  renderCartModal();
 }
 
-/* ---------- อัปเดต: ใส่ปุ่มกากบาท × และเช็คบ็อกซ์ในแต่ละแถว ---------- */
 export function renderCartModal() {
   const modalItems = document.getElementById('modal-items');
   modalItems.innerHTML = '';
@@ -68,7 +64,6 @@ export function renderCartModal() {
     totalCartPrice += item.totalPrice;
     const itemDiv = document.createElement('div');
     itemDiv.classList.add('modal-item');
-    // Determine display label: use customer name if provided, fallback to product & mix
     const displayName = item.customerName
       ? `${item.customerName} (${item.mix !== 'ไม่มี' ? item.mix : item.product})`
       : `${item.product}${item.mix !== 'ไม่มี' ? ` (${item.mix})` : ''}`;
@@ -78,7 +73,6 @@ export function renderCartModal() {
         <small>${item.quantity} ขวด × ${item.pricePerUnit}฿</small>
       </div>
       <span class="item-total">${item.totalPrice.toLocaleString()}฿</span>
-      <!-- show checkbox and remove button at the end to indicate transfer/cash status -->
       <input type="checkbox" class="transfer-checkbox" data-key="${key}" ${item.transfer ? 'checked' : ''} aria-label="โอน">
       <button class="remove-item" data-key="${key}" aria-label="ลบรายการ">×</button>
     `;
@@ -90,8 +84,7 @@ export function renderCartModal() {
   modalItems.querySelectorAll('.remove-item').forEach(btn => {
     btn.addEventListener('click', e => removeFromCart(e.currentTarget.dataset.key));
   });
-
-  // bind transfer checkboxes to update transfer flag
+  // bind transfer checkboxes
   modalItems.querySelectorAll('.transfer-checkbox').forEach(cb => {
     cb.addEventListener('change', e => {
       const key = e.currentTarget.dataset.key;
