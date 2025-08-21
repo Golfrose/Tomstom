@@ -891,3 +891,32 @@ body {
   border-radius: var(--border-radius-small);
   font-size: 1em;
 }
+
+/* Additional styles to support customer name input */
+.customer-name-input {
+  width: 100%;
+  padding: 12px 10px;
+  margin-top: 15px;
+  border: 1px solid #ddd;
+  border-radius: var(--border-radius-small);
+  font-size: 1em;
+}
+
+/* Style transfer checkbox within the cart modal.  Ensures checkbox and remove button align neatly */
+.transfer-checkbox {
+  margin-right: 8px;
+  cursor: pointer;
+}
+
+/* Style for table rows representing transfer (โอน) sales in the summary report */
+/* Colour all text in the row red to differentiate transfer payments */
+.transfer-sale td {
+  color: red;
+}
+
+/* Style for transfer amount displayed in the total revenue (summary) section */
+.transfer-sum {
+  color: red;
+  font-weight: bold;
+}
+
