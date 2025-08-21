@@ -34,6 +34,7 @@ export function addToCart(productCard) {
     cart[key].quantity += quantity;
     cart[key].totalPrice += totalPrice;
   } else {
+    // เพิ่มฟิลด์ transfer เพื่อบ่งชี้ว่าโอนหรือไม่ (เริ่มต้น false)
     cart[key] = { product, mix, quantity, pricePerUnit, totalPrice, customerName, transfer: false };
   }
   quantityInput.value = 0;
@@ -73,18 +74,20 @@ export function renderCartModal() {
         <small>${item.quantity} ขวด × ${item.pricePerUnit}฿</small>
       </div>
       <span class="item-total">${item.totalPrice.toLocaleString()}฿</span>
+      <!-- เช็คบ็อกซ์สำหรับระบุว่าเป็นการโอนหรือไม่ -->
       <input type="checkbox" class="transfer-checkbox" data-key="${key}" ${item.transfer ? 'checked' : ''} aria-label="โอน">
+      <!-- ปุ่มลบรายการ -->
       <button class="remove-item" data-key="${key}" aria-label="ลบรายการ">×</button>
     `;
     modalItems.appendChild(itemDiv);
   }
   document.getElementById('modal-cart-total').textContent = totalCartPrice.toLocaleString();
   document.getElementById('cart-modal').style.display = 'flex';
-  // bind delete buttons
+  // ติดตั้งอีเวนต์ให้กับปุ่มลบ
   modalItems.querySelectorAll('.remove-item').forEach(btn => {
     btn.addEventListener('click', e => removeFromCart(e.currentTarget.dataset.key));
   });
-  // bind transfer checkboxes
+  // ติดตั้งอีเวนต์ให้กับเช็คบ็อกซ์ เพื่ออัปเดตค่า transfer
   modalItems.querySelectorAll('.transfer-checkbox').forEach(cb => {
     cb.addEventListener('change', e => {
       const key = e.currentTarget.dataset.key;
