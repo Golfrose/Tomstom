@@ -34,7 +34,8 @@ export function addToCart(productCard) {
     cart[key].quantity += quantity;
     cart[key].totalPrice += totalPrice;
   } else {
-    cart[key] = { product, mix, quantity, pricePerUnit, totalPrice, customerName };
+    // include transfer flag defaulting to false
+    cart[key] = { product, mix, quantity, pricePerUnit, totalPrice, customerName, transfer: false };
   }
   // reset quantity after adding
   quantityInput.value = 0;
@@ -57,7 +58,7 @@ export function removeFromCart(key) {
   renderCartModal(); // refresh modal and totals
 }
 
-/* ---------- อัปเดต: ใส่ปุ่มกากบาท × ในแต่ละแถว ---------- */
+/* ---------- อัปเดต: ใส่ปุ่มกากบาท × และเช็คบ็อกซ์ในแต่ละแถว ---------- */
 export function renderCartModal() {
   const modalItems = document.getElementById('modal-items');
   modalItems.innerHTML = '';
@@ -72,12 +73,14 @@ export function renderCartModal() {
       ? `${item.customerName} (${item.mix !== 'ไม่มี' ? item.mix : item.product})`
       : `${item.product}${item.mix !== 'ไม่มี' ? ` (${item.mix})` : ''}`;
     itemDiv.innerHTML = `
-      <button class="remove-item" data-key="${key}" aria-label="ลบรายการ">×</button>
       <div class="item-details">
         <div>${displayName}</div>
         <small>${item.quantity} ขวด × ${item.pricePerUnit}฿</small>
       </div>
       <span class="item-total">${item.totalPrice.toLocaleString()}฿</span>
+      <!-- show checkbox and remove button at the end to indicate transfer/cash status -->
+      <input type="checkbox" class="transfer-checkbox" data-key="${key}" ${item.transfer ? 'checked' : ''} aria-label="โอน">
+      <button class="remove-item" data-key="${key}" aria-label="ลบรายการ">×</button>
     `;
     modalItems.appendChild(itemDiv);
   }
@@ -86,6 +89,16 @@ export function renderCartModal() {
   // bind delete buttons
   modalItems.querySelectorAll('.remove-item').forEach(btn => {
     btn.addEventListener('click', e => removeFromCart(e.currentTarget.dataset.key));
+  });
+
+  // bind transfer checkboxes to update transfer flag
+  modalItems.querySelectorAll('.transfer-checkbox').forEach(cb => {
+    cb.addEventListener('change', e => {
+      const key = e.currentTarget.dataset.key;
+      if (cart[key]) {
+        cart[key].transfer = e.currentTarget.checked;
+      }
+    });
   });
 }
 
