@@ -37,7 +37,7 @@ export function loadReport() {
     filteredData.forEach(item => {
       totalRevenue += item.totalPrice;
       totalQuantity += item.quantity;
-      // ตรวจสอบค่าฟิลด์ transfer ทั้งแบบ boolean, string หรือ number
+      // รองรับค่าที่เป็น boolean, string หรือ number ในฟิลด์ transfer
       const isTransfer =
         item.transfer === true ||
         item.transfer === 'true' ||
@@ -60,7 +60,7 @@ export function loadReport() {
       const displayLabel = item.customerName
         ? `${item.customerName} (${item.mix !== 'ไม่มี' ? item.mix : item.product})`
         : `${item.product}${item.mix !== 'ไม่มี' ? ` (${item.mix})` : ''}`;
-      // หากเป็นรายการโอน ให้ทั้งแถวเป็นสีแดง
+      // ถ้าเป็นรายการโอนให้ทั้งแถวเป็นสีแดง
       if (isTransfer) {
         tr.style.color = 'red';
       }
@@ -77,7 +77,7 @@ export function loadReport() {
       `;
       reportBody.appendChild(tr);
     });
-    // แสดงยอดรวม / ยอดโอนเสมอ พร้อมทำยอดโอนเป็นสีแดง
+    // แสดงยอดรวม / ยอดโอนเสมอ และทำให้ยอดโอนเป็นสีแดง
     totalRevenueEl.innerHTML = `${totalRevenue.toLocaleString()} / <span style="color: red; font-weight: bold;">${transferRevenue.toLocaleString()}</span>`;
     totalQuantityEl.textContent = totalQuantity.toLocaleString();
     for (const k in productSummary) {
@@ -86,7 +86,7 @@ export function loadReport() {
       if (k.includes('แลกขวดฟรี')) li.classList.add('report-free');
       productSummaryListEl.appendChild(li);
     }
-    // ผูกปุ่มแก้ไข/ลบด้วย function ปกติ เพื่อให้ this.dataset.id ทำงานถูกต้อง
+    // ผูกปุ่มแก้ไข/ลบ โดยใช้ function ปกติ เพื่อให้ this.dataset.id ทำงานถูกต้อง
     reportBody.querySelectorAll('.edit-btn').forEach(btn =>
       btn.addEventListener('click', function () {
         editSaleItem(this.dataset.id);
