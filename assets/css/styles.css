@@ -1004,4 +1004,13 @@ button, .add-to-cart-btn, .quantity-control button {
 .container, .product-card, .category-card {
   border: 1px solid #c8e6c9;
 }
+/* Override ปุ่มเพิ่มลงตะกร้าให้เข้าธีมเขียว */
+.add-to-cart-btn {
+  background: var(--button-bg-1);
+  border: 1px solid #388e3c;
+  color: #fff; /* ตัวอักษรขาว */
+}
 
+.add-to-cart-btn:hover {
+  background: var(--button-bg-2);
+}
