@@ -1,16 +1,16 @@
 :root {
-  --bg-color: #e0e9ff;
-  --card-bg: #fff;
-  --primary-color: #6a5acd;
-  --secondary-color: #ff6347;
-  --accent-color: #4CAF50;
-  --button-bg-1: linear-gradient(135deg, #a06de5, #8862e3);
-  --button-bg-2: linear-gradient(135deg, #6a6ee0, #4d51d9);
+  --bg-color: #edf7ed; 
+  --card-bg: #ffffff; 
+  --primary-color: #2e7d32; 
+  --secondary-color: #66bb6a; 
+  --accent-color: #43a047; 
+  --button-bg-1: linear-gradient(135deg, #a5d6a7, #66bb6a);
+  --button-bg-2: linear-gradient(135deg, #81c784, #388e3c);
   --button-text-color: #fff;
   --border-radius-large: 20px;
   --border-radius-small: 12px;
-  --shadow-light: 0 4px 15px rgba(0, 0, 0, 0.1);
-  --shadow-medium: 0 8px 25px rgba(0, 0, 0, 0.15);
+  --shadow-light: 0 4px 15px rgba(76, 175, 80, 0.15);
+  --shadow-medium: 0 8px 25px rgba(56, 142, 60, 0.25);
 }
 
 * {
@@ -997,4 +997,11 @@ body {
   justify-content: center;
 }
 
+button, .add-to-cart-btn, .quantity-control button {
+  border: 1px solid #388e3c;
+}
+
+.container, .product-card, .category-card {
+  border: 1px solid #c8e6c9;
+}
 
