@@ -1013,3 +1013,17 @@ button, .add-to-cart-btn, .quantity-control button {
 .product-card .add-to-cart-btn:hover {
   background: var(--button-bg-2) !important;
 }
+
+/* ปุ่มหมวดที่ active */
+.category-card.active {
+  background: var(--button-bg-1) !important;
+  border: 1px solid #388e3c !important;
+  color: #fff !important;
+  font-weight: 600;
+}
+
+/* เวลา hover บนปุ่มหมวด */
+.category-card:hover {
+  background: var(--button-bg-2);
+  color: #fff;
+}
