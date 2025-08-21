@@ -37,7 +37,13 @@ export function loadReport() {
     filteredData.forEach(item => {
       totalRevenue += item.totalPrice;
       totalQuantity += item.quantity;
-      if (item.transfer) {
+      // รองรับค่าที่เป็น boolean, string หรือ number ในฟิลด์ transfer
+      const isTransfer =
+        item.transfer === true ||
+        item.transfer === 'true' ||
+        item.transfer === 1 ||
+        item.transfer === '1';
+      if (isTransfer) {
         transferRevenue += item.totalPrice;
       }
       const summaryKey = `${item.product} (${item.mix})`;
@@ -54,9 +60,9 @@ export function loadReport() {
       const displayLabel = item.customerName
         ? `${item.customerName} (${item.mix !== 'ไม่มี' ? item.mix : item.product})`
         : `${item.product}${item.mix !== 'ไม่มี' ? ` (${item.mix})` : ''}`;
-      // ถ้าเป็นรายการโอน ให้เซ็ตสีตัวหนังสือของทั้งแถวเป็นสีแดง
-      if (item.transfer) {
-      tr.style.color = 'red';
+      // ถ้าเป็นรายการโอนให้ทั้งแถวเป็นสีแดง
+      if (isTransfer) {
+        tr.style.color = 'red';
       }
       tr.innerHTML = `
         <td>${displayDate}</td>
@@ -71,7 +77,7 @@ export function loadReport() {
       `;
       reportBody.appendChild(tr);
     });
-    // แสดงยอดรวม / ยอดโอน เสมอ ด้วย inline style ให้ยอดโอนเป็นสีแดง
+    // แสดงยอดรวม / ยอดโอนเสมอ โดยทำให้ยอดโอนเป็นสีแดงด้วย inline style
     totalRevenueEl.innerHTML = `${totalRevenue.toLocaleString()} / <span style="color: red; font-weight: bold;">${transferRevenue.toLocaleString()}</span>`;
     totalQuantityEl.textContent = totalQuantity.toLocaleString();
     for (const k in productSummary) {
@@ -80,13 +86,51 @@ export function loadReport() {
       if (k.includes('แลกขวดฟรี')) li.classList.add('report-free');
       productSummaryListEl.appendChild(li);
     }
+    // ผูกปุ่มแก้ไข/ลบด้วย function ปกติ เพื่อให้ this.dataset.id ทำงานถูกต้อง
     reportBody.querySelectorAll('.edit-btn').forEach(btn =>
-      btn.addEventListener('click', () => editSaleItem(btn.dataset.id))
+      btn.addEventListener('click', function () {
+        editSaleItem(this.dataset.id);
+      })
     );
     reportBody.querySelectorAll('.delete-btn').forEach(btn =>
-      btn.addEventListener('click', () => deleteSaleItem(btn.dataset.id))
+      btn.addEventListener('click', function () {
+        deleteSaleItem(this.dataset.id);
+      })
     );
   });
 }
 
-// ... โค้ดฟังก์ชัน editSaleItem และ deleteSaleItem เหมือนเดิม ...
+export function editSaleItem(itemId) {
+  const newQuantity = prompt('แก้ไขจำนวน:');
+  const q = parseInt(newQuantity);
+  if (isNaN(q) || q <= 0) {
+    alert('จำนวนไม่ถูกต้อง');
+    return;
+  }
+  const user = auth.currentUser;
+  const itemRef = database.ref('sales/' + user.uid + '/' + itemId);
+  itemRef.once('value', snapshot => {
+    const item = snapshot.val();
+    if (item) {
+      itemRef
+        .update({
+          quantity: q,
+          totalPrice: q * item.pricePerUnit,
+        })
+        .then(() => {
+          loadReport();
+          alert('แก้ไขรายการเรียบร้อย!');
+        });
+    }
+  });
+}
+
+export function deleteSaleItem(itemId) {
+  if (!confirm('ต้องการลบรายการนี้ใช่ไหม?')) return;
+  const user = auth.currentUser;
+  const itemRef = database.ref('sales/' + user.uid + '/' + itemId);
+  itemRef.remove().then(() => {
+    loadReport();
+    alert('ลบรายการเรียบร้อย!');
+  });
+}
