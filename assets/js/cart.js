@@ -1,4 +1,4 @@
-// cart.js — รองรับชื่อลูกค้า แยกโอน/สด ป้องกัน scroll ด้านหลัง และลบ/แก้ไขได้
+// cart.js — รองรับชื่อลูกค้า แยกโอน/สด ป้องกัน scroll และปิดคลิกพื้นหลัง
 export let cart = {};
 
 export function changeQuantity(inputEl, change) {
@@ -17,16 +17,13 @@ export function addToCart(productCard) {
     alert('กรุณาใส่จำนวนสินค้าก่อน');
     return;
   }
-  // selected mix
   const mixRadio = productCard.querySelector(`input[name="mix-${product}"]:checked`);
   const mix = mixRadio ? mixRadio.value : 'ไม่มี';
   const pricePerUnit = parseFloat(mixRadio ? mixRadio.dataset.price : productCard.dataset.price);
-  // calculate total price (promotion for น้ำดิบ)
   let totalPrice = pricePerUnit * quantity;
   if (product === 'น้ำดิบ') {
     totalPrice = Math.floor(quantity / 2) * 120 + (quantity % 2) * 65;
   }
-  // read customer name
   const nameInput = productCard.querySelector('.customer-name-input');
   const customerName = nameInput ? nameInput.value.trim() : '';
   const key = `${product}-${mix}-${customerName}`;
@@ -34,7 +31,6 @@ export function addToCart(productCard) {
     cart[key].quantity += quantity;
     cart[key].totalPrice += totalPrice;
   } else {
-    // include transfer flag defaulting to false
     cart[key] = { product, mix, quantity, pricePerUnit, totalPrice, customerName, transfer: false };
   }
   quantityInput.value = 0;
@@ -53,7 +49,7 @@ export function removeFromCart(key) {
   if (!cart[key]) return;
   delete cart[key];
   updateCartCount();
-  renderCartModal(); // refresh modal and totals
+  renderCartModal();
 }
 
 export function renderCartModal() {
@@ -65,7 +61,6 @@ export function renderCartModal() {
     totalCartPrice += item.totalPrice;
     const itemDiv = document.createElement('div');
     itemDiv.classList.add('modal-item');
-    // Determine display label: use customer name if provided, fallback to product & mix
     const displayName = item.customerName
       ? `${item.customerName} (${item.mix !== 'ไม่มี' ? item.mix : item.product})`
       : `${item.product}${item.mix !== 'ไม่มี' ? ` (${item.mix})` : ''}`;
@@ -75,9 +70,7 @@ export function renderCartModal() {
         <small>${item.quantity} ขวด × ${item.pricePerUnit}฿</small>
       </div>
       <span class="item-total">${item.totalPrice.toLocaleString()}฿</span>
-      <!-- เช็คบ็อกซ์เพื่อระบุว่าเป็นการโอนหรือไม่ -->
       <input type="checkbox" class="transfer-checkbox" data-key="${key}" ${item.transfer ? 'checked' : ''} aria-label="โอน">
-      <!-- ปุ่มลบรายการ -->
       <button class="remove-item" data-key="${key}" aria-label="ลบรายการ">×</button>
     `;
     modalItems.appendChild(itemDiv);
@@ -85,15 +78,17 @@ export function renderCartModal() {
   document.getElementById('modal-cart-total').textContent = totalCartPrice.toLocaleString();
   const cartModal = document.getElementById('cart-modal');
   cartModal.style.display = 'flex';
-  // เมื่อเปิดตะกร้า ให้ปิดการ scroll ของ body
+  // ปิดการ scroll ของหน้าเว็บด้านหลัง
   document.body.style.overflow = 'hidden';
+  // ปิดการคลิกบนองค์ประกอบอื่นทั้งหมด
+  document.body.style.pointerEvents = 'none';
+  // แต่เปิดการคลิกเฉพาะในตะกร้า
+  cartModal.style.pointerEvents = 'auto';
 
-  // bind delete buttons
   modalItems.querySelectorAll('.remove-item').forEach(btn => {
     btn.addEventListener('click', e => removeFromCart(e.currentTarget.dataset.key));
   });
 
-  // bind transfer checkboxes to update transfer flag
   modalItems.querySelectorAll('.transfer-checkbox').forEach(cb => {
     cb.addEventListener('change', e => {
       const key = e.currentTarget.dataset.key;
@@ -109,6 +104,7 @@ export function clearCart() {
   updateCartCount();
   const cartModal = document.getElementById('cart-modal');
   cartModal.style.display = 'none';
-  // คืนการ scroll ให้กับ body เมื่อปิดตะกร้า
+  // คืนการ scroll และการคลิกเมื่อปิดตะกร้า
   document.body.style.overflow = '';
+  document.body.style.pointerEvents = '';
 }
