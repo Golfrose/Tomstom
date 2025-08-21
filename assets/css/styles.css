@@ -882,3 +882,12 @@ body {
 }
 
 /* === END: โค้ดแก้ปัญหาช่องว่าง === */
+/* เพิ่มท้าย styles.css เพื่อจัดสไตล์ช่องกรอกชื่อลูกค้า */
+.customer-name-input {
+  width: 100%;
+  padding: 12px 10px;
+  margin-top: 15px;
+  border: 1px solid #ddd;
+  border-radius: var(--border-radius-small);
+  font-size: 1em;
+}
