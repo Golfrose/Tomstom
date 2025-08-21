@@ -1,4 +1,4 @@
-// report.js — modified to display customer names
+// report.js — modified to display customer names and handle transfer totals
 import { auth, database } from './firebase.js';
 import { isSameDay } from './utils/date.js';
 
@@ -32,10 +32,16 @@ export function loadReport() {
     noDataEl.style.display = 'none';
     let totalRevenue = 0,
       totalQuantity = 0;
+    // accumulate total revenue from transfer (โอน) items
+    let transferRevenue = 0;
     const productSummary = {};
     filteredData.forEach(item => {
       totalRevenue += item.totalPrice;
       totalQuantity += item.quantity;
+      // if this sale was marked as transfer (โอน) accumulate its revenue separately
+      if (item.transfer) {
+        transferRevenue += item.totalPrice;
+      }
       // for summary, still group by product + mix, not including customer name
       const summaryKey = `${item.product} (${item.mix})`;
       productSummary[summaryKey] = (productSummary[summaryKey] || 0) + item.quantity;
@@ -52,6 +58,10 @@ export function loadReport() {
       const displayLabel = item.customerName
         ? `${item.customerName} (${item.mix !== 'ไม่มี' ? item.mix : item.product})`
         : `${item.product}${item.mix !== 'ไม่มี' ? ` (${item.mix})` : ''}`;
+      // apply special class for transfer rows so they can be styled differently (e.g., red text)
+      if (item.transfer) {
+        tr.classList.add('transfer-sale');
+      }
       tr.innerHTML = `
         <td>${displayDate}</td>
         <td class="${productClass}">${displayLabel}</td>
@@ -65,7 +75,14 @@ export function loadReport() {
       `;
       reportBody.appendChild(tr);
     });
-    totalRevenueEl.textContent = totalRevenue.toLocaleString();
+    // update total revenue display. If there is any transfer revenue, show it alongside the total separated by a slash
+    if (transferRevenue > 0) {
+      // show both total and transfer totals separated by a slash, preserving the locale formatting
+      // We include a span around the transfer amount so it can be styled differently (e.g., red text)
+      totalRevenueEl.innerHTML = `${totalRevenue.toLocaleString()} / <span class="transfer-sum">${transferRevenue.toLocaleString()}</span>`;
+    } else {
+      totalRevenueEl.textContent = totalRevenue.toLocaleString();
+    }
     totalQuantityEl.textContent = totalQuantity.toLocaleString();
     for (const k in productSummary) {
       const li = document.createElement('li');
