@@ -27,8 +27,8 @@ body {
 }
 
 .dashboard {
-  background: linear-gradient(135deg, #a06de5, #8862e3);
-  color: var(--button-text-color);
+  background: linear-gradient(135deg, #a5d6a7, #66bb6a, #388e3c);
+  color: var(--button-text-color); /* ขาว */
   padding: 40px 20px 80px;
   border-bottom-left-radius: 40px;
   border-bottom-right-radius: 40px;
