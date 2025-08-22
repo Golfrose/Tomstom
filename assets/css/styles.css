@@ -1014,16 +1014,16 @@ button, .add-to-cart-btn, .quantity-control button {
   background: var(--button-bg-2) !important;
 }
 
-/* ปุ่มหมวดที่ active */
-.category-card.active {
-  background: #fff !important;
-  border: 1px solid #c8e6c9 !important;
-  color: var(--primary-color) !important;
-  font-weight: 500;
-}
-
 /* เวลา hover บนปุ่มหมวด */
 .category-card:hover {
   background: var(--button-bg-2);
   color: #fff;
+}
+/* ปุ่มหมวด ทั้งหมดเหมือนกัน ไม่แยก active */
+.category-selector .category-card,
+.category-selector .category-card.active {
+  background: #fff;                  /* พื้นหลังขาว */
+  border: 1px solid #c8e6c9;         /* ขอบเขียวอ่อน */
+  color: var(--primary-color);       /* ตัวหนังสือเขียวเข้ม */
+  font-weight: 500;
 }
