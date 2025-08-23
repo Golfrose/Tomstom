@@ -148,8 +148,18 @@
         </div>
         <div class="summary-box">
           <h3>ยอดรวมสินค้าที่ขายได้</h3>
-          <span id="total-quantity" class="value">0</span>
-          <span>ขวด</span>
+          <!--
+            Display the total quantity of items sold split by unit. The first
+            number represents the number of bottles sold and is followed by
+            the unit label (ขวด). The second number after the slash
+            represents the total of all items sold that are not measured
+            in bottles. It is styled via the .other-unit-value class to
+            appear red.
+          -->
+          <span id="total-quantity-left" class="value">0</span>
+          <span id="quantity-unit">ขวด</span>
+          /
+          <span id="total-quantity-right" class="value other-unit-value">0</span>
         </div>
         <div class="summary-box">
           <h3>รายการสินค้าที่ขายได้ (สรุป)</h3>
