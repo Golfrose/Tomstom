@@ -92,6 +92,22 @@
 .summary-table .delete-btn:hover {
   background: #ef5350;
 }
+/* ================================
+   SUMMARY COUNT COLORS
+   - ซ้าย = เขียว
+   - ขวา = แดง
+================================= */
+
+.summary-count .sold {
+  color: var(--primary-dark);   /* เขียวเข้ม */
+  font-weight: 700;
+}
+
+.summary-count .transfer {
+  color: #d32f2f;               /* แดง */
+  font-weight: 700;
+}
+
 
 /* ---- Responsive: ตารางเล็กบนมือถือ ---- */
 @media (max-width: 768px) {
