@@ -1,0 +1,182 @@
+/* =====================================================
+   หน้าสอง (Summary/Report): สไตล์เฉพาะหน้า + ส่วนที่เกี่ยวข้อง
+   อธิบายทุกบล็อกสั้นๆเพื่อให้ง่ายต่อการแก้ไข
+   ===================================================== */
+
+/* หน้าสอง (Summary/Report): สไตล์สำหรับ .summary-page .summary-box-container */
+.summary-page .summary-box-container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* หน้าสอง (Summary/Report): สไตล์สำหรับ .summary-page .summary-box */
+.summary-page .summary-box {
+  background-color: #f7f9fc;
+  padding: 20px;
+  border-radius: var(--border-radius-large);
+  box-shadow: var(--shadow-light);
+  text-align: center;
+}
+
+/* หน้าสอง (Summary/Report): สไตล์สำหรับ .summary-page .summary-box h3 */
+.summary-page .summary-box h3 {
+  font-size: 1.1em;
+  color: var(--primary-color);
+  margin: 0 0 10px;
+}
+
+/* หน้าสอง (Summary/Report): สไตล์สำหรับ .summary-page .summary-box .value */
+.summary-page .summary-box .value {
+  font-size: 2em;
+  font-weight: 700;
+  color: var(--secondary-color);
+}
+
+/* หน้าสอง (Summary/Report): สไตล์สำหรับ .summary-page .summary-box .value.money */
+.summary-page .summary-box .value.money {
+  color: var(--primary-color);
+}
+
+/* หน้าสอง (Summary/Report): สไตล์สำหรับ .summary-page .summary-box ul */
+.summary-page .summary-box ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  text-align: left;
+}
+
+/* หน้าสอง (Summary/Report): สไตล์สำหรับ .summary-page .summary-box li */
+.summary-page .summary-box li {
+  margin-bottom: 5px;
+  font-size: 0.95em;
+  font-weight: 500;
+}
+
+/* หน้าสอง (Summary/Report): สไตล์สำหรับ .summary-page .summary-table */
+.summary-page .summary-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+/* หน้าสอง (Summary/Report): สไตล์สำหรับ .summary-page .summary-table th,
+.summary-page .summary-table td */
+.summary-page .summary-table th,
+.summary-page .summary-table td {
+  text-align: left;
+  padding: 12px 15px;
+  border-bottom: 1px solid #eee;
+}
+
+/* หน้าสอง (Summary/Report): สไตล์สำหรับ .summary-page .summary-table th */
+.summary-page .summary-table th {
+  background-color: #f7f9fc;
+  font-weight: 600;
+  color: #666;
+}
+
+/* หน้าสอง (Summary/Report): สไตล์สำหรับ .summary-page .no-data */
+.summary-page .no-data {
+  text-align: center;
+  padding: 50px;
+  color: #999;
+}
+
+/* หน้าสอง (Summary/Report): สไตล์สำหรับ .summary-page .date-filter */
+.summary-page .date-filter {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+/* หน้าสอง (Summary/Report): สไตล์สำหรับ .summary-page .date-filter input,
+.summary-page .date-filter select */
+.summary-page .date-filter input,
+.summary-page .date-filter select {
+  padding: 8px;
+  border-radius: var(--border-radius-small);
+  border: 1px solid #ccc;
+}
+
+/* หน้าสอง (Summary/Report): สไตล์สำหรับ .summary-page .date-filter button */
+.summary-page .date-filter button {
+  padding: 8px 15px;
+  border-radius: var(--border-radius-small);
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+/* หน้าสอง (Summary/Report): สไตล์สำหรับ .summary-page .summary-actions */
+.summary-page .summary-actions {
+  display: flex;
+  gap: 5px;
+}
+
+/* หน้าสอง (Summary/Report): สไตล์สำหรับ .summary-page .summary-actions button */
+.summary-page .summary-actions button {
+  padding: 5px 10px;
+  font-size: 0.9em;
+}
+
+/* หน้าสอง (Summary/Report): สไตล์สำหรับ .summary-page .summary-actions .edit-btn */
+.summary-page .summary-actions .edit-btn {
+  background-color: #ffc107;
+  color: white;
+  border: none;
+}
+
+/* หน้าสอง (Summary/Report): สไตล์สำหรับ .summary-page .summary-actions .delete-btn */
+.summary-page .summary-actions .delete-btn {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+}
+
+/* หน้าสอง (Summary/Report): สไตล์สำหรับ .summary-page .report-free */
+.summary-page .report-free {
+  color: var(--secondary-color);
+  font-weight: bold;
+}
+
+/* หน้าสอง (Summary/Report): สไตล์สำหรับ /* ===== Summary table: responsive fix ===== */
+#summary-page .table-wrap,
+#summary-page .summary-table-wrap */
+/* ===== Summary table: responsive fix ===== */
+#summary-page .table-wrap,
+#summary-page .summary-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* หน้าสอง (Summary/Report): สไตล์สำหรับ #summary-page table td:last-child */
+#summary-page table td:last-child {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+}
+
+/* หน้าสอง (Summary/Report): สไตล์สำหรับ #summary-page table td,
+  #summary-page table th */
+#summary-page table td,
+  #summary-page table th {
+    padding: 10px 8px;
+  }
+
+/* หน้าสอง (Summary/Report): สไตล์สำหรับ #summary-page table td:last-child .btn,
+  #summary-page table td:last-child button */
+#summary-page table td:last-child .btn,
+  #summary-page table td:last-child button {
+    font-size: 12px;
+    padding: 6px 10px;
+    border-radius: 8px;
+  }
+
+/* หน้าสอง (Summary/Report): สไตล์สำหรับ #summary-page table td:last-child */
+#summary-page table td:last-child {
+    flex-direction: column;
+    gap: 6px;
+  }
