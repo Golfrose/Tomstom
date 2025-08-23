@@ -9,6 +9,7 @@ import { changeQuantity, addToCart, renderCartModal, updateCartCount, clearCart 
 import { confirmSale } from './sales.js';
 import { loadReport } from './report.js';
 import { populateProductSelect, switchCompareMode, clearComparison, compareSales } from './compare.js';
+import { database } from './firebase.js';
 
 /**
  * Show a page by its identifier. Hides all other pages first. When
@@ -153,6 +154,85 @@ export const products = {
   ],
 };
 
+// -----------------------------------------------------------------------------
+// Persistence helpers for the product lists
+//
+// The product definitions above are initial defaults. When the admin adds,
+// edits or removes products, those changes should persist across page
+// reloads. We save the entire `products` object into localStorage under a
+// fixed key and restore it on startup. Only the known categories (water,
+// med and other) are restored to guard against injection of untrusted keys.
+
+function saveProductsToStorage() {
+  try {
+    localStorage.setItem('tomstomProducts', JSON.stringify(products));
+  } catch (e) {
+    // localStorage might be unavailable (e.g. browser restrictions). Ignore.
+  }
+}
+
+function loadProductsFromStorage() {
+  try {
+    const stored = localStorage.getItem('tomstomProducts');
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      ['water', 'med', 'other'].forEach((cat) => {
+        if (Array.isArray(parsed[cat])) {
+          products[cat] = parsed[cat];
+        }
+      });
+    }
+  } catch (e) {
+    // Ignore parse errors or absence of storage
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Real-time database persistence for products
+//
+// In addition to saving product lists locally, we also save them to the
+// Firebase realtime database so that changes propagate to all users in
+// real-time. We listen for value changes on the `products` path and update
+// our local `products` object and UI accordingly. When an admin modifies
+// the product lists, we write the new state to the database.
+
+// Reference to the products location in Firebase
+const productsRef = database.ref('products');
+
+function saveProductsToDatabase() {
+  // Persist the entire products structure to the database. This will
+  // trigger the listener below for all connected clients, updating their
+  // interfaces in real-time.
+  productsRef.set(products);
+}
+
+function loadProductsFromDatabase() {
+  // Listen for changes to the products path. Whenever the data changes,
+  // update our local products object and re-render the product lists.
+  // Ensure that there is a data object in the database. If not, write
+  // the current products as the initial value. This prevents the
+  // products list from being undefined for other users.
+  productsRef.once('value').then((snapshot) => {
+    if (!snapshot.exists()) {
+      productsRef.set(products);
+    }
+  });
+  productsRef.on('value', (snapshot) => {
+    const data = snapshot.val();
+    if (data) {
+      ['water', 'med', 'other'].forEach((cat) => {
+        if (Array.isArray(data[cat])) {
+          products[cat] = data[cat];
+        }
+      });
+      // Re-render product lists to reflect the new data
+      mountProducts();
+      // Persist to localStorage as well for offline use
+      saveProductsToStorage();
+    }
+  });
+}
+
 /**
  * Mount all product rows to their respective category lists. Update
  * this function whenever you add or remove products or categories. The
@@ -181,6 +261,12 @@ function mountProducts() {
 
 // When the DOM is ready, mount products and wire up event handlers
 document.addEventListener('DOMContentLoaded', () => {
+  // Load any customised products from localStorage before rendering.
+  loadProductsFromStorage();
+  // Start listening to remote product changes. This will also call
+  // `mountProducts()` when data arrives, overriding the initial mount.
+  loadProductsFromDatabase();
+  // Render the initial product list before remote data arrives
   mountProducts();
   updateCartCount();
   // Cart icon shows the cart modal
@@ -220,6 +306,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const unitInput = prompt('หน่วย (เช่น ขวด, ถุง, ลัง เป็นต้น):', 'ขวด') || 'ขวด';
       products[category].push({ product: productName, mix, price, unit: unitInput });
       mountProducts();
+      saveProductsToStorage();
+      saveProductsToDatabase();
     });
   }
   if (removeBtn) {
@@ -242,6 +330,8 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       products[category].splice(idx, 1);
       mountProducts();
+      saveProductsToStorage();
+      saveProductsToDatabase();
     });
   }
   if (editBtn) {
@@ -273,6 +363,8 @@ document.addEventListener('DOMContentLoaded', () => {
       item.price = newPrice;
       item.unit = newUnit;
       mountProducts();
+      saveProductsToStorage();
+      saveProductsToDatabase();
     });
   }
 });
