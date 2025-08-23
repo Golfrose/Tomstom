@@ -135,7 +135,30 @@
   color: #d32f2f;               /* แดง */
   font-weight: 700;
 }
+/* ---- Summary Table: ปรับเส้นกรอบ ---- */
+.summary-table {
+  width: 100%;
+  border-collapse: collapse;  /* รวมเส้นติดกัน */
+  margin-top: 20px;
+  border: 1px solid #ddd;     /* กรอบนอก */
+  border-radius: var(--border-radius-small);
+  overflow: hidden;
+  box-shadow: var(--shadow-light);
+}
 
+.summary-table th,
+.summary-table td {
+  border: 1px solid #ddd;     /* เส้นทุกด้าน */
+  padding: 10px;
+  text-align: center;
+  font-size: 0.95rem;
+}
+
+.summary-table th {
+  background: linear-gradient(135deg, var(--primary-light), var(--primary-color));
+  color: #fff;
+  font-weight: 600;
+}
 /* ---- Responsive: ตารางเล็กบนมือถือ ---- */
 @media (max-width: 768px) {
   .summary-table th,
