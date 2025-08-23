@@ -1,0 +1,50 @@
+/* ================================
+   COMPARE PAGE
+   - ตารางเปรียบเทียบ
+   - หัวตารางเขียว gradient
+   - Alternate row สีเทาอ่อน
+================================= */
+
+/* ---- Comparison Table ---- */
+.comparison-result-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  border-radius: var(--border-radius-small);
+  overflow: hidden;
+  box-shadow: var(--shadow-light);
+}
+
+.comparison-result-table th {
+  background: linear-gradient(135deg, var(--primary-light), var(--primary-color));
+  color: #fff;
+  padding: 10px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.comparison-result-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+  font-size: 0.95rem;
+}
+
+/* ---- Alternate rows (สลับสี) ---- */
+.comparison-result-table tr:nth-child(even) td {
+  background: #fafafa;
+}
+
+/* ---- Hover row ---- */
+.comparison-result-table tr:hover td {
+  background: #f1f8f4; /* เขียวอ่อนจางๆ */
+}
+
+/* ---- Responsive: ตารางเล็กบนมือถือ ---- */
+@media (max-width: 768px) {
+  .comparison-result-table th,
+  .comparison-result-table td {
+    font-size: 0.8rem;
+    padding: 6px;
+  }
+}

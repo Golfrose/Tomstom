@@ -1,0 +1,83 @@
+/* ================================
+   SUMMARY PAGE
+   - ตารางสรุปยอดขาย
+   - ปุ่ม action (แก้ไข/ลบ)
+   - Highlight cash / transfer / total
+================================= */
+
+/* ---- Summary Table ---- */
+.summary-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  border-radius: var(--border-radius-small);
+  overflow: hidden;
+  box-shadow: var(--shadow-light);
+}
+.summary-table th {
+  background: linear-gradient(135deg, var(--primary-light), var(--primary-color));
+  color: #fff;
+  padding: 10px;
+  text-align: center;
+  font-weight: 600;
+}
+.summary-table td {
+  border: 1px solid #eee;
+  padding: 8px;
+  text-align: center;
+  font-size: 0.95rem;
+}
+.summary-table tr:hover {
+  background: #f9f9f9;
+}
+
+/* ---- Highlight values ---- */
+.cash-value {
+  color: var(--primary-dark);   /* เงินสด = เขียวเข้ม */
+  font-weight: 600;
+}
+.transfer-value {
+  color: #d32f2f;               /* โอนเงิน = แดง */
+  font-weight: 600;
+}
+.total-value {
+  color: var(--primary-color);  /* รวมทั้งหมด = เขียวสด */
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+/* ---- Action Buttons ---- */
+.summary-table .edit-btn {
+  background: #ffd54f;   /* เหลือง */
+  color: #333;
+  padding: 4px 8px;
+  border: none;
+  border-radius: var(--border-radius-small);
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+.summary-table .edit-btn:hover {
+  background: #ffca28;
+}
+
+.summary-table .delete-btn {
+  background: #e57373;   /* แดง */
+  color: #fff;
+  padding: 4px 8px;
+  border: none;
+  border-radius: var(--border-radius-small);
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+.summary-table .delete-btn:hover {
+  background: #ef5350;
+}
+
+/* ---- Responsive: ตารางเล็กบนมือถือ ---- */
+@media (max-width: 768px) {
+  .summary-table th,
+  .summary-table td {
+    font-size: 0.8rem;
+    padding: 6px;
+  }
+}

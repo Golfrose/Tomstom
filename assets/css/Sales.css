@@ -1,0 +1,344 @@
+/* ================================
+   SALES PAGE
+   - Dashboard (หัวเขียว gradient)
+   - Navigation (เมนู 8 ปุ่ม)
+   - Product rows (แถวสินค้า)
+   - Floating cart + Modal cart
+================================= */
+
+/* ---- Dashboard Header ---- */
+.dashboard {
+  background: linear-gradient(135deg, var(--primary-light), var(--primary-color), var(--primary-dark));
+  color: #fff;
+  text-align: center;
+  padding: 40px 20px 80px;
+  border-bottom-left-radius: 40px;
+  border-bottom-right-radius: 40px;
+  box-shadow: var(--shadow-medium);
+  margin-bottom: 20px;
+}
+.dashboard h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0;
+}
+.dashboard p {
+  font-size: 1.1rem;
+  opacity: 0.9;
+  margin: 5px 0 20px;
+}
+
+/* ---- Navigation Menu ---- */
+.main-nav {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-top: -50px; /* ดันขึ้นมาทับ Dashboard */
+}
+.nav-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100px;
+  padding: 15px;
+  background: var(--light-grey);
+  border-radius: var(--border-radius-large);
+  color: #555;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-light);
+}
+.nav-btn:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-medium);
+}
+.nav-btn.active {
+  background: linear-gradient(135deg, var(--primary-light), var(--primary-color));
+  color: #fff;
+  transform: translateY(-4px);
+}
+.nav-btn i { font-size: 1.5rem; margin-bottom: 6px; }
+.nav-btn span { font-size: 0.9rem; }
+
+/* ---- Product Lists ---- */
+.product-lists > .product-list { display: none; }
+.product-lists > .product-list.active { display: block; }
+
+.product-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.product-list .product-row {
+  flex: 1 1 100%;
+}
+@media (min-width: 600px) {
+  .product-list .product-row {
+    flex: 1 1 calc(50% - 10px);
+  }
+}
+
+/* ---- Product Row ---- */
+.product-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto; /* ซ้าย=ปุ่มจำนวน, กลาง=รายละเอียด, ขวา=checkbox */
+  align-items: center;
+  background: var(--light-grey);
+  padding: 12px 15px;
+  border-radius: var(--border-radius-small);
+  margin-bottom: 10px;
+  box-shadow: var(--shadow-light);
+  column-gap: 10px;
+}
+
+/* Quantity control */
+.product-row .quantity-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.product-row .quantity-control button {
+  width: 32px;
+  height: 32px;
+  background: var(--primary-color);
+  border: none;
+  color: #fff;
+  border-radius: 50%;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.product-row .quantity-control button:hover { transform: scale(1.1); }
+.product-row .quantity-control input {
+  width: 45px;
+  height: 32px;
+  text-align: center;
+  border: 1px solid #ddd;
+  border-radius: var(--border-radius-small);
+  font-size: 1rem;
+}
+
+/* Product details */
+.product-row .details {
+  padding: 0 10px;
+  font-size: 1rem;
+  color: var(--primary-dark);
+}
+.product-row .details .price {
+  font-size: 0.9rem;
+  color: #555;
+}
+
+/* Checkbox */
+.product-row input.add-checkbox {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--primary-color);
+  cursor: pointer;
+}
+
+/* ---- Floating Cart ---- */
+.cart-icon {
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, var(--primary-light), var(--primary-color));
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+  font-size: 1.4rem;
+  box-shadow: var(--shadow-medium);
+  cursor: pointer;
+  z-index: 100;
+}
+.cart-count {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: var(--primary-dark);
+  color: #fff;
+  border-radius: 50%;
+  padding: 3px 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* ---- Modal Cart ---- */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 101;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.4);
+  backdrop-filter: blur(4px);
+  justify-content: center;
+  align-items: center;
+}
+.modal-content {
+  background: linear-gradient(135deg, var(--accent-light), var(--accent-color));
+  color: #fff;
+  padding: 25px;
+  border-radius: var(--border-radius-large);
+  width: 90%;
+  max-width: 420px;
+  box-shadow: var(--shadow-medium);
+  text-align: center;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+.modal-header h3 {
+  margin: 0 0 15px;
+  font-size: 1.4rem;
+  font-weight: 500;
+}
+.modal-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255,255,255,0.15);
+  padding: 10px 12px;
+  border-radius: var(--border-radius-small);
+  margin-bottom: 8px;
+  font-size: 1rem;
+}
+.modal-item .item-details { flex: 1; text-align: left; }
+.modal-item .item-total { font-weight: 600; }
+.modal-item .remove-item {
+  margin-left: 6px;
+  background: #ff4d4f;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+}
+/* ================================
+   SALES PAGE (ต่อ)
+   - รายละเอียดใน Modal Cart
+   - Buyer info + ปุ่ม confirm/cancel
+   - Admin controls
+================================= */
+
+/* ---- Transfer toggle (ติ๊กโอนเงิน) ---- */
+.transfer-toggle {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-right: 8px;
+  font-size: 0.75rem;
+}
+.transfer-toggle input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent-color);
+  cursor: pointer;
+}
+.transfer-toggle span {
+  color: #fff;
+}
+
+/* ---- Buyer info ---- */
+.buyer-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 15px;
+}
+.buyer-name-input {
+  width: 100%;
+  padding: 10px;
+  border-radius: var(--border-radius-small);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  font-size: 1rem;
+  color: #333;
+}
+
+/* ---- Total ---- */
+.modal-total {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 15px 0;
+  border-top: 1px dashed rgba(255, 255, 255, 0.4);
+  padding-top: 12px;
+}
+
+/* ---- Global transfer option ---- */
+.transfer-global-option {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+}
+.transfer-global-option input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent-color);
+  cursor: pointer;
+}
+
+/* ---- Modal actions (confirm/cancel) ---- */
+.modal-actions {
+  display: flex;
+  gap: 12px;
+}
+.modal-actions button {
+  flex: 1;
+  padding: 12px;
+  border-radius: var(--border-radius-small);
+  border: none;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.modal-actions .confirm-btn {
+  background-color: var(--primary-dark);
+  color: #fff;
+}
+.modal-actions .cancel-btn {
+  background-color: #f0f0f0;
+  color: #555;
+}
+.modal-actions button:hover {
+  transform: translateY(-2px);
+}
+
+/* ---- Admin controls ---- */
+.admin-controls {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 20px;
+}
+.admin-btn {
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: var(--border-radius-small);
+  background-color: var(--primary-color);
+  color: #fff;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+.admin-btn:hover {
+  background-color: var(--primary-dark);
+}
