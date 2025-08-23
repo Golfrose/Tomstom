@@ -107,7 +107,21 @@
   color: #d32f2f;               /* แดง */
   font-weight: 700;
 }
+/* ================================
+   SUMMARY COUNT FIX
+   - ซ้าย = เขียว
+   - ขวา = แดง (มีแล้วที่ other-unit-value)
+================================= */
 
+#total-quantity-left {
+  color: var(--primary-dark);   /* เขียวเข้ม */
+  font-weight: 700;
+}
+
+#total-quantity-right.other-unit-value {
+  color: #d32f2f;               /* แดง */
+  font-weight: 700;
+}
 
 /* ---- Responsive: ตารางเล็กบนมือถือ ---- */
 @media (max-width: 768px) {
