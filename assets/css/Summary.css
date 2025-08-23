@@ -159,6 +159,41 @@
   color: #fff;
   font-weight: 600;
 }
+/* ================================
+   SALE GROUP TABLE STYLE
+   - กรณีหลายรายการ (multi)
+   - กรณีเดี่ยว (single)
+================================= */
+
+/* เส้นตั้ง: ใช้กับทุกบิล */
+.sale-group td:nth-child(1),  /* วันเวลา */
+.sale-group td:nth-child(3),  /* จำนวน */
+.sale-group td:nth-child(4)   /* ราคา */
+{
+  border-right: 2px solid #ddd;
+}
+
+/* เปิดบิล (บรรทัดแรก) */
+.sale-group-start td {
+  border-top: 2px solid #ddd;
+}
+
+/* ปิดบิล (บรรทัดสุดท้าย) */
+.sale-group-end td {
+  border-bottom: 2px solid #ddd;
+}
+
+/* แถวกลางในบิลหลายรายการ → ไม่มีเส้นบน/ล่าง */
+.sale-group td {
+  border-top: none;
+  border-bottom: none;
+}
+
+/* Legacy รายการเดียว (ใช้ sale-separator เดิม) */
+.sale-separator td {
+  border-top: 2px solid #ddd;
+  border-bottom: 2px solid #ddd;
+}
 /* ---- Responsive: ตารางเล็กบนมือถือ ---- */
 @media (max-width: 768px) {
   .summary-table th,
