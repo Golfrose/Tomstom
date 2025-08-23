@@ -17,13 +17,23 @@ export function loadReport() {
   const selectedDateStr = document.getElementById('report-date').value;
   const reportBody = document.getElementById('report-body');
   const totalRevenueEl = document.getElementById('total-revenue');
-  const totalQuantityEl = document.getElementById('total-quantity');
+  // Elements for displaying total quantities. total-quantity-left shows
+  // the number of bottles sold, quantity-unit displays the unit label
+  // (usually "ขวด"), and total-quantity-right shows the sum of all
+  // non-bottle units sold. The previous element with id
+  // "total-quantity" has been split into these three parts.
+  const totalQuantityLeftEl = document.getElementById('total-quantity-left');
+  const quantityUnitEl = document.getElementById('quantity-unit');
+  const totalQuantityRightEl = document.getElementById('total-quantity-right');
   const productSummaryListEl = document.getElementById('product-summary-list');
   const noDataEl = document.getElementById('no-data');
   reportBody.innerHTML = '';
   productSummaryListEl.innerHTML = '';
   totalRevenueEl.textContent = '0';
-  totalQuantityEl.textContent = '0';
+  // Reset quantity displays
+  if (totalQuantityLeftEl) totalQuantityLeftEl.textContent = '0';
+  if (quantityUnitEl) quantityUnitEl.textContent = 'ขวด';
+  if (totalQuantityRightEl) totalQuantityRightEl.textContent = '0';
   const user = auth.currentUser;
   if (!user) return;
   const salesRef = database.ref('sales/' + user.uid);
@@ -45,6 +55,11 @@ export function loadReport() {
     let totalRevenue = 0;
     let transferRevenue = 0;
     let totalQuantity = 0;
+    // Track quantities by unit. bottleCount counts items measured in 'ขวด',
+    // while otherCount aggregates all other units. These values are
+    // displayed as `bottleCount ขวด / otherCount` in the summary box.
+    let bottleCount = 0;
+    let otherCount = 0;
     const productSummary = {};
     function accumulateSummary(key, quantity, unit) {
       if (!productSummary[key]) {
@@ -74,6 +89,13 @@ export function loadReport() {
         });
         const customerName = rec.customerName || '';
         saleItems.forEach((itm, index) => {
+          // Accumulate bottle vs other unit counts
+          const currentUnit = itm.unit || 'ขวด';
+          if (currentUnit === 'ขวด') {
+            bottleCount += itm.quantity;
+          } else {
+            otherCount += itm.quantity;
+          }
           // Build summary key
           const summaryKey =
             itm.mix && itm.mix !== 'ไม่มี'
@@ -120,8 +142,12 @@ export function loadReport() {
             actionsTd.innerHTML = `
               <button class="delete-btn" data-id="${rec.id}">ลบ</button>
             `;
+            // Mark end of sale group to draw yellow border at the bottom
+            tr.classList.add('sale-group-end');
           }
           tr.appendChild(actionsTd);
+          // Mark each row as part of an aggregated sale group for vertical yellow borders
+          tr.classList.add('sale-group');
           reportBody.appendChild(tr);
         });
       } else {
@@ -129,6 +155,15 @@ export function loadReport() {
         totalRevenue += rec.totalPrice;
         totalQuantity += rec.quantity;
         if (isTransfer) transferRevenue += rec.totalPrice;
+        // Accumulate bottle vs other unit counts for legacy sales
+        {
+          const unit = rec.unit || 'ขวด';
+          if (unit === 'ขวด') {
+            bottleCount += rec.quantity;
+          } else {
+            otherCount += rec.quantity;
+          }
+        }
         const displayDate = new Date(rec.timestamp).toLocaleString('th-TH', {
           day: 'numeric',
           month: 'numeric',
@@ -173,13 +208,21 @@ export function loadReport() {
           <button class="delete-btn" data-id="${rec.id}">ลบ</button>
         `;
         tr.appendChild(actionsTd);
+        // Add a separator line after each legacy sale
+        tr.classList.add('sale-separator');
         reportBody.appendChild(tr);
       }
     });
     // Update totals. Show total revenue (cash + transfer) on the left and transfer revenue on the right.
     // Use the .total-value class for the combined revenue so it appears green like cash in the original design.
     totalRevenueEl.innerHTML = `<span class="total-value">${totalRevenue.toLocaleString()}</span> / <span class="transfer-value">${transferRevenue.toLocaleString()}</span>`;
-    totalQuantityEl.textContent = totalQuantity.toLocaleString();
+    // Update quantity summary. Display bottles on the left and
+    // non‑bottle units on the right separated by a slash. The right
+    // number will be styled red via CSS.
+    if (totalQuantityLeftEl) totalQuantityLeftEl.textContent = bottleCount.toLocaleString();
+    // Show the unit only if there are bottles sold; otherwise leave blank
+    if (quantityUnitEl) quantityUnitEl.textContent = bottleCount > 0 ? 'ขวด' : '';
+    if (totalQuantityRightEl) totalQuantityRightEl.textContent = otherCount.toLocaleString();
     // Populate product summary list
     for (const k in productSummary) {
       const li = document.createElement('li');
