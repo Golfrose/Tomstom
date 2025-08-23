@@ -148,6 +148,10 @@ export function loadReport() {
           tr.appendChild(actionsTd);
           // Mark each row as part of an aggregated sale group for vertical yellow borders
           tr.classList.add('sale-group');
+          // Mark the first row of a sale group for the top yellow border
+          if (index === 0) {
+            tr.classList.add('sale-group-start');
+          }
           reportBody.appendChild(tr);
         });
       } else {
