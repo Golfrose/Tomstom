@@ -35,79 +35,163 @@ export function loadReport() {
     }
     const filteredData = Object.keys(salesData)
       .map((id) => ({ id, ...salesData[id] }))
-      .filter((item) => isSameDay(new Date(item.timestamp), new Date(selectedDateStr)));
+      .filter((rec) => isSameDay(new Date(rec.timestamp), new Date(selectedDateStr)));
     if (filteredData.length === 0) {
       noDataEl.style.display = 'block';
       return;
     }
     noDataEl.style.display = 'none';
-    let totalRevenue = 0,
-      totalQuantity = 0;
+    // Prepare totals and product summary. Summary values hold quantity and unit.
+    let totalRevenue = 0;
     let transferRevenue = 0;
+    let totalQuantity = 0;
     const productSummary = {};
-    filteredData.forEach((item) => {
-      totalRevenue += item.totalPrice;
-      totalQuantity += item.quantity;
+    function accumulateSummary(key, quantity, unit) {
+      if (!productSummary[key]) {
+        productSummary[key] = { quantity: 0, unit };
+      }
+      productSummary[key].quantity += quantity;
+    }
+    // Loop through each sale record
+    filteredData.forEach((rec) => {
       const isTransfer =
-        item.transfer === true || item.transfer === 'true' || item.transfer === 1 || item.transfer === '1';
-      if (isTransfer) {
-        transferRevenue += item.totalPrice;
+        rec.transfer === true ||
+        rec.transfer === 'true' ||
+        rec.transfer === 1 ||
+        rec.transfer === '1';
+      if (rec.items && Array.isArray(rec.items)) {
+        // Aggregated sale
+        totalRevenue += rec.totalPrice;
+        totalQuantity += rec.totalQuantity || rec.items.reduce((sum, itm) => sum + itm.quantity, 0);
+        if (isTransfer) transferRevenue += rec.totalPrice;
+        const saleItems = rec.items;
+        const displayDate = new Date(rec.timestamp).toLocaleString('th-TH', {
+          day: 'numeric',
+          month: 'numeric',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+        });
+        const customerName = rec.customerName || '';
+        saleItems.forEach((itm, index) => {
+          // Build summary key
+          const summaryKey =
+            itm.mix && itm.mix !== 'ไม่มี'
+              ? `${itm.product} (${itm.mix})`
+              : itm.product;
+          accumulateSummary(summaryKey, itm.quantity, itm.unit || 'ขวด');
+          const tr = document.createElement('tr');
+          // Set transfer class if sale is transfer
+          if (isTransfer) tr.classList.add('transfer-row');
+          // Determine if current item is a free item
+          const isFree =
+            itm.product.includes('แลกฟรี') ||
+            (itm.mix && itm.mix.includes('แลกฟรี'));
+          // Date cell
+          const dateTd = document.createElement('td');
+          dateTd.textContent = index === 0 ? displayDate : '';
+          tr.appendChild(dateTd);
+          // Name cell
+          const nameTd = document.createElement('td');
+          let itemName = itm.product;
+          if (itm.mix && itm.mix !== 'ไม่มี') itemName += ` (${itm.mix})`;
+          if (index === 0 && customerName) {
+            nameTd.innerHTML = `<span class="customer-name">${customerName}</span> · <span class="${
+              isFree ? 'free-label' : ''
+            }">${itemName}</span>`;
+          } else {
+            nameTd.innerHTML = `&bull; <span class="${
+              isFree ? 'free-label' : ''
+            }">${itemName}</span>`;
+          }
+          tr.appendChild(nameTd);
+          // Quantity cell with unit
+          const qtyTd = document.createElement('td');
+          qtyTd.textContent = `${itm.quantity} ${itm.unit || ''}`.trim();
+          tr.appendChild(qtyTd);
+          // Total cell: only show on last row of sale
+          const totalTd = document.createElement('td');
+          totalTd.textContent = index === saleItems.length - 1 ? rec.totalPrice.toLocaleString() : '';
+          tr.appendChild(totalTd);
+          // Actions cell: only on last row
+          const actionsTd = document.createElement('td');
+          if (index === saleItems.length - 1) {
+            // For aggregated sale, editing is disabled
+            actionsTd.innerHTML = `
+              <button class="delete-btn" data-id="${rec.id}">ลบ</button>
+            `;
+          }
+          tr.appendChild(actionsTd);
+          reportBody.appendChild(tr);
+        });
+      } else {
+        // Legacy single-item sale
+        totalRevenue += rec.totalPrice;
+        totalQuantity += rec.quantity;
+        if (isTransfer) transferRevenue += rec.totalPrice;
+        const displayDate = new Date(rec.timestamp).toLocaleString('th-TH', {
+          day: 'numeric',
+          month: 'numeric',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+        });
+        const tr = document.createElement('tr');
+        // Determine if this sale is a free item
+        const isFree =
+          rec.product.includes('แลกฟรี') ||
+          (rec.mix && rec.mix.includes('แลกฟรี'));
+        if (isTransfer) tr.classList.add('transfer-row');
+        // Build summary key
+        const summaryKey =
+          rec.mix && rec.mix !== 'ไม่มี'
+            ? `${rec.product} (${rec.mix})`
+            : rec.product;
+        accumulateSummary(summaryKey, rec.quantity, rec.unit || 'ขวด');
+        // Date cell
+        const dateTd = document.createElement('td');
+        dateTd.textContent = displayDate;
+        tr.appendChild(dateTd);
+        // Name cell
+        const nameTd = document.createElement('td');
+        let itemName = rec.product;
+        if (rec.mix && rec.mix !== 'ไม่มี') itemName += ` (${rec.mix})`;
+        nameTd.innerHTML = `<span class="${isFree ? 'free-label' : ''}">${itemName}</span>`;
+        tr.appendChild(nameTd);
+        // Quantity cell with unit
+        const qtyTd = document.createElement('td');
+        qtyTd.textContent = `${rec.quantity} ${rec.unit || ''}`.trim();
+        tr.appendChild(qtyTd);
+        // Total cell: show total price
+        const totalTd = document.createElement('td');
+        totalTd.textContent = rec.totalPrice.toLocaleString();
+        tr.appendChild(totalTd);
+        // Actions cell: allow edit and delete for legacy items
+        const actionsTd = document.createElement('td');
+        actionsTd.innerHTML = `
+          <button class="edit-btn" data-id="${rec.id}">แก้</button>
+          <button class="delete-btn" data-id="${rec.id}">ลบ</button>
+        `;
+        tr.appendChild(actionsTd);
+        reportBody.appendChild(tr);
       }
-      // Build summary key using product and mix
-      // Compose the summary key. If mix is 'ไม่มี' treat this as a
-      // simple product with no mix; otherwise include the mix in
-      // parentheses. This prevents water items with no mix from
-      // appearing like "ผสมเงิน (ไม่มี)" in the summary list.
-      const summaryKey = item.mix && item.mix !== 'ไม่มี' ? `${item.product} (${item.mix})` : item.product;
-      productSummary[summaryKey] = (productSummary[summaryKey] || 0) + item.quantity;
-      const tr = document.createElement('tr');
-      // Format the timestamp into Thai locale date & time
-      const displayDate = new Date(item.timestamp).toLocaleString('th-TH', {
-        day: 'numeric',
-        month: 'numeric',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-      });
-      // If customer name exists, prepend it; otherwise show product and mix
-      const displayLabel = item.customerName
-        ? `${item.customerName} (${item.mix !== 'ไม่มี' ? item.mix : item.product})`
-        : `${item.product}${item.mix !== 'ไม่มี' ? ` (${item.mix})` : ''}`;
-      // Assign classes for free and transfer rows. Any item where
-      // either the product or the mix contains 'แลกฟรี' should be
-      // considered a free item and highlighted in green, regardless
-      // of its price. Transfer items are highlighted in red.
-      if (item.product.includes('แลกฟรี') || (item.mix && item.mix.includes('แลกฟรี'))) {
-        tr.classList.add('free-row');
-      }
-      if (isTransfer) {
-        tr.classList.add('transfer-row');
-      }
-      tr.innerHTML = `
-        <td>${displayDate}</td>
-        <td>${displayLabel}</td>
-        <td>${item.quantity}</td>
-        <td>${item.pricePerUnit}</td>
-        <td>${item.totalPrice.toLocaleString()}</td>
-        <td>
-          <button class="edit-btn" data-id="${item.id}">แก้</button>
-          <button class="delete-btn" data-id="${item.id}">ลบ</button>
-        </td>
-      `;
-      reportBody.appendChild(tr);
     });
-    // Compute cash revenue (excluding transfers) and update totals
-    const cashRevenue = totalRevenue - transferRevenue;
-    totalRevenueEl.innerHTML = `<span class="cash-value">${cashRevenue.toLocaleString()}</span> / <span class="transfer-value">${transferRevenue.toLocaleString()}</span>`;
+    // Update totals. Show total revenue (cash + transfer) on the left and transfer revenue on the right.
+    // Use the .total-value class for the combined revenue so it appears green like cash in the original design.
+    totalRevenueEl.innerHTML = `<span class="total-value">${totalRevenue.toLocaleString()}</span> / <span class="transfer-value">${transferRevenue.toLocaleString()}</span>`;
     totalQuantityEl.textContent = totalQuantity.toLocaleString();
+    // Populate product summary list
     for (const k in productSummary) {
       const li = document.createElement('li');
-      li.textContent = `${k}: ${productSummary[k]} ขวด`;
-      // Highlight free items (any summary key containing 'แลกฟรี' or 'แลกขวดฟรี')
-      if (k.includes('แลกฟรี')) li.classList.add('report-free');
+      const { quantity, unit } = productSummary[k];
+      li.textContent = `${k}: ${quantity} ${unit}`;
+      // Highlight free items in the summary list
+      if (k.includes('แลกฟรี')) {
+        li.classList.add('report-free');
+      }
       productSummaryListEl.appendChild(li);
     }
-    // Attach edit/delete handlers
+    // Attach edit/delete handlers for legacy items and delete for aggregated sales
     reportBody.querySelectorAll('.edit-btn').forEach((btn) =>
       btn.addEventListener('click', function () {
         editSaleItem(this.dataset.id);

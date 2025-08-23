@@ -39,7 +39,7 @@ export function showPage(pageId) {
  * and the checkbox is unchecked.
  * @param {{name:string, price:number, mixes?:Array<{label:string, price:number}>, promo?:string}} param0
  */
-function createProductRow({ product, mix = 'ไม่มี', price, promo }) {
+function createProductRow({ product, mix = 'ไม่มี', price, unit = 'ขวด', promo }) {
   // Create a row representing a single product/mix combination. The
   // caller must provide a `product` (base name), a `mix` label
   // indicating the flavour or option, a numeric `price` and an
@@ -51,6 +51,7 @@ function createProductRow({ product, mix = 'ไม่มี', price, promo }) {
   row.dataset.product = product;
   row.dataset.mix = mix;
   row.dataset.price = price;
+  row.dataset.unit = unit;
   if (promo) row.dataset.promo = promo;
 
   // Quantity control: minus button, input, plus button
@@ -116,39 +117,39 @@ export const products = {
    * right column via CSS).
    */
   water: [
-    { product: 'ผสมเงิน', mix: 'ไม่มี', price: 100 },
-    { product: 'ผสมเงินซิ', mix: 'ไม่มี', price: 100 },
-    { product: 'ผสมเงินสด', mix: 'ไม่มี', price: 100 },
-    { product: 'ผสมแดง', mix: 'ไม่มี', price: 100 },
-    { product: 'ผสมแดงซิ', mix: 'ไม่มี', price: 100 },
-    { product: 'ผสมแดงสด', mix: 'ไม่มี', price: 100 },
-    { product: 'ผสมไก่', mix: 'ไม่มี', price: 100 },
-    { product: 'ผสมไก่ซิ', mix: 'ไม่มี', price: 100 },
+    { product: 'ผสมเงิน', mix: 'ไม่มี', price: 100, unit: 'ขวด' },
+    { product: 'ผสมเงินซิ', mix: 'ไม่มี', price: 100, unit: 'ขวด' },
+    { product: 'ผสมเงินสด', mix: 'ไม่มี', price: 100, unit: 'ขวด' },
+    { product: 'ผสมแดง', mix: 'ไม่มี', price: 100, unit: 'ขวด' },
+    { product: 'ผสมแดงซิ', mix: 'ไม่มี', price: 100, unit: 'ขวด' },
+    { product: 'ผสมแดงสด', mix: 'ไม่มี', price: 100, unit: 'ขวด' },
+    { product: 'ผสมไก่', mix: 'ไม่มี', price: 100, unit: 'ขวด' },
+    { product: 'ผสมไก่ซิ', mix: 'ไม่มี', price: 100, unit: 'ขวด' },
     // Items after the eighth will appear on the right side of the water list
-    { product: 'ผสมไก่สด', mix: 'ไม่มี', price: 100 },
-    { product: 'ผสมซี', mix: 'ไม่มี', price: 100 },
-    { product: 'ผสมซีซิ', mix: 'ไม่มี', price: 100 },
-    { product: 'ผสมซีสด', mix: 'ไม่มี', price: 100 },
-    { product: 'น้ำดิบ', mix: 'ไม่มี', price: 65, promo: '2 ขวด 120 บาท' },
-    { product: 'แลกฟรี', mix: 'ไม่มี', price: 0 },
-    { product: 'แลกฟรีซิ', mix: 'ไม่มี', price: 20 },
-    { product: 'แลกฟรีสด', mix: 'ไม่มี', price: 20 },
+    { product: 'ผสมไก่สด', mix: 'ไม่มี', price: 100, unit: 'ขวด' },
+    { product: 'ผสมซี', mix: 'ไม่มี', price: 100, unit: 'ขวด' },
+    { product: 'ผสมซีซิ', mix: 'ไม่มี', price: 100, unit: 'ขวด' },
+    { product: 'ผสมซีสด', mix: 'ไม่มี', price: 100, unit: 'ขวด' },
+    { product: 'น้ำดิบ', mix: 'ไม่มี', price: 65, promo: '2 ขวด 120 บาท', unit: 'ขวด' },
+    { product: 'แลกฟรี', mix: 'ไม่มี', price: 0, unit: 'ขวด' },
+    { product: 'แลกฟรีซิ', mix: 'ไม่มี', price: 20, unit: 'ขวด' },
+    { product: 'แลกฟรีสด', mix: 'ไม่มี', price: 20, unit: 'ขวด' },
   ],
   /**
    * Medicine category menu. Items have no mix options.
    */
   med: [
-    { product: 'ยาฝาเงิน', mix: 'ไม่มี', price: 80 },
-    { product: 'ยาฝาแดง', mix: 'ไม่มี', price: 90 },
-    { product: 'ยาไก่', mix: 'ไม่มี', price: 80 },
-    { product: 'ยาซี', mix: 'ไม่มี', price: 80 },
+    { product: 'ยาฝาเงิน', mix: 'ไม่มี', price: 80, unit: 'ขวด' },
+    { product: 'ยาฝาแดง', mix: 'ไม่มี', price: 90, unit: 'ขวด' },
+    { product: 'ยาไก่', mix: 'ไม่มี', price: 80, unit: 'ขวด' },
+    { product: 'ยาซี', mix: 'ไม่มี', price: 80, unit: 'ขวด' },
   ],
   /**
    * Other category menu. Oishi and fresh sugar with updated prices.
    */
   other: [
-    { product: 'โออิซิ', mix: 'ไม่มี', price: 25 },
-    { product: 'น้ำตาลสด', mix: 'ไม่มี', price: 20 },
+    { product: 'โออิซิ', mix: 'ไม่มี', price: 25, unit: 'ขวด' },
+    { product: 'น้ำตาลสด', mix: 'ไม่มี', price: 20, unit: 'ขวด' },
   ],
 };
 
@@ -215,7 +216,9 @@ document.addEventListener('DOMContentLoaded', () => {
         alert('ราคาผิดพลาด');
         return;
       }
-      products[category].push({ product: productName, mix, price });
+      // Ask for unit (e.g., ขวด, ถุง, ลัง). Default to ขวด.
+      const unitInput = prompt('หน่วย (เช่น ขวด, ถุง, ลัง เป็นต้น):', 'ขวด') || 'ขวด';
+      products[category].push({ product: productName, mix, price, unit: unitInput });
       mountProducts();
     });
   }
@@ -265,7 +268,10 @@ document.addEventListener('DOMContentLoaded', () => {
         alert('ราคาผิดพลาด');
         return;
       }
+      // Ask for a new unit; default to existing unit
+      const newUnit = prompt('หน่วยใหม่ (เช่น ขวด, ถุง, ลัง เป็นต้น):', item.unit || 'ขวด') || item.unit;
       item.price = newPrice;
+      item.unit = newUnit;
       mountProducts();
     });
   }

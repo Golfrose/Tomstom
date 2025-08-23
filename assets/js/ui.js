@@ -53,4 +53,14 @@ document.addEventListener('DOMContentLoaded', () => {
       if (activeList) activeList.classList.add('active');
     });
   });
+
+  // Ensure only the first category list is visible on initial load
+  const firstCard = document.querySelector('.category-card');
+  if (firstCard) {
+    firstCard.classList.add('active');
+    const cat = firstCard.dataset.category;
+    document.querySelectorAll('.product-list').forEach((list) => list.classList.remove('active'));
+    const firstList = document.getElementById(`product-list-${cat}`);
+    if (firstList) firstList.classList.add('active');
+  }
 });

@@ -22,7 +22,14 @@ export function populateProductSelect() {
   salesRef.once('value', (snapshot) => {
     const data = snapshot.val();
     const setP = new Set();
-    if (data) Object.values(data).forEach((s) => setP.add(s.product));
+    if (data)
+      Object.values(data).forEach((s) => {
+        if (s.items && Array.isArray(s.items)) {
+          s.items.forEach((itm) => setP.add(itm.product));
+        } else if (s.product) {
+          setP.add(s.product);
+        }
+      });
     // Ensure that items in the "other" category are always present
     // in the drop-down even if they have not been sold yet.  This
     // addresses the requirement that โออิซิและน้ำตาลสด appear in
@@ -91,8 +98,50 @@ export function compareSales() {
       }
       const D1 = new Date(d1),
         D2 = new Date(d2);
-      salesData1 = Object.values(salesData).filter((i) => isSameDay(new Date(i.timestamp), D1));
-      salesData2 = Object.values(salesData).filter((i) => isSameDay(new Date(i.timestamp), D2));
+      // Flatten sales data for day 1 and day 2
+      const allData = Object.values(salesData);
+      salesData1 = [];
+      salesData2 = [];
+      allData.forEach((rec) => {
+        if (isSameDay(new Date(rec.timestamp), D1)) {
+          if (rec.items && Array.isArray(rec.items)) {
+            rec.items.forEach((itm) => {
+              salesData1.push({
+                product: itm.product,
+                quantity: itm.quantity,
+                totalPrice: itm.totalPrice,
+                timestamp: rec.timestamp,
+              });
+            });
+          } else {
+            salesData1.push({
+              product: rec.product,
+              quantity: rec.quantity,
+              totalPrice: rec.totalPrice,
+              timestamp: rec.timestamp,
+            });
+          }
+        }
+        if (isSameDay(new Date(rec.timestamp), D2)) {
+          if (rec.items && Array.isArray(rec.items)) {
+            rec.items.forEach((itm) => {
+              salesData2.push({
+                product: itm.product,
+                quantity: itm.quantity,
+                totalPrice: itm.totalPrice,
+                timestamp: rec.timestamp,
+              });
+            });
+          } else {
+            salesData2.push({
+              product: rec.product,
+              quantity: rec.quantity,
+              totalPrice: rec.totalPrice,
+              timestamp: rec.timestamp,
+            });
+          }
+        }
+      });
       label1 = formatDateThai(d1);
       label2 = formatDateThai(d2);
     } else {
@@ -108,13 +157,51 @@ export function compareSales() {
         E1 = new Date(e1);
       const S2 = new Date(s2),
         E2 = new Date(e2);
-      salesData1 = Object.values(salesData).filter((i) => {
-        const d = new Date(i.timestamp);
-        return d >= S1 && d <= new Date(E1.getFullYear(), E1.getMonth(), E1.getDate(), 23, 59, 59);
-      });
-      salesData2 = Object.values(salesData).filter((i) => {
-        const d = new Date(i.timestamp);
-        return d >= S2 && d <= new Date(E2.getFullYear(), E2.getMonth(), E2.getDate(), 23, 59, 59);
+      const allData = Object.values(salesData);
+      salesData1 = [];
+      salesData2 = [];
+      allData.forEach((rec) => {
+        const d = new Date(rec.timestamp);
+        const end1 = new Date(E1.getFullYear(), E1.getMonth(), E1.getDate(), 23, 59, 59);
+        const end2 = new Date(E2.getFullYear(), E2.getMonth(), E2.getDate(), 23, 59, 59);
+        if (d >= S1 && d <= end1) {
+          if (rec.items && Array.isArray(rec.items)) {
+            rec.items.forEach((itm) => {
+              salesData1.push({
+                product: itm.product,
+                quantity: itm.quantity,
+                totalPrice: itm.totalPrice,
+                timestamp: rec.timestamp,
+              });
+            });
+          } else {
+            salesData1.push({
+              product: rec.product,
+              quantity: rec.quantity,
+              totalPrice: rec.totalPrice,
+              timestamp: rec.timestamp,
+            });
+          }
+        }
+        if (d >= S2 && d <= end2) {
+          if (rec.items && Array.isArray(rec.items)) {
+            rec.items.forEach((itm) => {
+              salesData2.push({
+                product: itm.product,
+                quantity: itm.quantity,
+                totalPrice: itm.totalPrice,
+                timestamp: rec.timestamp,
+              });
+            });
+          } else {
+            salesData2.push({
+              product: rec.product,
+              quantity: rec.quantity,
+              totalPrice: rec.totalPrice,
+              timestamp: rec.timestamp,
+            });
+          }
+        }
       });
       label1 = 'ช่วงที่ 1';
       label2 = 'ช่วงที่ 2';

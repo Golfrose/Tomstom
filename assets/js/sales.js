@@ -27,22 +27,32 @@ export function confirmSale() {
   const customerName = buyerNameInput ? buyerNameInput.value.trim() : '';
   const transferFlag = transferGlobalCheckbox ? transferGlobalCheckbox.checked : false;
   const salesRef = database.ref('sales/' + user.uid);
+  // Build aggregated sale record. Each cart entry becomes an item in the sale.
+  const saleItems = [];
+  let totalPrice = 0;
+  let totalQuantity = 0;
   for (const key in cart) {
     const item = cart[key];
-    const newSaleRef = salesRef.push();
-    newSaleRef.set({
-      timestamp: firebase.database.ServerValue.TIMESTAMP,
+    saleItems.push({
       product: item.product,
       mix: item.mix,
+      unit: item.unit,
       quantity: item.quantity,
       pricePerUnit: item.pricePerUnit,
       totalPrice: item.totalPrice,
-      customerName: customerName || '',
-      // Apply the global transfer flag to all items. Per-item
-      // transfer flags have been removed from the cart.
-      transfer: transferFlag,
     });
+    totalPrice += item.totalPrice;
+    totalQuantity += item.quantity;
   }
+  const newSaleRef = salesRef.push();
+  newSaleRef.set({
+    timestamp: firebase.database.ServerValue.TIMESTAMP,
+    customerName: customerName || '',
+    transfer: transferFlag,
+    items: saleItems,
+    totalPrice: totalPrice,
+    totalQuantity: totalQuantity,
+  });
   clearCart();
   alert('บันทึกการขายเรียบร้อย!');
 }

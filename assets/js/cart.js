@@ -41,6 +41,7 @@ export function addToCart(row) {
   const product = row.dataset.product;
   const mix = row.dataset.mix || 'ไม่มี';
   const pricePerUnit = parseFloat(row.dataset.price);
+  const unit = row.dataset.unit || 'ขวด';
   const quantityInput = row.querySelector('.quantity-input');
   const quantity = parseInt(quantityInput.value || '0', 10);
   if (!quantity || quantity <= 0) {
@@ -57,8 +58,8 @@ export function addToCart(row) {
     // Promotion: 2 bottles for 120 baht instead of 65 × 2.
     totalPrice = pairs * 120 + remainder * 65;
   }
-  // Use a key combining product and mix so identical items merge
-  const key = `${product}-${mix}`;
+  // Use a key combining product, mix and unit so identical items merge
+  const key = `${product}-${mix}-${unit}`;
   if (cart[key]) {
     cart[key].quantity += quantity;
     cart[key].totalPrice += totalPrice;
@@ -66,6 +67,7 @@ export function addToCart(row) {
     cart[key] = {
       product,
       mix,
+      unit,
       quantity,
       pricePerUnit,
       totalPrice,
@@ -125,7 +127,7 @@ export function renderCartModal() {
     // payment type for all items.
     itemDiv.innerHTML = `
       <span class="modal-item-name">${displayName}</span>
-      <span class="modal-item-qty">${item.quantity} × ${item.pricePerUnit.toLocaleString()}฿</span>
+      <span class="modal-item-qty">${item.quantity} ${item.unit || ''} × ${item.pricePerUnit.toLocaleString()}฿</span>
       <span class="modal-item-total">${item.totalPrice.toLocaleString()}฿</span>
       <button class="remove-item" data-key="${key}"><i class="fas fa-times"></i></button>
     `;

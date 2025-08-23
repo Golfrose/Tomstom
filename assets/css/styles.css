@@ -37,7 +37,7 @@ body {
 }
 
 .container {
-  max-width: 95%;
+  max-width: 100%;
   margin: 20px auto;
   padding: 20px;
   background-color: #fff;
@@ -158,36 +158,39 @@ body {
   display: block;
 }
 
-/* Water category: display items in two columns for easier scanning.
-   The first eight items will flow into the first column and the
-   remaining items wrap to the second column. We use flexbox with
-   wrapping and set each product row to roughly half the container
-   width. Other categories remain single column. */
-#product-list-water {
+/* Display items in two columns on wider screens. Each product list uses flexbox with wrapping.
+   On small screens lists fall back to a single column. */
+.product-list {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
 }
-#product-list-water .product-row {
-  flex: 1 1 calc(50% - 10px);
-}
-
-/* Ensure non‑water lists occupy full width */
-#product-list-med .product-row,
-#product-list-other .product-row {
+.product-list .product-row {
   flex: 1 1 100%;
+}
+@media (min-width: 600px) {
+  .product-list .product-row {
+    flex: 1 1 calc(50% - 10px);
+  }
 }
 
 /* Product row design */
+/*
+ * Each product row contains three logical segments: the quantity
+ * controls on the left, the product details in the centre and the
+ * add‑to‑cart checkbox on the far right. We use a CSS grid layout
+ * here to ensure the segments align neatly across two column layouts.
+ */
 .product-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
-  justify-content: space-between;
   background-color: var(--light-grey);
   padding: 12px 15px;
   border-radius: var(--border-radius-small);
   margin-bottom: 10px;
   box-shadow: var(--shadow-light);
+  column-gap: 10px;
 }
 /* Quantity control (plus/minus and quantity input) */
 .product-row .quantity-control {
@@ -484,21 +487,15 @@ body {
  *  - Style comparison result tables
  */
 
-/* Two column layout for the water category. We use flex wrap so
-   product rows automatically flow into two columns on wide screens. */
-#product-list-water {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-#product-list-water .product-row {
-  flex: 1 1 calc(50% - 10px);
-}
+/* The water list inherits the generic .product-list styling. Specific
+   layout rules for two columns on wider screens are defined on
+   .product-list .product-row via media queries above. */
 
 /* Highlight free items in the product summary list. These items
    correspond to swaps / giveaways and should appear green. */
 .report-free {
-  color: var(--primary-color);
+  /* Highlight free items in the summary list with red text */
+  color: #d32f2f;
   font-weight: 600;
 }
 
@@ -508,15 +505,32 @@ body {
   font-weight: 600;
 }
 
-/* Highlight rows for free items in the report (zero price). */
-/* Highlight free rows (giveaways) in a bright green. */
-.free-row td {
-  color: var(--primary-light);
+/*
+ * Mark up free items inside the report. By default these items
+ * appear in red. When the row represents a transfer sale, the row
+ * itself is already red; override the colour to green for the free
+ * item text to distinguish it from the rest of the row.
+ */
+.free-label {
+  color: #d32f2f;
   font-weight: 600;
 }
+.transfer-row .free-label {
+  color: var(--primary-light);
+}
+
+/* Highlight rows for free items in the report (zero price). */
+/* The free-row class is deprecated; use .free-label on the item name instead. */
 
 /* Style for cash and transfer values in the revenue total string */
 .cash-value {
+  color: var(--primary-dark);
+}
+
+/* Value representing the sum of all revenue (cash + transfer) on the
+   summary page. Inherits the primary dark green colour for
+   consistency. */
+.total-value {
   color: var(--primary-dark);
 }
 .transfer-value {
