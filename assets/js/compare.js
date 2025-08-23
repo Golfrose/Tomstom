@@ -23,6 +23,12 @@ export function populateProductSelect() {
     const data = snapshot.val();
     const setP = new Set();
     if (data) Object.values(data).forEach((s) => setP.add(s.product));
+    // Ensure that items in the "other" category are always present
+    // in the drop-down even if they have not been sold yet.  This
+    // addresses the requirement that โออิซิและน้ำตาลสด appear in
+    // the comparison list.  Additional items can be added here if
+    // future categories need to be prepopulated.
+    ['โออิซิ', 'น้ำตาลสด'].forEach((p) => setP.add(p));
     const defaultOption = new Option('เลือกสินค้า...', '');
     const allItems = new Option('สินค้าทั้งหมด', 'all');
     productSelect.add(defaultOption);

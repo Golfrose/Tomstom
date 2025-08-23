@@ -34,27 +34,27 @@ export function changeQuantity(btnEl, change) {
  * @param {HTMLElement} row The `.product-row` element representing a product
  */
 export function addToCart(row) {
+  // Read product, mix and price from data attributes. Each row
+  // represents one specific product/mix combination so there are no
+  // radio buttons in the new design. We still honour the promotion
+  // for น้ำดิบ.
   const product = row.dataset.product;
+  const mix = row.dataset.mix || 'ไม่มี';
+  const pricePerUnit = parseFloat(row.dataset.price);
   const quantityInput = row.querySelector('.quantity-input');
   const quantity = parseInt(quantityInput.value || '0', 10);
   if (!quantity || quantity <= 0) {
     alert('กรุณาใส่จำนวนสินค้าก่อน');
     return;
   }
-  // Determine selected mix option, if any. Mix radios are named using
-  // product name to ensure uniqueness across categories. If no mix
-  // option is selected, default to 'ไม่มี'.
-  const mixRadio = row.querySelector(`input[name="mix-${product}"]:checked`);
-  const mix = mixRadio ? mixRadio.value : 'ไม่มี';
-  // Determine price per unit. If the mix radio defines its own price,
-  // use that, otherwise fall back to the base price stored on the row.
-  const pricePerUnit = parseFloat(mixRadio ? mixRadio.dataset.price : row.dataset.price);
   // Compute total price. Special promotion for 'น้ำดิบ': 2 bottles for
-  // 120 บาท instead of 65 × 2.
+  // 120 บาท instead of 65 × 2. If the quantity has pairs of two,
+  // charge 120 for each pair and the regular price for any leftover.
   let totalPrice = pricePerUnit * quantity;
   if (product === 'น้ำดิบ') {
     const pairs = Math.floor(quantity / 2);
     const remainder = quantity % 2;
+    // Promotion: 2 bottles for 120 baht instead of 65 × 2.
     totalPrice = pairs * 120 + remainder * 65;
   }
   // Use a key combining product and mix so identical items merge
@@ -69,10 +69,9 @@ export function addToCart(row) {
       quantity,
       pricePerUnit,
       totalPrice,
-      transfer: false,
     };
   }
-  // Reset quantity input and checkbox
+  // Reset quantity input
   quantityInput.value = 0;
   updateCartCount();
 }
@@ -120,18 +119,14 @@ export function renderCartModal() {
     itemDiv.classList.add('modal-item');
     // Compose a display name. If mix is 'ไม่มี' then just show product.
     const displayName = item.mix && item.mix !== 'ไม่มี' ? `${item.product} (${item.mix})` : item.product;
-    // Each row shows name, quantity × price, total, a remove button and
-    // a checkbox to indicate if this item is paid by transfer. The
-    // transfer checkbox allows individual items to override the global
-    // transfer setting at checkout.
+    // Each row shows name, quantity × price and total along with a
+    // remove button. Per-item transfer checkboxes have been removed;
+    // the global transfer option in the modal footer now controls the
+    // payment type for all items.
     itemDiv.innerHTML = `
       <span class="modal-item-name">${displayName}</span>
       <span class="modal-item-qty">${item.quantity} × ${item.pricePerUnit.toLocaleString()}฿</span>
       <span class="modal-item-total">${item.totalPrice.toLocaleString()}฿</span>
-      <label class="transfer-toggle">
-        <input type="checkbox" class="transfer-checkbox" data-key="${key}" ${item.transfer ? 'checked' : ''} />
-        <span>โอน</span>
-      </label>
       <button class="remove-item" data-key="${key}"><i class="fas fa-times"></i></button>
     `;
     modalItems.appendChild(itemDiv);
@@ -150,16 +145,6 @@ export function renderCartModal() {
     btn.addEventListener('click', (e) => {
       const key = e.currentTarget.dataset.key;
       removeFromCart(key);
-    });
-  });
-  // Attach transfer toggle handlers. Update the `transfer` field on
-  // the corresponding cart entry when the checkbox changes.
-  modalItems.querySelectorAll('.transfer-checkbox').forEach((cb) => {
-    cb.addEventListener('change', (e) => {
-      const key = e.currentTarget.dataset.key;
-      if (cart[key]) {
-        cart[key].transfer = e.currentTarget.checked;
-      }
     });
   });
 }

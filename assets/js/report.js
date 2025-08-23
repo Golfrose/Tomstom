@@ -53,9 +53,15 @@ export function loadReport() {
       if (isTransfer) {
         transferRevenue += item.totalPrice;
       }
-      const summaryKey = `${item.product} (${item.mix})`;
+      // Build summary key using product and mix
+      // Compose the summary key. If mix is 'ไม่มี' treat this as a
+      // simple product with no mix; otherwise include the mix in
+      // parentheses. This prevents water items with no mix from
+      // appearing like "ผสมเงิน (ไม่มี)" in the summary list.
+      const summaryKey = item.mix && item.mix !== 'ไม่มี' ? `${item.product} (${item.mix})` : item.product;
       productSummary[summaryKey] = (productSummary[summaryKey] || 0) + item.quantity;
       const tr = document.createElement('tr');
+      // Format the timestamp into Thai locale date & time
       const displayDate = new Date(item.timestamp).toLocaleString('th-TH', {
         day: 'numeric',
         month: 'numeric',
@@ -63,11 +69,19 @@ export function loadReport() {
         hour: '2-digit',
         minute: '2-digit',
       });
+      // If customer name exists, prepend it; otherwise show product and mix
       const displayLabel = item.customerName
         ? `${item.customerName} (${item.mix !== 'ไม่มี' ? item.mix : item.product})`
         : `${item.product}${item.mix !== 'ไม่มี' ? ` (${item.mix})` : ''}`;
+      // Assign classes for free and transfer rows. Any item where
+      // either the product or the mix contains 'แลกฟรี' should be
+      // considered a free item and highlighted in green, regardless
+      // of its price. Transfer items are highlighted in red.
+      if (item.product.includes('แลกฟรี') || (item.mix && item.mix.includes('แลกฟรี'))) {
+        tr.classList.add('free-row');
+      }
       if (isTransfer) {
-        tr.style.color = 'red';
+        tr.classList.add('transfer-row');
       }
       tr.innerHTML = `
         <td>${displayDate}</td>
@@ -82,12 +96,15 @@ export function loadReport() {
       `;
       reportBody.appendChild(tr);
     });
-    totalRevenueEl.innerHTML = `${totalRevenue.toLocaleString()} / ${transferRevenue.toLocaleString()} `;
+    // Compute cash revenue (excluding transfers) and update totals
+    const cashRevenue = totalRevenue - transferRevenue;
+    totalRevenueEl.innerHTML = `<span class="cash-value">${cashRevenue.toLocaleString()}</span> / <span class="transfer-value">${transferRevenue.toLocaleString()}</span>`;
     totalQuantityEl.textContent = totalQuantity.toLocaleString();
     for (const k in productSummary) {
       const li = document.createElement('li');
       li.textContent = `${k}: ${productSummary[k]} ขวด`;
-      if (k.includes('แลกขวดฟรี')) li.classList.add('report-free');
+      // Highlight free items (any summary key containing 'แลกฟรี' or 'แลกขวดฟรี')
+      if (k.includes('แลกฟรี')) li.classList.add('report-free');
       productSummaryListEl.appendChild(li);
     }
     // Attach edit/delete handlers

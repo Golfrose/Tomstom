@@ -39,10 +39,17 @@ export function showPage(pageId) {
  * and the checkbox is unchecked.
  * @param {{name:string, price:number, mixes?:Array<{label:string, price:number}>, promo?:string}} param0
  */
-function createProductRow({ name, price, mixes = [], promo }) {
+function createProductRow({ product, mix = 'ไม่มี', price, promo }) {
+  // Create a row representing a single product/mix combination. The
+  // caller must provide a `product` (base name), a `mix` label
+  // indicating the flavour or option, a numeric `price` and an
+  // optional `promo` string for display in the cart. Unlike the
+  // original version, this function no longer renders radio buttons
+  // for mix selection; each row corresponds to one specific mix.
   const row = document.createElement('div');
   row.className = 'product-row';
-  row.dataset.product = name;
+  row.dataset.product = product;
+  row.dataset.mix = mix;
   row.dataset.price = price;
   if (promo) row.dataset.promo = promo;
 
@@ -55,61 +62,95 @@ function createProductRow({ name, price, mixes = [], promo }) {
     <button class="qty-plus">+</button>
   `;
   row.appendChild(qtyControl);
-
   // Bind quantity buttons
   qtyControl.querySelector('.qty-minus').addEventListener('click', (e) => changeQuantity(e.currentTarget, -1));
   qtyControl.querySelector('.qty-plus').addEventListener('click', (e) => changeQuantity(e.currentTarget, 1));
 
-  // Details: display product name and price. Even though the user
-  // requested not to repeat the name elsewhere, a compact label helps
-  // users orient themselves. The full name will still appear in the
-  // cart.
+  // Details: display product name and, if applicable, the mix label on
+  // a separate line. We intentionally omit price on the sale page
+  // since it will be shown in the cart.
   const details = document.createElement('div');
   details.className = 'details';
-  details.innerHTML = `
-    <span class="product-name">${name}</span>
-    <span class="product-price">${price.toLocaleString()}฿${promo ? ` (${promo})` : ''}</span>
-  `;
+  const displayName = document.createElement('span');
+  displayName.className = 'product-name';
+  displayName.textContent = product;
+  details.appendChild(displayName);
+  if (mix && mix !== 'ไม่มี') {
+    const mixEl = document.createElement('span');
+    mixEl.className = 'product-mix';
+    mixEl.textContent = mix;
+    details.appendChild(mixEl);
+  }
   row.appendChild(details);
 
-  // Mix options, if provided
-  if (mixes && mixes.length > 0) {
-    const mixContainer = document.createElement('div');
-    mixContainer.className = 'mix-options';
-    mixes.forEach((m, idx) => {
-      const optionId = `mix-${name}-${idx}`;
-      const wrapper = document.createElement('label');
-      wrapper.className = 'mix-option';
-      const input = document.createElement('input');
-      input.type = 'radio';
-      input.name = `mix-${name}`;
-      input.value = m.label;
-      input.dataset.price = m.price;
-      if (idx === 0) input.checked = true;
-      const span = document.createElement('span');
-      span.textContent = m.label;
-      wrapper.appendChild(input);
-      wrapper.appendChild(span);
-      mixContainer.appendChild(wrapper);
-    });
-    row.appendChild(mixContainer);
-  }
-
-  // Checkbox to add selected quantity to cart
+  // Checkbox to add the selected quantity to the cart. When checked
+  // the item is added and the checkbox resets immediately.
   const cb = document.createElement('input');
   cb.type = 'checkbox';
   cb.className = 'add-checkbox';
-  // When checked, add to cart and immediately uncheck
   cb.addEventListener('change', (e) => {
     if (e.target.checked) {
       addToCart(row);
-      // Reset checkbox
       e.target.checked = false;
     }
   });
   row.appendChild(cb);
   return row;
 }
+
+// -----------------------------------------------------------------------------
+// Product data definitions
+//
+// Define the initial product lists. These objects are defined at module
+// scope so they can be mutated by the admin control handlers. Each
+// product entry contains a `product` (base name), a `mix` label and
+// a numeric `price`. Promotions such as the น้ำดิบ deal can be
+// indicated with a `promo` string.
+export const products = {
+  /**
+   * Water category menu. Each entry represents a single menu item
+   * without a secondary mix option (mix is set to 'ไม่มี'). Prices
+   * are 100 Baht per bottle except for the promotions and freebies.
+   * The order here determines how items flow into the two columns on
+   * the sale page (first eight to the left column, next eight to the
+   * right column via CSS).
+   */
+  water: [
+    { product: 'ผสมเงิน', mix: 'ไม่มี', price: 100 },
+    { product: 'ผสมเงินซิ', mix: 'ไม่มี', price: 100 },
+    { product: 'ผสมเงินสด', mix: 'ไม่มี', price: 100 },
+    { product: 'ผสมแดง', mix: 'ไม่มี', price: 100 },
+    { product: 'ผสมแดงซิ', mix: 'ไม่มี', price: 100 },
+    { product: 'ผสมแดงสด', mix: 'ไม่มี', price: 100 },
+    { product: 'ผสมไก่', mix: 'ไม่มี', price: 100 },
+    { product: 'ผสมไก่ซิ', mix: 'ไม่มี', price: 100 },
+    // Items after the eighth will appear on the right side of the water list
+    { product: 'ผสมไก่สด', mix: 'ไม่มี', price: 100 },
+    { product: 'ผสมซี', mix: 'ไม่มี', price: 100 },
+    { product: 'ผสมซีซิ', mix: 'ไม่มี', price: 100 },
+    { product: 'ผสมซีสด', mix: 'ไม่มี', price: 100 },
+    { product: 'น้ำดิบ', mix: 'ไม่มี', price: 65, promo: '2 ขวด 120 บาท' },
+    { product: 'แลกฟรี', mix: 'ไม่มี', price: 0 },
+    { product: 'แลกฟรีซิ', mix: 'ไม่มี', price: 20 },
+    { product: 'แลกฟรีสด', mix: 'ไม่มี', price: 20 },
+  ],
+  /**
+   * Medicine category menu. Items have no mix options.
+   */
+  med: [
+    { product: 'ยาฝาเงิน', mix: 'ไม่มี', price: 80 },
+    { product: 'ยาฝาแดง', mix: 'ไม่มี', price: 90 },
+    { product: 'ยาไก่', mix: 'ไม่มี', price: 80 },
+    { product: 'ยาซี', mix: 'ไม่มี', price: 80 },
+  ],
+  /**
+   * Other category menu. Oishi and fresh sugar with updated prices.
+   */
+  other: [
+    { product: 'โออิซิ', mix: 'ไม่มี', price: 25 },
+    { product: 'น้ำตาลสด', mix: 'ไม่มี', price: 20 },
+  ],
+};
 
 /**
  * Mount all product rows to their respective category lists. Update
@@ -118,138 +159,21 @@ function createProductRow({ name, price, mixes = [], promo }) {
  * createProductRow().
  */
 function mountProducts() {
-  // Define products per category. Names and mixes are based on the
-  // original Tomstom offerings. Additional categories can be added
-  // freely (e.g. other) with their own products.
-  const water = [
-    {
-      name: 'ผสมเงิน',
-      price: 100,
-      mixes: [
-        { label: 'ผสมเงิน', price: 100 },
-        { label: 'ผสมเงินซิ', price: 100 },
-        { label: 'ผสมเงินน้ำตาลสด', price: 100 },
-      ],
-    },
-    {
-      name: 'ผสมแดง',
-      price: 100,
-      mixes: [
-        { label: 'ผสมแดง', price: 100 },
-        { label: 'ผสมแดงซิ', price: 100 },
-        { label: 'ผสมแดงน้ำตาลสด', price: 100 },
-      ],
-    },
-    {
-      name: 'ผสมไก่',
-      price: 100,
-      mixes: [
-        { label: 'ผสมไก่', price: 100 },
-        { label: 'ผสมไก่ซิ', price: 100 },
-        { label: 'ผสมไก่น้ำตาลสด', price: 100 },
-      ],
-    },
-    {
-      name: 'ผสมซี',
-      price: 100,
-      mixes: [
-        { label: 'ผสมซี', price: 100 },
-        { label: 'ผสมซีซิ', price: 100 },
-        { label: 'ผสมซีน้ำตาลสด', price: 100 },
-      ],
-    },
-    { name: 'น้ำดิบ', price: 65, mixes: [], promo: '2 ขวด 120 บาท' },
-    {
-      name: 'แลกขวดฟรี',
-      price: 0,
-      mixes: [
-        { label: 'แลกฟรี', price: 0 },
-        { label: 'แลกฟรีผสมซิ', price: 20 },
-        { label: 'แลกฟรีผสมน้ำตาลสด', price: 20 },
-      ],
-    },
-  ];
-
-  const med = [
-    { name: 'ยาฝาเงิน', price: 80, mixes: [] },
-    { name: 'ยาฝาแดง', price: 90, mixes: [] },
-    { name: 'ยาไก่', price: 80, mixes: [] },
-    { name: 'ยาซี', price: 80, mixes: [] },
-  ];
-
-  // Define mix category items. These can mirror water mixes or be
-  // entirely new beverages. Here we reuse some of the water mixes but
-  // label them distinctly to indicate they are part of the mix menu.
-  const mix = [
-    {
-      name: 'มิกซ์เงิน',
-      price: 120,
-      mixes: [
-        { label: 'มิกซ์เงิน', price: 120 },
-        { label: 'มิกซ์เงินซิ', price: 120 },
-        { label: 'มิกซ์เงินน้ำตาลสด', price: 120 },
-      ],
-    },
-    {
-      name: 'มิกซ์แดง',
-      price: 120,
-      mixes: [
-        { label: 'มิกซ์แดง', price: 120 },
-        { label: 'มิกซ์แดงซิ', price: 120 },
-        { label: 'มิกซ์แดงน้ำตาลสด', price: 120 },
-      ],
-    },
-    {
-      name: 'มิกซ์ไก่',
-      price: 120,
-      mixes: [
-        { label: 'มิกซ์ไก่', price: 120 },
-        { label: 'มิกซ์ไก่ซิ', price: 120 },
-        { label: 'มิกซ์ไก่น้ำตาลสด', price: 120 },
-      ],
-    },
-    {
-      name: 'มิกซ์ซี',
-      price: 120,
-      mixes: [
-        { label: 'มิกซ์ซี', price: 120 },
-        { label: 'มิกซ์ซีซิ', price: 120 },
-        { label: 'มิกซ์ซีน้ำตาลสด', price: 120 },
-      ],
-    },
-  ];
-
-  const free = [
-    {
-      name: 'แลกขวดฟรี',
-      price: 0,
-      mixes: [
-        { label: 'แลกฟรี', price: 0 },
-        { label: 'แลกฟรีผสมซิ', price: 20 },
-        { label: 'แลกฟรีผสมน้ำตาลสด', price: 20 },
-      ],
-    },
-  ];
-
-  const other = [
-    { name: 'โออิซิ', price: 20, mixes: [] },
-    { name: 'น้ำตาลสด', price: 20, mixes: [] },
-  ];
-
-  // Map categories to DOM containers
+  // Map categories to DOM containers. Only water, med and other are
+  // present; mix and free categories have been removed. The data
+  // structure `products` (defined outside this function) stores the
+  // current product lists and can be mutated by admin controls.
   const categories = {
-    water: { items: water, container: document.getElementById('product-list-water') },
-    med: { items: med, container: document.getElementById('product-list-med') },
-    mix: { items: mix, container: document.getElementById('product-list-mix') },
-    free: { items: free, container: document.getElementById('product-list-free') },
-    other: { items: other, container: document.getElementById('product-list-other') },
+    water: { items: products.water, container: document.getElementById('product-list-water') },
+    med: { items: products.med, container: document.getElementById('product-list-med') },
+    other: { items: products.other, container: document.getElementById('product-list-other') },
   };
   // Clear any existing rows and append new ones
   Object.values(categories).forEach(({ items, container }) => {
     if (!container) return;
     container.innerHTML = '';
-    items.forEach((product) => {
-      container.appendChild(createProductRow(product));
+    items.forEach((item) => {
+      container.appendChild(createProductRow(item));
     });
   });
 }
@@ -266,4 +190,83 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('compare-mode-select').addEventListener('change', (e) => switchCompareMode(e.target.value));
   document.getElementById('clear-compare-btn').addEventListener('click', clearComparison);
   document.getElementById('compare-btn').addEventListener('click', compareSales);
+
+  // Admin controls: add, remove and edit products. These prompt the
+  // user for basic information and mutate the `products` object.
+  const addBtn = document.getElementById('add-product-btn');
+  const removeBtn = document.getElementById('remove-product-btn');
+  const editBtn = document.getElementById('edit-product-btn');
+  if (addBtn) {
+    addBtn.addEventListener('click', () => {
+      const category = prompt('เลือกหมวด (water, med, other):');
+      if (!category || !products[category]) {
+        alert('หมวดไม่ถูกต้อง');
+        return;
+      }
+      const productName = prompt('ชื่อสินค้า:');
+      if (!productName) return;
+      let mix = 'ไม่มี';
+      if (category === 'water') {
+        mix = prompt('รส/ผสม (เช่น ผสมเงิน, ผสมเงินซิ เป็นต้น):') || 'ไม่มี';
+      }
+      const priceStr = prompt('ราคาต่อหน่วย (ตัวเลข):');
+      const price = parseFloat(priceStr);
+      if (isNaN(price)) {
+        alert('ราคาผิดพลาด');
+        return;
+      }
+      products[category].push({ product: productName, mix, price });
+      mountProducts();
+    });
+  }
+  if (removeBtn) {
+    removeBtn.addEventListener('click', () => {
+      const category = prompt('เลือกหมวดของสินค้าที่ต้องการลบ (water, med, other):');
+      if (!category || !products[category]) {
+        alert('หมวดไม่ถูกต้อง');
+        return;
+      }
+      const productName = prompt('ชื่อสินค้า:');
+      if (!productName) return;
+      let mix = 'ไม่มี';
+      if (category === 'water') {
+        mix = prompt('รส/ผสมที่ต้องการลบ (หรือเว้นว่างถ้าสินค้าไม่มีผสม):') || 'ไม่มี';
+      }
+      const idx = products[category].findIndex((item) => item.product === productName && item.mix === mix);
+      if (idx === -1) {
+        alert('ไม่พบสินค้าที่ระบุ');
+        return;
+      }
+      products[category].splice(idx, 1);
+      mountProducts();
+    });
+  }
+  if (editBtn) {
+    editBtn.addEventListener('click', () => {
+      const category = prompt('เลือกหมวดของสินค้าที่ต้องการแก้ไข (water, med, other):');
+      if (!category || !products[category]) {
+        alert('หมวดไม่ถูกต้อง');
+        return;
+      }
+      const productName = prompt('ชื่อสินค้า:');
+      if (!productName) return;
+      let mix = 'ไม่มี';
+      if (category === 'water') {
+        mix = prompt('รส/ผสมที่ต้องการแก้ไข (หรือเว้นว่างถ้าสินค้าไม่มีผสม):') || 'ไม่มี';
+      }
+      const item = products[category].find((p) => p.product === productName && p.mix === mix);
+      if (!item) {
+        alert('ไม่พบสินค้าที่ระบุ');
+        return;
+      }
+      const newPriceStr = prompt('กรุณาระบุราคาใหม่:', item.price);
+      const newPrice = parseFloat(newPriceStr);
+      if (isNaN(newPrice)) {
+        alert('ราคาผิดพลาด');
+        return;
+      }
+      item.price = newPrice;
+      mountProducts();
+    });
+  }
 });

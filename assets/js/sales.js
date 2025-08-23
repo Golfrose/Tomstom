@@ -38,10 +38,9 @@ export function confirmSale() {
       pricePerUnit: item.pricePerUnit,
       totalPrice: item.totalPrice,
       customerName: customerName || '',
-      // Use the per-item transfer flag if defined, otherwise fall back
-      // to the global transfer checkbox. This mirrors the original
-      // behaviour where each item could be marked individually.
-      transfer: typeof item.transfer !== 'undefined' ? !!item.transfer : transferFlag,
+      // Apply the global transfer flag to all items. Per-item
+      // transfer flags have been removed from the cart.
+      transfer: transferFlag,
     });
   }
   clearCart();
