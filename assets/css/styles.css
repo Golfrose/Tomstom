@@ -584,6 +584,17 @@ body {
   padding-left: 10px;
 }
 
+/* Add a top border to the first row in each aggregated sale group */
+.sale-group-start td {
+  border-top: 2px solid #fdd835;
+}
+
+/* Align the total cell (4th column) of aggregated sales slightly to the right */
+.sale-group-end td:nth-child(4) {
+  text-align: right;
+  padding-right: 10px;
+}
+
 /*
  * Style the quantity of non-bottle items in the summary. This
  * ensures the number on the right side of the "ยอดรวมสินค้าที่ขายได้"
