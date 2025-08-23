@@ -1,130 +1,146 @@
 /* ================================
-   Global Styles for Summary Page
-   ================================ */
+   SUMMARY PAGE
+   - ตารางสรุปยอดขาย
+   - ปุ่ม action (แก้ไข/ลบ)
+   - Highlight cash / transfer / total
+================================= */
 
-/* Layout table */
+/* ---- Summary Table ---- */
 .summary-table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 1rem;
-  font-size: 0.95rem;
+  margin-top: 20px;
+  border-radius: var(--border-radius-small);
+  overflow: hidden;
+  box-shadow: var(--shadow-light);
+}
+/* กล่องสรุปแต่ละบล็อก */
+.summary-box {
+  text-align: center;        /* จัดเนื้อหากล่องตรงกลาง */
+  margin: 15px 0;
 }
 
-/* Table headers */
+/* ยอดรวมสินค้าที่ขายได้ */
+.summary-count {
+  font-size: 1.4rem;
+  font-weight: 600;
+  text-align: center;        /* จัดเลขตรงกลาง */
+  margin: 10px 0 15px;
+}
+/* ================================
+   HIGHLIGHT (บันทึก + ตารางสินค้า)
+================================= */
+
+/* แลกฟรี = น้ำเงิน */
+.report-free,
+.free-label {
+  color: #1976d2 !important;
+  font-weight: 600;
+}
+
+/* แม้อยู่ในแถวโอน ก็ยังคงเป็นน้ำเงิน */
+.transfer-row .free-label {
+  color: #1976d2 !important;
+  font-weight: 600;
+}
+
+/* โอน = แดงทั้งแถวในบันทึก */
+.transfer-row td {
+  color: #d32f2f !important;
+  font-weight: 600;
+}
 .summary-table th {
-  background: linear-gradient(90deg, #2ecc71, #27ae60);
-  color: white;
+  background: linear-gradient(135deg, var(--primary-light), var(--primary-color));
+  color: #fff;
   padding: 10px;
   text-align: center;
   font-weight: 600;
-  border: none;
 }
-
-/* Table cells */
 .summary-table td {
-  padding: 8px 10px;
-  border: none;
-  vertical-align: middle;
+  border: 1px solid #eee;
+  padding: 8px;
+  text-align: center;
+  font-size: 0.95rem;
 }
-
-/* ปุ่มลบ */
-.summary-table td button {
-  background: #e74c3c;
-  border: none;
-  border-radius: 6px;
-  color: white;
-  padding: 5px 10px;
-  cursor: pointer;
-  font-size: 0.85rem;
+.summary-table tr:hover {
+  background: #f9f9f9;
 }
-.summary-table td button:hover {
-  background: #c0392b;
-}
-
-/* ================================
-   Highlight values
-   ================================ */
 .cash-value {
-  color: var(--primary-dark); /* เงินสด = เขียวเข้ม */
+  color: var(--primary-dark);   /* เงินสด = เขียวเข้ม */
   font-weight: 600;
 }
 .transfer-value {
-  color: #d32f2f; /* โอนเงิน = แดง */
+  color: #d32f2f;               /* โอนเงิน = แดง */
   font-weight: 600;
 }
 .total-value {
-  color: var(--primary-color); /* รวมทั้งหมด = เขียวสด */
+  color: var(--primary-color);  /* รวมทั้งหมด = เขียวสด */
   font-weight: 700;
   font-size: 1.05rem;
 }
-.free-label,
-.report-free {
-  color: #1976d2; /* แลกฟรี = น้ำเงิน */
-  font-weight: 600;
+
+/* ---- Action Buttons ---- */
+.summary-table .edit-btn {
+  background: #ffd54f;   /* เหลือง */
+  color: #333;
+  padding: 4px 8px;
+  border: none;
+  border-radius: var(--border-radius-small);
+  cursor: pointer;
+  font-size: 0.85rem;
 }
-.transfer-row td {
-  color: #d32f2f; /* แถวโอนเงินเป็นสีแดง */
-  font-weight: 600;
+.summary-table .edit-btn:hover {
+  background: #ffca28;
 }
 
+.summary-table .delete-btn {
+  background: #e57373;   /* แดง */
+  color: #fff;
+  padding: 4px 8px;
+  border: none;
+  border-radius: var(--border-radius-small);
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+.summary-table .delete-btn:hover {
+  background: #ef5350;
+}
 /* ================================
-   Alignment per column
-   ================================ */
-.summary-table td:nth-child(1) { text-align: center; } /* วันที่/เวลา */
-.summary-table td:nth-child(2) { text-align: left; }   /* ชื่อสินค้า */
-.summary-table td:nth-child(3) { text-align: right; }  /* จำนวน */
-.summary-table td:nth-child(4) { text-align: right; }  /* ยอดรวม */
-.summary-table td:nth-child(5) { text-align: center; } /* ปุ่มจัดการ */
+   SUMMARY COUNT COLORS
+   - ซ้าย = เขียว
+   - ขวา = แดง
+================================= */
 
+.summary-count .sold {
+  color: var(--primary-dark);   /* เขียวเข้ม */
+  font-weight: 700;
+}
+
+.summary-count .transfer {
+  color: #d32f2f;               /* แดง */
+  font-weight: 700;
+}
 /* ================================
-   Bill Borders (Single / Multiple)
-   ================================ */
+   SUMMARY COUNT FIX
+   - ซ้าย = เขียว
+   - ขวา = แดง (มีแล้วที่ other-unit-value)
+================================= */
 
-/* บิลเดี่ยว = เส้นแนวนอนเปิด-ปิด */
-.sale-separator td {
-  border-top: 2px solid #ccc;
-  border-bottom: 2px solid #ccc;
-}
-
-/* บิลหลายรายการ */
-.sale-group-start td {
-  border-top: 2px solid #ccc;
-  border-bottom: none;
-}
-.sale-group td {
-  border-top: none;
-  border-bottom: none;
-}
-.sale-group-end td {
-  border-bottom: 2px solid #ccc;
+#total-quantity-left {
+  color: var(--primary-dark);   /* เขียวเข้ม */
+  font-weight: 700;
 }
 
-/* เส้นแนวตั้งเฉพาะบิลหลาย */
-.sale-group td:nth-child(1),
-.sale-group td:nth-child(3),
-.sale-group td:nth-child(4),
-.sale-group-start td:nth-child(1),
-.sale-group-start td:nth-child(3),
-.sale-group-start td:nth-child(4),
-.sale-group-end td:nth-child(1),
-.sale-group-end td:nth-child(3),
-.sale-group-end td:nth-child(4) {
-  border-right: 2px solid #ccc;
+#total-quantity-right.other-unit-value {
+  color: #d32f2f;               /* แดง */
+  font-weight: 700;
 }
 
-/* ================================
-   Responsive
-   ================================ */
-@media screen and (max-width: 768px) {
-  .summary-table {
-    font-size: 0.85rem;
-  }
+/* ---- Responsive: ตารางเล็กบนมือถือ ---- */
+@media (max-width: 768px) {
   .summary-table th,
   .summary-table td {
-    padding: 6px 5px;
-  }
-  .summary-table td button {
-    padding: 4px 8px;
-    font-size: 0.75rem;
+    font-size: 0.8rem;
+    padding: 6px;
   }
 }
