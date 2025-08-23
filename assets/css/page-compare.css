@@ -1,0 +1,35 @@
+/* =====================================================
+   หน้าสาม (Compare): สไตล์เฉพาะหน้า + ส่วนที่เกี่ยวข้อง
+   อธิบายทุกบล็อกสั้นๆเพื่อให้ง่ายต่อการแก้ไข
+   ===================================================== */
+
+/* หน้าสาม (Compare): สไตล์สำหรับ .compare-mode-selection */
+.compare-mode-selection {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin: 0 auto 20px auto;
+  max-width: 640px;
+}
+
+/* หน้าสาม (Compare): สไตล์สำหรับ .compare-mode-form */
+.compare-mode-form {
+  display: none;
+}
+
+/* หน้าสาม (Compare): สไตล์สำหรับ .compare-mode-form.active */
+.compare-mode-form.active {
+  display: block;
+}
+
+/* หน้าสาม (Compare): สไตล์สำหรับ #day-to-day-mode,
+#date-range-mode,
+.date-filter.compare-style */
+#day-to-day-mode,
+#date-range-mode,
+.date-filter.compare-style {
+  width: 100%;
+  max-width: 640px;
+  margin: 12px auto;
+  text-align: center;
+}
