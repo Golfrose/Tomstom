@@ -1027,3 +1027,62 @@ button, .add-to-cart-btn, .quantity-control button {
   color: var(--primary-color);       /* ตัวหนังสือเขียวเข้ม */
   font-weight: 500;
 }
+
+/* Modified styles for sale page redesign */
+/*
+These styles should be appended to your existing styles.css file. They
+introduce support for four product categories (water, med, mix and free)
+and adjust the layout so that only one category's products are visible at
+a time. Existing styling for the dashboard, summary and compare pages
+remains unaffected.
+*/
+
+/* Category selector container: display all category cards in a single row
+   with equal widths and spacing */
+.category-selector {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+/* Each category card takes up equal space. The inactive cards have a
+   neutral background and primary coloured text. */
+.category-selector .category-card {
+  flex: 1;
+  margin-bottom: 0;
+  padding: 12px;
+  font-size: 1em;
+  border-radius: var(--border-radius-small);
+  border: 1px solid transparent;
+  background-color: var(--bg-color);
+  color: var(--primary-color);
+  box-shadow: var(--shadow-light);
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Active category card: highlight with primary colour and white text */
+.category-selector .category-card.active {
+  background: var(--primary-color);
+  color: var(--button-text-color);
+}
+
+/* Container for product lists. We define explicit grid layout only when
+   the list is visible. The display is toggled via JavaScript. */
+.product-list-container {
+  margin-top: 15px;
+}
+
+/* All product lists are hidden by default. JavaScript will set
+   display:grid on the active list. */
+.product-list-container .product-list {
+  display: none;
+  grid-template-columns: 1fr;
+  gap: 15px;
+}
+
+/* Display the water list by default (in case JS does not run) */
+#product-list-water {
+  display: grid;
+}
