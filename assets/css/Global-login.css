@@ -91,3 +91,62 @@ body {
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
+/* ================================
+   LOGIN PAGE IMPROVED
+   - เพิ่มตกแต่งให้สวยขึ้น
+================================= */
+
+/* โลโก้/Title */
+.login-box h1 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 25px;
+  color: var(--primary-dark);
+}
+
+/* Input */
+.login-box input {
+  width: 100%;
+  padding: 12px 14px;
+  margin: 12px 0;
+  border: 1px solid #ddd;
+  border-radius: var(--border-radius-small);
+  font-size: 1rem;
+  transition: border 0.3s, box-shadow 0.3s;
+}
+.login-box input:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 6px rgba(46, 204, 113, 0.4);
+  outline: none;
+}
+
+/* ปุ่ม Login */
+.login-box button {
+  width: 100%;
+  padding: 14px;
+  margin-top: 10px;
+  background: linear-gradient(135deg, var(--primary-light), var(--primary-color), var(--primary-dark));
+  border: none;
+  border-radius: var(--border-radius-small);
+  color: #fff;
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s, background 0.3s;
+}
+.login-box button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .login-box {
+    width: 90%;
+    padding: 30px 20px;
+  }
+  .login-box h1 {
+    font-size: 1.5rem;
+  }
+}
