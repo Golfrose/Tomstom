@@ -37,9 +37,29 @@
 /* Cells – reset border */
 .summary-table td {
   padding: 8px 10px;
-  text-align: center;
   font-size: 0.95rem;
   border: none !important;
+}
+
+/* Align per column */
+.summary-table td:nth-child(1) { /* วันเวลา */
+  text-align: center;
+}
+.summary-table td:nth-child(2) { /* ชื่อสินค้า */
+  text-align: left;
+}
+.summary-table td:nth-child(3),
+.summary-table td:nth-child(4) { /* จำนวน, ยอดรวม */
+  text-align: right;
+}
+.summary-table td:nth-child(5) { /* ปุ่ม */
+  text-align: center;
+}
+
+/* ปุ่มลบ */
+.summary-table td button {
+  margin: 0 auto;
+  display: inline-block;
 }
 
 /* ================================
@@ -62,22 +82,16 @@
 .sale-group-end td {
   border-bottom: 2px solid #ddd !important;
 }
-/* แถวกลางของบิลหลายรายการ → ไม่มีเส้นบน/ล่าง */
+/* แถวกลางในบิลหลายรายการ → ไม่มีเส้นบน/ล่าง */
 .sale-group td {
   border-top: none !important;
   border-bottom: none !important;
 }
 
-/* แนวตั้ง 3 เส้น (วันเวลา, จำนวน, ราคา) */
-.sale-group-start td:nth-child(1),
+/* แนวตั้ง 3 เส้น */
 .sale-group td:nth-child(1),
-.sale-group-end td:nth-child(1),
-.sale-group-start td:nth-child(3),
 .sale-group td:nth-child(3),
-.sale-group-end td:nth-child(3),
-.sale-group-start td:nth-child(4),
-.sale-group td:nth-child(4),
-.sale-group-end td:nth-child(4) {
+.sale-group td:nth-child(4) {
   border-right: 2px solid #ddd !important;
 }
 
