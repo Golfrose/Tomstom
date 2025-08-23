@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ระบบขายสินค้า - แยกไฟล์โครงสร้าง</title>
+  <title>ระบบขายสินค้า - ปรับปรุงหน้าแรก</title>
 
   <!-- Fonts & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -44,12 +44,14 @@
   <div id="app-container" style="display:none;">
     <button id="logout-btn" class="logout-btn">ออกจากระบบ</button>
 
+    <!-- Dashboard -->
     <div class="dashboard">
       <p>ระบบขายสินค้า</p>
       <h1 id="current-time">00:00:00</h1>
       <p id="current-date"></p>
     </div>
 
+    <!-- Navigation Bar -->
     <div class="main-nav">
       <div class="nav-btn active" data-page="sale">
         <i class="fas fa-shopping-cart"></i>
@@ -67,40 +69,50 @@
 
     <!-- Sale Page -->
     <div id="sale-page" class="page container">
-
-      <!-- START: เพิ่มส่วนเลือกหมวดหมู่ -->
+      <!-- Category Selector -->
       <div class="category-selector">
-        <div class="category-card active">
+        <div class="category-card active" data-category="water">
           <i class="fas fa-cocktail"></i>
           <span>หมวดน้ำ</span>
         </div>
-        <div class="category-card">
+        <div class="category-card" data-category="med">
           <i class="fas fa-pills"></i>
           <span>หมวดยา</span>
         </div>
-      </div>
-      <!-- END: เพิ่มส่วนเลือกหมวดหมู่ -->
-
-      <!-- โครงสร้าง 2 คอลัมน์สำหรับรายการสินค้า -->
-      <div class="sale-grid">
-        <!-- คอลัมน์ซ้าย: หมวดน้ำ -->
-        <div class="sale-column">
-          <div class="product-list" id="product-list-water">
-            <!-- JavaScript จะเติมสินค้าหมวดน้ำที่นี่เหมือนเดิม -->
-          </div>
+        <div class="category-card" data-category="mix">
+          <i class="fas fa-blender"></i>
+          <span>หมวดมิกซ์</span>
         </div>
-
-        <!-- คอลัมน์ขวา: หมวดยา -->
-        <div class="sale-column">
-          <div class="product-list" id="product-list-med">
-            <!-- JavaScript จะเติมสินค้าหมวดยาที่นี่เหมือนเดิม -->
-          </div>
+        <div class="category-card" data-category="free">
+          <i class="fas fa-gift"></i>
+          <span>หมวดฟรี</span>
+        </div>
+        <div class="category-card" data-category="other">
+          <i class="fas fa-apple-alt"></i>
+          <span>อื่น ๆ</span>
         </div>
       </div>
 
+      <!-- Product Lists for each category -->
+      <div class="product-lists">
+        <div class="product-list active" id="product-list-water"></div>
+        <div class="product-list" id="product-list-med"></div>
+        <div class="product-list" id="product-list-mix"></div>
+        <div class="product-list" id="product-list-free"></div>
+        <div class="product-list" id="product-list-other"></div>
+      </div>
+
+      <!-- Floating Cart Icon -->
       <div class="cart-icon" id="cart-icon">
         <i class="fas fa-shopping-basket"></i>
         <span class="cart-count" id="cart-count">0</span>
+      </div>
+
+      <!-- Admin Controls -->
+      <div class="admin-controls">
+        <button id="add-product-btn" class="admin-btn"><i class="fas fa-plus"></i></button>
+        <button id="remove-product-btn" class="admin-btn"><i class="fas fa-minus"></i></button>
+        <button id="edit-product-btn" class="admin-btn"><i class="fas fa-edit"></i></button>
       </div>
     </div>
 
@@ -110,8 +122,17 @@
         <div class="modal-header">
           <h3><i class="fas fa-shopping-basket"></i> สรุปรายการสั่งซื้อ</h3>
         </div>
+        <!-- Items will be injected here -->
         <div id="modal-items"></div>
         <div class="modal-total">รวมทั้งหมด: <span id="modal-cart-total">0</span> บาท</div>
+        <!-- Buyer name and transfer checkbox -->
+        <div class="buyer-info">
+          <input type="text" id="buyer-name-input" class="buyer-name-input" placeholder="ชื่อลูกค้า (ไม่บังคับ)">
+          <label class="transfer-global-option">
+            <input type="checkbox" id="global-transfer-checkbox">
+            <span>ชำระโดยการโอน (บันทึกเป็นยอดโอน)</span>
+          </label>
+        </div>
         <div class="modal-actions">
           <button class="confirm-btn" id="confirm-sale-btn"><i class="fas fa-check"></i> ยืนยันการขาย</button>
           <button class="cancel-btn" id="clear-cart-btn"><i class="fas fa-times"></i> ล้างตะกร้า</button>
@@ -119,7 +140,7 @@
       </div>
     </div>
 
-    <!-- Summary -->
+    <!-- Summary Page -->
     <div id="summary-page" class="page container summary-page">
       <h1>สรุปยอดขาย</h1>
       <div class="date-filter">
@@ -159,7 +180,7 @@
       <div id="no-data" class="no-data" style="display:none;">ไม่พบข้อมูลการขายในวันที่เลือก</div>
     </div>
 
-    <!-- Compare -->
+    <!-- Compare Page -->
     <div id="compare-page" class="page container summary-page">
       <h1>เปรียบเทียบยอดขาย</h1>
       <div class="compare-mode-selection">
@@ -170,8 +191,8 @@
         </select>
         <button id="clear-compare-btn">ล้างข้อมูล</button>
       </div>
-
       <div class="comparison-input-group">
+        <!-- Day to Day -->
         <div id="day-to-day-mode" class="compare-mode-form active">
           <div class="comparison-date-group">
             <label for="compare-date-1">วันที่ 1:</label>
@@ -182,7 +203,7 @@
             <input type="date" id="compare-date-2">
           </div>
         </div>
-
+        <!-- Date Range -->
         <div id="date-range-mode" class="compare-mode-form">
           <div class="comparison-date-group">
             <label for="start-date-1">ช่วงที่ 1 เริ่ม:</label>
@@ -197,14 +218,13 @@
             <input type="date" id="end-date-2">
           </div>
         </div>
-
+        <!-- Product Selection -->
         <div class="date-filter compare-style">
           <label for="product-select">เลือกสินค้า:</label>
           <select id="product-select"></select>
           <button id="compare-btn">เปรียบเทียบ</button>
         </div>
       </div>
-
       <div id="detailed-comparison-result" style="margin-top: 20px;"></div>
       <div id="no-comparison-data" class="no-data" style="display:none;">ไม่พบข้อมูลสำหรับเปรียบเทียบ</div>
       <div class="chart-container">
