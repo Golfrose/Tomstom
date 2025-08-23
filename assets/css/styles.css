@@ -556,6 +556,44 @@ body {
   color: #fff;
 }
 
+/*
+ * Add a yellow border between bills (legacy single-item sales only).
+ * Each legacy sale row receives the sale-separator class. We underline
+ * the entire row with a thick yellow line to separate individual bills.
+ */
+.sale-separator td {
+  border-bottom: 2px solid #fdd835;
+}
+
+/*
+ * Yellow borders for aggregated sale groups. Each row belonging to
+ * an aggregated sale has the class sale-group. The last row of the
+ * group additionally has sale-group-end. We draw vertical borders
+ * on the left and right of all cells in the group and a bottom
+ * border on the last row to create a boxed outline similar to the
+ * provided design.
+ */
+.sale-group td {
+  border-left: 2px solid #fdd835;
+  border-right: 2px solid #fdd835;
+}
+.sale-group-end td {
+  border-bottom: 2px solid #fdd835;
+}
+.sale-group-end td:last-child {
+  padding-left: 10px;
+}
+
+/*
+ * Style the quantity of non-bottle items in the summary. This
+ * ensures the number on the right side of the "ยอดรวมสินค้าที่ขายได้"
+ * box appears red to differentiate it from the bottle count.
+ */
+.other-unit-value {
+  color: #d32f2f;
+  font-weight: 600;
+}
+
 /* Comparison result table styling */
 .comparison-result-table {
   width: 100%;
