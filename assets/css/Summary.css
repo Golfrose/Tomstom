@@ -14,6 +14,19 @@
   overflow: hidden;
   box-shadow: var(--shadow-light);
 }
+/* กล่องสรุปแต่ละบล็อก */
+.summary-box {
+  text-align: center;        /* จัดเนื้อหากล่องตรงกลาง */
+  margin: 15px 0;
+}
+
+/* ยอดรวมสินค้าที่ขายได้ */
+.summary-count {
+  font-size: 1.4rem;
+  font-weight: 600;
+  text-align: center;        /* จัดเลขตรงกลาง */
+  margin: 10px 0 15px;
+}
 /* ================================
    HIGHLIGHT (บันทึก + ตารางสินค้า)
 ================================= */
