@@ -151,19 +151,23 @@
     ================================= */
     /* Single-item sales (legacy) separator: draw a grey horizontal line after each item */
     .sale-separator td {
-      border-bottom: 2px solid #ccc;
+      /* Grey line separating single-item sale bills. Use a soft grey tone */
+      border-bottom: 2px solid #dddddd;
     }
 
     /* Aggregated sale group: draw vertical borders on the left and right of each row */
     .sale-group td {
-      border-left: 2px solid #ccc;
-      border-right: 2px solid #ccc;
+      /* Draw vertical borders on both sides of aggregated sale groups */
+      border-left: 2px solid #dddddd;
+      border-right: 2px solid #dddddd;
     }
     /* Bottom border of the last row in an aggregated group */
     .sale-group-end td {
-      border-bottom: 2px solid #ccc;
+      /* Bottom border for the end of aggregated groups */
+      border-bottom: 2px solid #dddddd;
     }
     /* Top border of the first row in an aggregated group */
     .sale-group-start td {
-      border-top: 2px solid #ccc;
+      /* Top border for the start of aggregated groups */
+      border-top: 2px solid #dddddd;
     }
