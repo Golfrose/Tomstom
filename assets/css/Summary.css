@@ -178,3 +178,19 @@
       /* Top border for the start of aggregated groups */
       border-top: 2px solid #dddddd !important;
     }
+    
+    /* === FIX จุดเดียวจบ: บิลเดี่ยวที่ถูกเรนเดอร์เป็นกลุ่ม (มีทั้ง start และ end ในแถวเดียว) === */
+tr.sale-group.sale-group-start.sale-group-end td {
+  /* ตัดเส้นแนวตั้งทุกด้านทิ้ง แล้วคงไว้แค่เส้นเปิด/ปิดบิล */
+  border: none !important;
+  border-top: 2px solid #dddddd !important;
+  border-bottom: 2px solid #dddddd !important;
+}
+
+/* กันกฎแนวตั้งของกลุ่มมาทับอีกรอบ */
+tr.sale-group.sale-group-start.sale-group-end td:nth-child(2),
+tr.sale-group.sale-group-start.sale-group-end td:nth-child(3),
+tr.sale-group.sale-group-start.sale-group-end td:nth-child(4) {
+  border-left: none !important;
+}
+
