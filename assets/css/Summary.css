@@ -146,30 +146,57 @@
     
 
 /* === สีเทา + รูปแบบเส้นตามตัวอย่าง === */
-.sale-separator td {
-  border-bottom: 2px solid #dddddd!important;
+
+/* 1) รีเซ็ตสีให้เป็นเทา (กรณีบล็อกเก่ายังอยู่) */
+.sale-separator td,
+.sale-group td,
+.sale-group-start td,
+.sale-group-end td {
+  border-color: #dddddd !important;
 }
 
-/*
- * Yellow borders for aggregated sale groups. Each row belonging to
- * an aggregated sale has the class sale-group. The last row of the
- * group additionally has sale-group-end. We draw vertical borders
- * on the left and right of all cells in the group and a bottom
- * border on the last row to create a boxed outline similar to the
- * provided design.
- */
+/* 2) บิลเดี่ยว: ให้มี “เส้นบน+ล่าง” เท่านั้น ไม่มีเส้นแนวตั้ง */
+.sale-separator td {
+  border: none !important;
+  border-top: 2px solid #dddddd !important;
+  border-bottom: 2px solid #dddddd !important;
+  /* กันไว้ กรณีเคยโดนเส้นแนวตั้งจากกฎอื่น */
+  border-left: none !important;
+  border-right: none !important;
+}
+
+/* 3) บิลกลุ่ม: รีเซ็ตก่อน แล้วค่อยวาดเฉพาะเส้นที่ต้องการ */
 .sale-group td {
-  border-left: 2px solid #dddddd!important;
-  border-right: 2px solid #dddddd!important;
+  border: none !important;
+}
+
+/* วาด “เส้นแนวตั้ง 3 เส้น” เท่านั้น:
+   - ก่อนคอลัมน์ชื่อ/สินค้า (คอลัมน์ที่ 2)
+   - ระหว่างคอลัมน์จำนวน (คอลัมน์ที่ 3)
+   - ระหว่างคอลัมน์ยอดรวม (คอลัมน์ที่ 4) */
+.sale-group td:nth-child(2),
+.sale-group td:nth-child(3),
+.sale-group td:nth-child(4) {
+  border-left: 2px solid #dddddd !important;
+}
+
+/* เส้นเปิด-ปิดบิลกลุ่ม */
+.sale-group-start td {
+  border-top: 2px solid #dddddd !important;
 }
 .sale-group-end td {
-  border-bottom: 2px solid #dddddd!important;
-}
-.sale-group-end td:last-child {
-  padding-left: 10px;
+  border-bottom: 2px solid #dddddd !important;
 }
 
-/* Add a top border to the first row in each aggregated sale group */
-.sale-group-start td {
-  border-top: 2px solid #dddddd!important;
+/* จัดตำแหน่งตัวเลขยอดรวม แถวสุดท้ายของกลุ่ม (ถ้าต้องการคงไว้) */
+.sale-group-end td:nth-child(4) {
+  text-align: right;
+  padding-right: 10px;
 }
+
+/* กันกรณี “บิลเดี่ยวที่ถูกเรนเดอร์เป็น sale-group” ให้ยังคงหน้าตาแบบบิลเดี่ยว */
+.sale-group.sale-separator td {
+  border-left: none !important;
+  border-right: none !important;
+}
+
