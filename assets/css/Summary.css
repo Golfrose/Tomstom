@@ -144,59 +144,37 @@
         padding: 6px;
       }
     
-
-/* === สีเทา + รูปแบบเส้นตามตัวอย่าง === */
-
-/* 1) รีเซ็ตสีให้เป็นเทา (กรณีบล็อกเก่ายังอยู่) */
-.sale-separator td,
-.sale-group td,
-.sale-group-start td,
-.sale-group-end td {
-  border-color: #dddddd !important;
-}
-
-/* 2) บิลเดี่ยว: ให้มี “เส้นบน+ล่าง” เท่านั้น ไม่มีเส้นแนวตั้ง */
+    /* ================================
+       CUSTOM MODIFICATIONS
+       - Grey separators for sale items and groups on report page
+    ================================= */
+/* Single-item sales (legacy) separator: draw a grey horizontal line above and below each item */
 .sale-separator td {
-  border: none !important;
+  /* Grey horizontal lines to open and close single-item sale bills */
   border-top: 2px solid #dddddd !important;
   border-bottom: 2px solid #dddddd !important;
-  /* กันไว้ กรณีเคยโดนเส้นแนวตั้งจากกฎอื่น */
   border-left: none !important;
   border-right: none !important;
 }
 
-/* 3) บิลกลุ่ม: รีเซ็ตก่อน แล้วค่อยวาดเฉพาะเส้นที่ต้องการ */
+/* Aggregated sale group: remove all default cell borders (both horizontal and vertical) */
 .sale-group td {
   border: none !important;
 }
 
-/* วาด “เส้นแนวตั้ง 3 เส้น” เท่านั้น:
-   - ก่อนคอลัมน์ชื่อ/สินค้า (คอลัมน์ที่ 2)
-   - ระหว่างคอลัมน์จำนวน (คอลัมน์ที่ 3)
-   - ระหว่างคอลัมน์ยอดรวม (คอลัมน์ที่ 4) */
+/* Add vertical lines for aggregated sale groups: one before the items cell, one between the quantity and total columns, and one between total and action columns.  Assuming the summary table has the order: 1) date/time, 2) items, 3) quantity, 4) total, 5) actions.  We draw borders on the left of the 2nd, 3rd and 4th cells to create three vertical lines across the group. */
 .sale-group td:nth-child(2),
 .sale-group td:nth-child(3),
 .sale-group td:nth-child(4) {
   border-left: 2px solid #dddddd !important;
 }
-
-/* เส้นเปิด-ปิดบิลกลุ่ม */
-.sale-group-start td {
-  border-top: 2px solid #dddddd !important;
-}
-.sale-group-end td {
-  border-bottom: 2px solid #dddddd !important;
-}
-
-/* จัดตำแหน่งตัวเลขยอดรวม แถวสุดท้ายของกลุ่ม (ถ้าต้องการคงไว้) */
-.sale-group-end td:nth-child(4) {
-  text-align: right;
-  padding-right: 10px;
-}
-
-/* กันกรณี “บิลเดี่ยวที่ถูกเรนเดอร์เป็น sale-group” ให้ยังคงหน้าตาแบบบิลเดี่ยว */
-.sale-group.sale-separator td {
-  border-left: none !important;
-  border-right: none !important;
-}
-
+    /* Bottom border of the last row in an aggregated group */
+    .sale-group-end td {
+      /* Bottom border for the end of aggregated groups */
+      border-bottom: 2px solid #dddddd !important;
+    }
+    /* Top border of the first row in an aggregated group */
+    .sale-group-start td {
+      /* Top border for the start of aggregated groups */
+      border-top: 2px solid #dddddd !important;
+    }
