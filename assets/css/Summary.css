@@ -152,23 +152,35 @@
 /* Single-item sales (legacy) separator: draw a grey horizontal line above and below each item */
 .sale-separator td {
   /* Grey horizontal lines to open and close single-item sale bills */
-  border-top: 2px solid #dddddd;
-  border-bottom: 2px solid #dddddd;
+  border-top: 2px solid #dddddd !important;
+  border-bottom: 2px solid #dddddd !important;
+  border-left: none !important;
+  border-right: none !important;
 }
 
 /* Aggregated sale group: do not draw extra vertical borders on each cell.
    The group will be distinguished by the top and bottom horizontal lines
    applied via .sale-group-start and .sale-group-end. */
 .sale-group td {
-  /* intentionally left empty to avoid unwanted borders */
+  /* intentionally left empty to avoid unwanted borders. Reset any borders from global styles */
+  border-left: none !important;
+  border-right: none !important;
+}
+
+/* Draw vertical group borders only on the first and last cell of each aggregated sale row */
+.sale-group td:first-child {
+  border-left: 2px solid #dddddd !important;
+}
+.sale-group td:last-child {
+  border-right: 2px solid #dddddd !important;
 }
     /* Bottom border of the last row in an aggregated group */
     .sale-group-end td {
       /* Bottom border for the end of aggregated groups */
-      border-bottom: 2px solid #dddddd;
+      border-bottom: 2px solid #dddddd !important;
     }
     /* Top border of the first row in an aggregated group */
     .sale-group-start td {
       /* Top border for the start of aggregated groups */
-      border-top: 2px solid #dddddd;
+      border-top: 2px solid #dddddd !important;
     }
