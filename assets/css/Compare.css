@@ -1,50 +1,90 @@
 /* ================================
-   COMPARE PAGE
-   - ตารางเปรียบเทียบ
-   - หัวตารางเขียว gradient
-   - Alternate row สีเทาอ่อน
-================================= */
+       COMPARE PAGE
+       - ตารางเปรียบเทียบ
+       - หัวตารางเขียว gradient
+       - Alternate row สีเทาอ่อน
+    ================================= */
 
-/* ---- Comparison Table ---- */
-.comparison-result-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-  border-radius: var(--border-radius-small);
-  overflow: hidden;
-  box-shadow: var(--shadow-light);
-}
+    /* ---- Comparison Table ---- */
+    .comparison-result-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      border-radius: var(--border-radius-small);
+      overflow: hidden;
+      box-shadow: var(--shadow-light);
+    }
 
-.comparison-result-table th {
-  background: linear-gradient(135deg, var(--primary-light), var(--primary-color));
-  color: #fff;
-  padding: 10px;
-  text-align: center;
-  font-weight: 600;
-}
+    .comparison-result-table th {
+      background: linear-gradient(135deg, var(--primary-light), var(--primary-color));
+      color: #fff;
+      padding: 10px;
+      text-align: center;
+      font-weight: 600;
+    }
 
-.comparison-result-table td {
-  border: 1px solid #ddd;
-  padding: 8px;
-  text-align: center;
-  font-size: 0.95rem;
-}
+    .comparison-result-table td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: center;
+      font-size: 0.95rem;
+    }
 
-/* ---- Alternate rows (สลับสี) ---- */
-.comparison-result-table tr:nth-child(even) td {
-  background: #fafafa;
-}
+    /* ---- Alternate rows (สลับสี) ---- */
+    .comparison-result-table tr:nth-child(even) td {
+      background: #fafafa;
+    }
 
-/* ---- Hover row ---- */
-.comparison-result-table tr:hover td {
-  background: #f1f8f4; /* เขียวอ่อนจางๆ */
-}
+    /* ---- Hover row ---- */
+    .comparison-result-table tr:hover td {
+      background: #f1f8f4; /* เขียวอ่อนจางๆ */
+    }
 
-/* ---- Responsive: ตารางเล็กบนมือถือ ---- */
-@media (max-width: 768px) {
-  .comparison-result-table th,
-  .comparison-result-table td {
-    font-size: 0.8rem;
-    padding: 6px;
-  }
-}
+    /* ---- Responsive: ตารางเล็กบนมือถือ ---- */
+    @media (max-width: 768px) {
+      .comparison-result-table th,
+      .comparison-result-table td {
+        font-size: 0.8rem;
+        padding: 6px;
+      }
+    }
+
+    /* ================================
+       CUSTOM MODIFICATIONS
+       - Hide inactive comparison forms and beautify buttons
+    ================================= */
+    /* Hide all compare mode forms by default. The active one will be shown by JS. */
+    .compare-mode-form {
+      display: none;
+    }
+    .compare-mode-form.active {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    /* Group each label+input into a column for better spacing */
+    .comparison-date-group {
+      display: flex;
+      flex-direction: column;
+      margin-right: 15px;
+    }
+
+    /* Style the compare and clear buttons to match the green theme */
+    #compare-btn,
+    #clear-compare-btn {
+      padding: 10px 20px;
+      border-radius: var(--border-radius-small);
+      border: none;
+      cursor: pointer;
+      background: linear-gradient(135deg, var(--primary-light), var(--primary-color));
+      color: #fff;
+      font-weight: 600;
+      transition: background 0.3s, box-shadow 0.3s, transform 0.2s;
+    }
+    #compare-btn:hover,
+    #clear-compare-btn:hover {
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+      box-shadow: var(--shadow-medium);
+      transform: translateY(-2px);
+    }
