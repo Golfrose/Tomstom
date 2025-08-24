@@ -156,12 +156,12 @@
   border-bottom: 2px solid #dddddd;
 }
 
-    /* Aggregated sale group: draw vertical borders on the left and right of each row */
-    .sale-group td {
-      /* Draw vertical borders on both sides of aggregated sale groups */
-      border-left: 2px solid #dddddd;
-      border-right: 2px solid #dddddd;
-    }
+/* Aggregated sale group: do not draw extra vertical borders on each cell.
+   The group will be distinguished by the top and bottom horizontal lines
+   applied via .sale-group-start and .sale-group-end. */
+.sale-group td {
+  /* intentionally left empty to avoid unwanted borders */
+}
     /* Bottom border of the last row in an aggregated group */
     .sale-group-end td {
       /* Bottom border for the end of aggregated groups */
