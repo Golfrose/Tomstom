@@ -149,11 +149,12 @@
        CUSTOM MODIFICATIONS
        - Grey separators for sale items and groups on report page
     ================================= */
-    /* Single-item sales (legacy) separator: draw a grey horizontal line after each item */
-    .sale-separator td {
-      /* Grey line separating single-item sale bills. Use a soft grey tone */
-      border-bottom: 2px solid #dddddd;
-    }
+/* Single-item sales (legacy) separator: draw a grey horizontal line above and below each item */
+.sale-separator td {
+  /* Grey horizontal lines to open and close single-item sale bills */
+  border-top: 2px solid #dddddd;
+  border-bottom: 2px solid #dddddd;
+}
 
     /* Aggregated sale group: draw vertical borders on the left and right of each row */
     .sale-group td {
