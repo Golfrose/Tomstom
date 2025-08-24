@@ -147,7 +147,7 @@
 
 /* === สีเทา + รูปแบบเส้นตามตัวอย่าง === */
 .sale-separator td {
-  border-bottom: 2px solid #dddddd;
+  border-bottom: 2px solid #dddddd!important;
 }
 
 /*
@@ -159,11 +159,11 @@
  * provided design.
  */
 .sale-group td {
-  border-left: 2px solid #dddddd;
-  border-right: 2px solid #dddddd;
+  border-left: 2px solid #dddddd!important;
+  border-right: 2px solid #dddddd!important;
 }
 .sale-group-end td {
-  border-bottom: 2px solid #dddddd;
+  border-bottom: 2px solid #dddddd!important;
 }
 .sale-group-end td:last-child {
   padding-left: 10px;
@@ -171,5 +171,5 @@
 
 /* Add a top border to the first row in each aggregated sale group */
 .sale-group-start td {
-  border-top: 2px solid #dddddd;
+  border-top: 2px solid #dddddd!important;
 }
