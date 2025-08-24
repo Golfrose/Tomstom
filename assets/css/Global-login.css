@@ -1,152 +1,185 @@
 /*
- * styles.css (Green-White Theme)
- * รวมทั้งหมด 4 หน้า: Login, Sales, Summary, Compare
- * ครบถ้วนเหมือนเดิม + เพิ่มคำอธิบาย
- */
+     * styles.css (Green-White Theme)
+     * รวมทั้งหมด 4 หน้า: Login, Sales, Summary, Compare
+     * ครบถ้วนเหมือนเดิม + เพิ่มคำอธิบาย
+     */
 
-/* ================================
-   GLOBAL VARIABLES
-   - สีหลัก, ตัวแปรฟอนต์, shadow
-================================= */
-:root {
-  /* Primary greens */
-  --primary-color: #2ecc71;   /* เขียวสด */
-  --primary-light: #66ffb2;  /* เขียวอ่อน */
-  --primary-dark: #1e8449;   /* เขียวเข้ม */
+    /* ================================
+       GLOBAL VARIABLES
+       - สีหลัก, ตัวแปรฟอนต์, shadow
+    ================================= */
+    :root {
+      /* Primary greens */
+      --primary-color: #2ecc71;   /* เขียวสด */
+      --primary-light: #66ffb2;  /* เขียวอ่อน */
+      --primary-dark: #1e8449;   /* เขียวเข้ม */
 
-  /* Accent (แทนม่วงเดิมด้วยเขียว) */
-  --accent-color: #2ecc71;
-  --accent-light: #a8f5d5;
+      /* Accent (แทนม่วงเดิมด้วยเขียว) */
+      --accent-color: #2ecc71;
+      --accent-light: #a8f5d5;
 
-  /* Generic */
-  --light-grey: #f7f9fc;
-  --border-radius-large: 20px;
-  --border-radius-small: 10px;
-  --shadow-light: 0 2px 8px rgba(0, 0, 0, 0.05);
-  --shadow-medium: 0 4px 15px rgba(0, 0, 0, 0.15);
+      /* Generic */
+      --light-grey: #f7f9fc;
+      --border-radius-large: 20px;
+      --border-radius-small: 10px;
+      --shadow-light: 0 2px 8px rgba(0, 0, 0, 0.05);
+      --shadow-medium: 0 4px 15px rgba(0, 0, 0, 0.15);
 
-  font-family: 'Prompt', sans-serif;
-}
+      font-family: 'Prompt', sans-serif;
+    }
 
-/* ================================
-   BASE BODY STYLE
-================================= */
-body {
-  margin: 0;
-  padding: 0;
-  background: linear-gradient(135deg, #eafaf1, #ffffff); /* ขาวไล่เขียวอ่อน */
-  color: #333;
-  line-height: 1.5;
-  font-family: var(--font-family);
-}
+    /* ================================
+       BASE BODY STYLE
+    ================================= */
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #eafaf1, #ffffff); /* ขาวไล่เขียวอ่อน */
+      color: #333;
+      line-height: 1.5;
+      font-family: var(--font-family);
+    }
 
-.container {
-  max-width: 100%;
-  margin: 20px auto;
-  padding: 20px;
-  background: #fff;
-  border-radius: var(--border-radius-large);
-  box-shadow: var(--shadow-light);
-  position: relative;
-}
+    .container {
+      max-width: 100%;
+      margin: 20px auto;
+      padding: 20px;
+      background: #fff;
+      border-radius: var(--border-radius-large);
+      box-shadow: var(--shadow-light);
+      position: relative;
+    }
 
-/* ================================
-   LOGIN PAGE
-   - กล่อง login ตรงกลาง
-================================= */
-.login-box {
-  background: #fff;
-  padding: 40px 30px;
-  border-radius: var(--border-radius-large);
-  box-shadow: var(--shadow-medium);
-  text-align: center;
-  width: 320px;
-  margin: auto;
-  margin-top: 10%;
-}
-.login-box h1 {
-  margin-bottom: 20px;
-  color: var(--primary-dark);
-}
-.login-box input {
-  width: 100%;
-  padding: 12px;
-  margin: 10px 0;
-  border: 1px solid #ddd;
-  border-radius: var(--border-radius-small);
-  font-size: 1rem;
-}
-.login-box button {
-  width: 100%;
-  padding: 12px;
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-  border: none;
-  border-radius: var(--border-radius-small);
-  color: #fff;
-  font-weight: bold;
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-.login-box button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-}
-/* ================================
-   LOGIN PAGE IMPROVED
-   - เพิ่มตกแต่งให้สวยขึ้น
-================================= */
+    /* ================================
+       LOGIN PAGE
+       - กล่อง login ตรงกลาง
+    ================================= */
+    .login-box {
+      background: #fff;
+      padding: 40px 30px;
+      border-radius: var(--border-radius-large);
+      box-shadow: var(--shadow-medium);
+      text-align: center;
+      width: 320px;
+      margin: auto;
+      margin-top: 10%;
+    }
+    .login-box h1 {
+      margin-bottom: 20px;
+      color: var(--primary-dark);
+    }
+    .login-box input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: 1px solid #ddd;
+      border-radius: var(--border-radius-small);
+      font-size: 1rem;
+    }
+    .login-box button {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+      border: none;
+      border-radius: var(--border-radius-small);
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .login-box button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    /* ================================
+       LOGIN PAGE IMPROVED
+       - เพิ่มตกแต่งให้สวยขึ้น
+    ================================= */
 
-/* โลโก้/Title */
-.login-box h1 {
-  font-size: 1.8rem;
-  font-weight: 700;
-  margin-bottom: 25px;
-  color: var(--primary-dark);
-}
+    /* โลโก้/Title */
+    .login-box h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 25px;
+      color: var(--primary-dark);
+    }
 
-/* Input */
-.login-box input {
-  width: 100%;
-  padding: 12px 14px;
-  margin: 12px 0;
-  border: 1px solid #ddd;
-  border-radius: var(--border-radius-small);
-  font-size: 1rem;
-  transition: border 0.3s, box-shadow 0.3s;
-}
-.login-box input:focus {
-  border-color: var(--primary-color);
-  box-shadow: 0 0 6px rgba(46, 204, 113, 0.4);
-  outline: none;
-}
+    /* Input */
+    .login-box input {
+      width: 100%;
+      padding: 12px 14px;
+      margin: 12px 0;
+      border: 1px solid #ddd;
+      border-radius: var(--border-radius-small);
+      font-size: 1rem;
+      transition: border 0.3s, box-shadow 0.3s;
+    }
+    .login-box input:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 6px rgba(46, 204, 113, 0.4);
+      outline: none;
+    }
 
-/* ปุ่ม Login */
-.login-box button {
-  width: 100%;
-  padding: 14px;
-  margin-top: 10px;
-  background: linear-gradient(135deg, var(--primary-light), var(--primary-color), var(--primary-dark));
-  border: none;
-  border-radius: var(--border-radius-small);
-  color: #fff;
-  font-size: 1.05rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s, background 0.3s;
-}
-.login-box button:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 12px rgba(0,0,0,0.2);
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-}
+    /* ปุ่ม Login */
+    .login-box button {
+      width: 100%;
+      padding: 14px;
+      margin-top: 10px;
+      background: linear-gradient(135deg, var(--primary-light), var(--primary-color), var(--primary-dark));
+      border: none;
+      border-radius: var(--border-radius-small);
+      color: #fff;
+      font-size: 1.05rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s, background 0.3s;
+    }
+    .login-box button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    }
 
-/* Responsive */
-@media (max-width: 480px) {
-  .login-box {
-    width: 90%;
-    padding: 30px 20px;
-  }
-  .login-box h1 {
-    font-size: 1.5rem;
-  }
-}
+    /* Responsive */
+    @media (max-width: 480px) {
+      .login-box {
+        width: 90%;
+        padding: 30px 20px;
+      }
+      .login-box h1 {
+        font-size: 1.5rem;
+      }
+    }
+
+    /* ================================
+       CUSTOM MODIFICATIONS
+       - Center auth container and style logout button
+    ================================= */
+    /* Center the authentication container so the login card stays in the middle of the screen */
+    .auth-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    /* Style the logout button similarly to the login button and center it */
+    #logout-btn {
+      display: block;
+      margin: 20px auto;
+      padding: 12px 24px;
+      background: linear-gradient(135deg, var(--primary-light), var(--primary-color), var(--primary-dark));
+      color: #fff;
+      border: none;
+      border-radius: var(--border-radius-small);
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: var(--shadow-light);
+      transition: background 0.3s, box-shadow 0.3s, transform 0.2s;
+    }
+    #logout-btn:hover {
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+      box-shadow: var(--shadow-medium);
+      transform: translateY(-3px);
+    }
