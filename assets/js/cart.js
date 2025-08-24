@@ -28,16 +28,15 @@ export function changeQuantity(btnEl, change) {
  * Add the selected quantity of a product row to the cart. This function
  * reads data attributes from the provided row element to determine the
  * product name, base price and any selected mix option. It then
- * calculates the total price (including special promotions such as the
- * น้ำดิบ 2-for-120 deal) and updates the cart. After adding, the
- * quantity input is reset to zero.
+ * calculates the total price (including special promotions such as custom
+ * promotions like "3 ขวด 250" and the น้ำดิบ 2‑for‑120 deal) and updates
+ * the cart. After adding, the quantity input is reset to zero.
  * @param {HTMLElement} row The `.product-row` element representing a product
  */
 export function addToCart(row) {
   // Read product, mix and price from data attributes. Each row
   // represents one specific product/mix combination so there are no
-  // radio buttons in the new design. We still honour the promotion
-  // for น้ำดิบ.
+  // radio buttons in the new design.
   const product = row.dataset.product;
   const mix = row.dataset.mix || 'ไม่มี';
   const pricePerUnit = parseFloat(row.dataset.price);
@@ -48,15 +47,36 @@ export function addToCart(row) {
     alert('กรุณาใส่จำนวนสินค้าก่อน');
     return;
   }
-  // Compute total price. Special promotion for 'น้ำดิบ': 2 bottles for
-  // 120 บาท instead of 65 × 2. If the quantity has pairs of two,
-  // charge 120 for each pair and the regular price for any leftover.
-  let totalPrice = pricePerUnit * quantity;
-  if (product === 'น้ำดิบ') {
-    const pairs = Math.floor(quantity / 2);
-    const remainder = quantity % 2;
-    // Promotion: 2 bottles for 120 baht instead of 65 × 2.
-    totalPrice = pairs * 120 + remainder * 65;
+  // Compute total price. If there is a custom promotion string stored
+  // in the row's dataset (e.g. "3 ขวด 250"), parse it and apply the
+  // promotion. Otherwise fall back to the special น้ำดิบ case and
+  // default pricing.
+  let totalPrice;
+  const promoStr = row.dataset.promo;
+  if (promoStr) {
+    // Extract two numeric values from the promotion string: the quantity
+    // threshold and the promotional price. This regex captures the first
+    // two numbers in the string regardless of surrounding Thai words.
+    const match = promoStr.match(/(\d+)\D*(\d+)/);
+    if (match) {
+      const promoQty = parseInt(match[1], 10);
+      const promoPrice = parseFloat(match[2]);
+      if (!isNaN(promoQty) && promoQty > 0 && !isNaN(promoPrice)) {
+        const groups = Math.floor(quantity / promoQty);
+        const remainder = quantity % promoQty;
+        totalPrice = groups * promoPrice + remainder * pricePerUnit;
+      }
+    }
+  }
+  // If no promotion applied yet, handle the น้ำดิบ special case
+  if (totalPrice === undefined) {
+    totalPrice = pricePerUnit * quantity;
+    if (product === 'น้ำดิบ') {
+      const pairs = Math.floor(quantity / 2);
+      const remainder = quantity % 2;
+      // Promotion: 2 bottles for 120 baht instead of 65 × 2.
+      totalPrice = pairs * 120 + remainder * 65;
+    }
   }
   // Use a key combining product, mix and unit so identical items merge
   const key = `${product}-${mix}-${unit}`;
@@ -73,7 +93,7 @@ export function addToCart(row) {
       totalPrice,
     };
   }
-  // Reset quantity input
+  // Reset quantity input and update cart count
   quantityInput.value = 0;
   updateCartCount();
 }
@@ -121,16 +141,13 @@ export function renderCartModal() {
     itemDiv.classList.add('modal-item');
     // Compose a display name. If mix is 'ไม่มี' then just show product.
     const displayName = item.mix && item.mix !== 'ไม่มี' ? `${item.product} (${item.mix})` : item.product;
-    // Each row shows name, quantity × price and total along with a
-    // remove button. Per-item transfer checkboxes have been removed;
-    // the global transfer option in the modal footer now controls the
-    // payment type for all items.
+    // Each row shows name, quantity × price and total along with a remove button.
     itemDiv.innerHTML = `
-      <span class="modal-item-name">${displayName}</span>
-      <span class="modal-item-qty">${item.quantity} ${item.unit || ''} × ${item.pricePerUnit.toLocaleString()}฿</span>
-      <span class="modal-item-total">${item.totalPrice.toLocaleString()}฿</span>
-      <button class="remove-item" data-key="${key}"><i class="fas fa-times"></i></button>
-    `;
+          <span class="modal-item-name">${displayName}</span>
+          <span class="modal-item-qty">${item.quantity} ${item.unit || ''} × ${item.pricePerUnit.toLocaleString()}฿</span>
+          <span class="modal-item-total">${item.totalPrice.toLocaleString()}฿</span>
+          <button class="remove-item" data-key="${key}"><i class="fas fa-times"></i></button>
+        `;
     modalItems.appendChild(itemDiv);
   }
   // Update total price
@@ -161,11 +178,11 @@ export function clearCart() {
   updateCartCount();
   const cartModal = document.getElementById('cart-modal');
   if (cartModal) cartModal.style.display = 'none';
+  // Reset buyer name and global transfer option
+  const buyerNameInput = document.getElementById('buyer-name-input');
+  if (buyerNameInput) buyerNameInput.value = '';
+  const transferCheckbox = document.getElementById('global-transfer-checkbox');
+  if (transferCheckbox) transferCheckbox.checked = false;
   document.body.style.overflow = '';
   document.body.style.pointerEvents = '';
-  // Reset buyer info and transfer checkbox
-  const buyerInput = document.getElementById('buyer-name-input');
-  const transferGlobal = document.getElementById('global-transfer-checkbox');
-  if (buyerInput) buyerInput.value = '';
-  if (transferGlobal) transferGlobal.checked = false;
 }
