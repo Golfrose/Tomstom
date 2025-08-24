@@ -144,35 +144,42 @@
         padding: 6px;
       }
     
+/* === สีเทา + รูปแบบเส้นตามตัวอย่าง === */
 
-    /* ========== ปรับปรุงเส้นตารางสรุปยอดขาย ========== */
+/* 1) รีเซ็ตสีให้เป็นเทา (กรณีบล็อกเก่ายังอยู่) */
+.sale-separator td,
+.sale-group td,
+.sale-group-start td,
+.sale-group-end td {
+  border-color: #dddddd !important;
+}
 
-/* บิลเดี่ยว (sale-separator):
-   ลบกรอบแนวตั้งทั้งหมด แล้ววาดเฉพาะเส้นแนวนอนด้านบนและด้านล่าง */
+/* 2) บิลเดี่ยว: ให้มี “เส้นบน+ล่าง” เท่านั้น ไม่มีเส้นแนวตั้ง */
 .sale-separator td {
   border: none !important;
   border-top: 2px solid #dddddd !important;
   border-bottom: 2px solid #dddddd !important;
+  /* กันไว้ กรณีเคยโดนเส้นแนวตั้งจากกฎอื่น */
+  border-left: none !important;
+  border-right: none !important;
 }
 
-/* บิลกลุ่ม (sale-group):
-   เริ่มต้นลบเส้นขอบทั้งหมด จากนั้นค่อยเพิ่มเฉพาะที่ต้องการ */
+/* 3) บิลกลุ่ม: รีเซ็ตก่อน แล้วค่อยวาดเฉพาะเส้นที่ต้องการ */
 .sale-group td {
   border: none !important;
 }
 
-/* เส้นแนวตั้ง 3 เส้นสำหรับบิลกลุ่ม:
-   1) ก่อนคอลัมน์รายการสินค้า (คอลัมน์ที่ 2)
-   2) ระหว่างคอลัมน์จำนวน (คอลัมน์ที่ 3)
-   3) ระหว่างคอลัมน์ยอดรวม (คอลัมน์ที่ 4) */
+/* วาด “เส้นแนวตั้ง 3 เส้น” เท่านั้น:
+   - ก่อนคอลัมน์ชื่อ/สินค้า (คอลัมน์ที่ 2)
+   - ระหว่างคอลัมน์จำนวน (คอลัมน์ที่ 3)
+   - ระหว่างคอลัมน์ยอดรวม (คอลัมน์ที่ 4) */
 .sale-group td:nth-child(2),
 .sale-group td:nth-child(3),
 .sale-group td:nth-child(4) {
   border-left: 2px solid #dddddd !important;
 }
 
-/* เส้นเปิด-ปิดบิลกลุ่ม:
-   วาดขอบหนาเฉพาะแถวแรกและแถวสุดท้ายของบิลกลุ่ม */
+/* เส้นเปิด-ปิดบิลกลุ่ม */
 .sale-group-start td {
   border-top: 2px solid #dddddd !important;
 }
@@ -180,4 +187,4 @@
   border-bottom: 2px solid #dddddd !important;
 }
 
-/* =============================================== */
+
