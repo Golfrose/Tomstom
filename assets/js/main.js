@@ -59,10 +59,10 @@ function createProductRow({ product, mix = 'ไม่มี', price, unit = 'ข
   const qtyControl = document.createElement('div');
   qtyControl.className = 'quantity-control';
   qtyControl.innerHTML = `
-    <button class="qty-minus">-</button>
-    <input type="number" class="quantity-input" value="0" min="0" readonly />
-    <button class="qty-plus">+</button>
-  `;
+        <button class="qty-minus">-</button>
+        <input type="number" class="qty-input" value="1" min="1" />
+        <button class="qty-plus">+</button>
+      `;
   row.appendChild(qtyControl);
   // Bind quantity buttons
   qtyControl.querySelector('.qty-minus').addEventListener('click', (e) => changeQuantity(e.currentTarget, -1));
@@ -304,7 +304,13 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       // Ask for unit (e.g., ขวด, ถุง, ลัง). Default to ขวด.
       const unitInput = prompt('หน่วย (เช่น ขวด, ถุง, ลัง เป็นต้น):', 'ขวด') || 'ขวด';
-      products[category].push({ product: productName, mix, price, unit: unitInput });
+      // Ask for promotion information
+      const promoInput = prompt('ราคาโปรโมชั่น (เช่น 3 ขวด 250 หรือเว้นว่างถ้าไม่มี):', '');
+      const newItem = { product: productName, mix, price, unit: unitInput };
+      if (promoInput && promoInput.trim() !== '') {
+        newItem.promo = promoInput.trim();
+      }
+      products[category].push(newItem);
       mountProducts();
       saveProductsToStorage();
       saveProductsToDatabase();
@@ -360,6 +366,15 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       // Ask for a new unit; default to existing unit
       const newUnit = prompt('หน่วยใหม่ (เช่น ขวด, ถุง, ลัง เป็นต้น):', item.unit || 'ขวด') || item.unit;
+      // Ask for promotion update
+      const newPromo = prompt('ราคาโปรโมชั่นใหม่ (เช่น 3 ขวด 250 หรือเว้นว่างถ้าไม่มี):', item.promo || '');
+      if (newPromo !== null) {
+        if (newPromo.trim() === '') {
+          delete item.promo;
+        } else {
+          item.promo = newPromo.trim();
+        }
+      }
       item.price = newPrice;
       item.unit = newUnit;
       mountProducts();
