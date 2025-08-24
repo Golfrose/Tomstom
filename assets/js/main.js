@@ -58,9 +58,12 @@ function createProductRow({ product, mix = 'ไม่มี', price, unit = 'ข
   // Quantity control: minus button, input, plus button
   const qtyControl = document.createElement('div');
   qtyControl.className = 'quantity-control';
+  // Render the quantity control. Use a shared class `quantity-input` so
+  // changeQuantity() and addToCart() can locate the input. Start at 0 and
+  // allow incrementing from zero.
   qtyControl.innerHTML = `
         <button class="qty-minus">-</button>
-        <input type="number" class="qty-input" value="1" min="1" />
+        <input type="number" class="quantity-input qty-input" value="0" min="0" />
         <button class="qty-plus">+</button>
       `;
   row.appendChild(qtyControl);
