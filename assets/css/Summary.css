@@ -1,146 +1,169 @@
 /* ================================
-   SUMMARY PAGE
-   - ตารางสรุปยอดขาย
-   - ปุ่ม action (แก้ไข/ลบ)
-   - Highlight cash / transfer / total
-================================= */
+       SUMMARY PAGE
+       - ตารางสรุปยอดขาย
+       - ปุ่ม action (แก้ไข/ลบ)
+       - Highlight cash / transfer / total
+    ================================= */
 
-/* ---- Summary Table ---- */
-.summary-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-  border-radius: var(--border-radius-small);
-  overflow: hidden;
-  box-shadow: var(--shadow-light);
-}
-/* กล่องสรุปแต่ละบล็อก */
-.summary-box {
-  text-align: center;        /* จัดเนื้อหากล่องตรงกลาง */
-  margin: 15px 0;
-}
+    /* ---- Summary Table ---- */
+    .summary-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      border-radius: var(--border-radius-small);
+      overflow: hidden;
+      box-shadow: var(--shadow-light);
+    }
+    /* กล่องสรุปแต่ละบล็อก */
+    .summary-box {
+      text-align: center;        /* จัดเนื้อหากล่องตรงกลาง */
+      margin: 15px 0;
+    }
 
-/* ยอดรวมสินค้าที่ขายได้ */
-.summary-count {
-  font-size: 1.4rem;
-  font-weight: 600;
-  text-align: center;        /* จัดเลขตรงกลาง */
-  margin: 10px 0 15px;
-}
-/* ================================
-   HIGHLIGHT (บันทึก + ตารางสินค้า)
-================================= */
+    /* ยอดรวมสินค้าที่ขายได้ */
+    .summary-count {
+      font-size: 1.4rem;
+      font-weight: 600;
+      text-align: center;        /* จัดเลขตรงกลาง */
+      margin: 10px 0 15px;
+    }
+    /* ================================
+       HIGHLIGHT (บันทึก + ตารางสินค้า)
+    ================================= */
 
-/* แลกฟรี = น้ำเงิน */
-.report-free,
-.free-label {
-  color: #1976d2 !important;
-  font-weight: 600;
-}
+    /* แลกฟรี = น้ำเงิน */
+    .report-free,
+    .free-label {
+      color: #1976d2 !important;
+      font-weight: 600;
+    }
 
-/* แม้อยู่ในแถวโอน ก็ยังคงเป็นน้ำเงิน */
-.transfer-row .free-label {
-  color: #1976d2 !important;
-  font-weight: 600;
-}
+    /* แม้อยู่ในแถวโอน ก็ยังคงเป็นน้ำเงิน */
+    .transfer-row .free-label {
+      color: #1976d2 !important;
+      font-weight: 600;
+    }
 
-/* โอน = แดงทั้งแถวในบันทึก */
-.transfer-row td {
-  color: #d32f2f !important;
-  font-weight: 600;
-}
-.summary-table th {
-  background: linear-gradient(135deg, var(--primary-light), var(--primary-color));
-  color: #fff;
-  padding: 10px;
-  text-align: center;
-  font-weight: 600;
-}
-.summary-table td {
-  border: 1px solid #eee;
-  padding: 8px;
-  text-align: center;
-  font-size: 0.95rem;
-}
-.summary-table tr:hover {
-  background: #f9f9f9;
-}
-.cash-value {
-  color: var(--primary-dark);   /* เงินสด = เขียวเข้ม */
-  font-weight: 600;
-}
-.transfer-value {
-  color: #d32f2f;               /* โอนเงิน = แดง */
-  font-weight: 600;
-}
-.total-value {
-  color: var(--primary-color);  /* รวมทั้งหมด = เขียวสด */
-  font-weight: 700;
-  font-size: 1.05rem;
-}
+    /* โอน = แดงทั้งแถวในบันทึก */
+    .transfer-row td {
+      color: #d32f2f !important;
+      font-weight: 600;
+    }
+    .summary-table th {
+      background: linear-gradient(135deg, var(--primary-light), var(--primary-color));
+      color: #fff;
+      padding: 10px;
+      text-align: center;
+      font-weight: 600;
+    }
+    .summary-table td {
+      border: 1px solid #eee;
+      padding: 8px;
+      text-align: center;
+      font-size: 0.95rem;
+    }
+    .summary-table tr:hover {
+      background: #f9f9f9;
+    }
+    .cash-value {
+      color: var(--primary-dark);   /* เงินสด = เขียวเข้ม */
+      font-weight: 600;
+    }
+    .transfer-value {
+      color: #d32f2f;               /* โอนเงิน = แดง */
+      font-weight: 600;
+    }
+    .total-value {
+      color: var(--primary-color);  /* รวมทั้งหมด = เขียวสด */
+      font-weight: 700;
+      font-size: 1.05rem;
+    }
 
-/* ---- Action Buttons ---- */
-.summary-table .edit-btn {
-  background: #ffd54f;   /* เหลือง */
-  color: #333;
-  padding: 4px 8px;
-  border: none;
-  border-radius: var(--border-radius-small);
-  cursor: pointer;
-  font-size: 0.85rem;
-}
-.summary-table .edit-btn:hover {
-  background: #ffca28;
-}
+    /* ---- Action Buttons ---- */
+    .summary-table .edit-btn {
+      background: #ffd54f;   /* เหลือง */
+      color: #333;
+      padding: 4px 8px;
+      border: none;
+      border-radius: var(--border-radius-small);
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+    .summary-table .edit-btn:hover {
+      background: #ffca28;
+    }
 
-.summary-table .delete-btn {
-  background: #e57373;   /* แดง */
-  color: #fff;
-  padding: 4px 8px;
-  border: none;
-  border-radius: var(--border-radius-small);
-  cursor: pointer;
-  font-size: 0.85rem;
-}
-.summary-table .delete-btn:hover {
-  background: #ef5350;
-}
-/* ================================
-   SUMMARY COUNT COLORS
-   - ซ้าย = เขียว
-   - ขวา = แดง
-================================= */
+    .summary-table .delete-btn {
+      background: #e57373;   /* แดง */
+      color: #fff;
+      padding: 4px 8px;
+      border: none;
+      border-radius: var(--border-radius-small);
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+    .summary-table .delete-btn:hover {
+      background: #ef5350;
+    }
+    /* ================================
+       SUMMARY COUNT COLORS
+       - ซ้าย = เขียว
+       - ขวา = แดง
+    ================================= */
 
-.summary-count .sold {
-  color: var(--primary-dark);   /* เขียวเข้ม */
-  font-weight: 700;
-}
+    .summary-count .sold {
+      color: var(--primary-dark);   /* เขียวเข้ม */
+      font-weight: 700;
+    }
 
-.summary-count .transfer {
-  color: #d32f2f;               /* แดง */
-  font-weight: 700;
-}
-/* ================================
-   SUMMARY COUNT FIX
-   - ซ้าย = เขียว
-   - ขวา = แดง (มีแล้วที่ other-unit-value)
-================================= */
+    .summary-count .transfer {
+      color: #d32f2f;               /* แดง */
+      font-weight: 700;
+    }
+    /* ================================
+       SUMMARY COUNT FIX
+       - ซ้าย = เขียว
+       - ขวา = แดง (มีแล้วที่ other-unit-value)
+    ================================= */
 
-#total-quantity-left {
-  color: var(--primary-dark);   /* เขียวเข้ม */
-  font-weight: 700;
-}
+    #total-quantity-left {
+      color: var(--primary-dark);   /* เขียวเข้ม */
+      font-weight: 700;
+    }
 
-#total-quantity-right.other-unit-value {
-  color: #d32f2f;               /* แดง */
-  font-weight: 700;
-}
+    #total-quantity-right.other-unit-value {
+      color: #d32f2f;               /* แดง */
+      font-weight: 700;
+    }
 
-/* ---- Responsive: ตารางเล็กบนมือถือ ---- */
-@media (max-width: 768px) {
-  .summary-table th,
-  .summary-table td {
-    font-size: 0.8rem;
-    padding: 6px;
-  }
-}
+    /* ---- Responsive: ตารางเล็กบนมือถือ ---- */
+    @media (max-width: 768px) {
+      .summary-table th,
+      .summary-table td {
+        font-size: 0.8rem;
+        padding: 6px;
+      }
+    }
+
+    /* ================================
+       CUSTOM MODIFICATIONS
+       - Grey separators for sale items and groups on report page
+    ================================= */
+    /* Single-item sales (legacy) separator: draw a grey horizontal line after each item */
+    .sale-separator td {
+      border-bottom: 2px solid #ccc;
+    }
+
+    /* Aggregated sale group: draw vertical borders on the left and right of each row */
+    .sale-group td {
+      border-left: 2px solid #ccc;
+      border-right: 2px solid #ccc;
+    }
+    /* Bottom border of the last row in an aggregated group */
+    .sale-group-end td {
+      border-bottom: 2px solid #ccc;
+    }
+    /* Top border of the first row in an aggregated group */
+    .sale-group-start td {
+      border-top: 2px solid #ccc;
+    }
