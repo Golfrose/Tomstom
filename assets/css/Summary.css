@@ -5,146 +5,147 @@
        - Highlight cash / transfer / total
     ================================= */
 
-    /* ---- Summary Table ---- */
-    .summary-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-      border-radius: var(--border-radius-small);
-      overflow: hidden;
-      box-shadow: var(--shadow-light);
-    }
-    /* กล่องสรุปแต่ละบล็อก */
-    .summary-box {
-      text-align: center;        /* จัดเนื้อหากล่องตรงกลาง */
-      margin: 15px 0;
-    }
+/* ---- Summary Table ---- */
+.summary-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  border-radius: var(--border-radius-small);
+  overflow: hidden;
+  box-shadow: var(--shadow-light);
+}
+/* กล่องสรุปแต่ละบล็อก */
+.summary-box {
+  text-align: center;        /* จัดเนื้อหากล่องตรงกลาง */
+  margin: 15px 0;
+}
 
-    /* ยอดรวมสินค้าที่ขายได้ */
-    .summary-count {
-      font-size: 1.4rem;
-      font-weight: 600;
-      text-align: center;        /* จัดเลขตรงกลาง */
-      margin: 10px 0 15px;
-    }
-    /* ================================
+/* ยอดรวมสินค้าที่ขายได้ */
+.summary-count {
+  font-size: 1.4rem;
+  font-weight: 600;
+  text-align: center;        /* จัดเลขตรงกลาง */
+  margin: 10px 0 15px;
+}
+/* ================================
        HIGHLIGHT (บันทึก + ตารางสินค้า)
     ================================= */
 
-    /* แลกฟรี = น้ำเงิน */
-    .report-free,
-    .free-label {
-      color: #1976d2 !important;
-      font-weight: 600;
-    }
+/* แลกฟรี = น้ำเงิน */
+.report-free,
+.free-label {
+  color: #1976d2 !important;
+  font-weight: 600;
+}
 
-    /* แม้อยู่ในแถวโอน ก็ยังคงเป็นน้ำเงิน */
-    .transfer-row .free-label {
-      color: #1976d2 !important;
-      font-weight: 600;
-    }
+/* แม้อยู่ในแถวโอน ก็ยังคงเป็นน้ำเงิน */
+.transfer-row .free-label {
+  color: #1976d2 !important;
+  font-weight: 600;
+}
 
-    /* โอน = แดงทั้งแถวในบันทึก */
-    .transfer-row td {
-      color: #d32f2f !important;
-      font-weight: 600;
-    }
-    .summary-table th {
-      background: linear-gradient(135deg, var(--primary-light), var(--primary-color));
-      color: #fff;
-      padding: 10px;
-      text-align: center;
-      font-weight: 600;
-    }
-    .summary-table td {
-      border: 1px solid #eee;
-      padding: 8px;
-      text-align: center;
-      font-size: 0.95rem;
-    }
-    .summary-table tr:hover {
-      background: #f9f9f9;
-    }
-    .cash-value {
-      color: var(--primary-dark);   /* เงินสด = เขียวเข้ม */
-      font-weight: 600;
-    }
-    .transfer-value {
-      color: #d32f2f;               /* โอนเงิน = แดง */
-      font-weight: 600;
-    }
-    .total-value {
-      color: var(--primary-color);  /* รวมทั้งหมด = เขียวสด */
-      font-weight: 700;
-      font-size: 1.05rem;
-    }
+/* โอน = แดงทั้งแถวในบันทึก */
+.transfer-row td {
+  color: #d32f2f !important;
+  font-weight: 600;
+}
+.summary-table th {
+  background: linear-gradient(135deg, var(--primary-light), var(--primary-color));
+  color: #fff;
+  padding: 10px;
+  text-align: center;
+  font-weight: 600;
+}
+.summary-table td {
+  border: 1px solid #eee;
+  padding: 8px;
+  text-align: center;
+  font-size: 0.95rem;
+}
+.summary-table tr:hover {
+  background: #f9f9f9;
+}
+.cash-value {
+  color: var(--primary-dark);   /* เงินสด = เขียวเข้ม */
+  font-weight: 600;
+}
+.transfer-value {
+  color: #d32f2f;               /* โอนเงิน = แดง */
+  font-weight: 600;
+}
+.total-value {
+  color: var(--primary-color);  /* รวมทั้งหมด = เขียวสด */
+  font-weight: 700;
+  font-size: 1.05rem;
+}
 
-    /* ---- Action Buttons ---- */
-    .summary-table .edit-btn {
-      background: #ffd54f;   /* เหลือง */
-      color: #333;
-      padding: 4px 8px;
-      border: none;
-      border-radius: var(--border-radius-small);
-      cursor: pointer;
-      font-size: 0.85rem;
-    }
-    .summary-table .edit-btn:hover {
-      background: #ffca28;
-    }
+/* ---- Action Buttons ---- */
+.summary-table .edit-btn {
+  background: #ffd54f;   /* เหลือง */
+  color: #333;
+  padding: 4px 8px;
+  border: none;
+  border-radius: var(--border-radius-small);
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+.summary-table .edit-btn:hover {
+  background: #ffca28;
+}
 
-    .summary-table .delete-btn {
-      background: #e57373;   /* แดง */
-      color: #fff;
-      padding: 4px 8px;
-      border: none;
-      border-radius: var(--border-radius-small);
-      cursor: pointer;
-      font-size: 0.85rem;
-    }
-    .summary-table .delete-btn:hover {
-      background: #ef5350;
-    }
-    /* ================================
+.summary-table .delete-btn {
+  background: #e57373;   /* แดง */
+  color: #fff;
+  padding: 4px 8px;
+  border: none;
+  border-radius: var(--border-radius-small);
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+.summary-table .delete-btn:hover {
+  background: #ef5350;
+}
+/* ================================
        SUMMARY COUNT COLORS
        - ซ้าย = เขียว
        - ขวา = แดง
     ================================= */
 
-    .summary-count .sold {
-      color: var(--primary-dark);   /* เขียวเข้ม */
-      font-weight: 700;
-    }
+.summary-count .sold {
+  color: var(--primary-dark);   /* เขียวเข้ม */
+  font-weight: 700;
+}
 
-    .summary-count .transfer {
-      color: #d32f2f;               /* แดง */
-      font-weight: 700;
-    }
-    /* ================================
+.summary-count .transfer {
+  color: #d32f2f;               /* แดง */
+  font-weight: 700;
+}
+/* ================================
        SUMMARY COUNT FIX
        - ซ้าย = เขียว
        - ขวา = แดง (มีแล้วที่ other-unit-value)
     ================================= */
 
-    #total-quantity-left {
-      color: var(--primary-dark);   /* เขียวเข้ม */
-      font-weight: 700;
-    }
+#total-quantity-left {
+  color: var(--primary-dark);   /* เขียวเข้ม */
+  font-weight: 700;
+}
 
-    #total-quantity-right.other-unit-value {
-      color: #d32f2f;               /* แดง */
-      font-weight: 700;
-    }
+#total-quantity-right.other-unit-value {
+  color: #d32f2f;               /* แดง */
+  font-weight: 700;
+}
 
-    /* ---- Responsive: ตารางเล็กบนมือถือ ---- */
-    @media (max-width: 768px) {
-      .summary-table th,
-      .summary-table td {
-        font-size: 0.8rem;
-        padding: 6px;
-      }
-    
-    /* ================================
+/* ---- Responsive: ตารางเล็กบนมือถือ ---- */
+@media (max-width: 768px) {
+  .summary-table th,
+  .summary-table td {
+    font-size: 0.8rem;
+    padding: 6px;
+  }
+}
+
+/* ================================
        CUSTOM MODIFICATIONS
        - Grey separators for sale items and groups on report page
     ================================= */
@@ -168,18 +169,17 @@
 .sale-group td:nth-child(4) {
   border-left: 2px solid #dddddd !important;
 }
-    /* Bottom border of the last row in an aggregated group */
-    .sale-group-end td {
-      /* Bottom border for the end of aggregated groups */
-      border-bottom: 2px solid #dddddd !important;
-    }
-    /* Top border of the first row in an aggregated group */
-    .sale-group-start td {
-      /* Top border for the start of aggregated groups */
-      border-top: 2px solid #dddddd !important;
-    }
-    
-    /* === FIX จุดเดียวจบ: บิลเดี่ยวที่ถูกเรนเดอร์เป็นกลุ่ม (มีทั้ง start และ end ในแถวเดียว) === */
+/* Bottom border of the last row in an aggregated group */
+.sale-group-end td {
+  /* Bottom border for the end of aggregated groups */
+  border-bottom: 2px solid #dddddd !important;
+}
+/* Top border of the first row in an aggregated group */
+.sale-group-start td {
+  /* Top border for the start of aggregated groups */
+  border-top: 2px solid #dddddd !important;
+}
+/* === FIX จุดเดียวจบ: บิลเดี่ยวที่ถูกเรนเดอร์เป็นกลุ่ม (มีทั้ง start และ end ในแถวเดียว) === */
 tr.sale-group.sale-group-start.sale-group-end td {
   /* ตัดเส้นแนวตั้งทุกด้านทิ้ง แล้วคงไว้แค่เส้นเปิด/ปิดบิล */
   border: none !important;
@@ -187,17 +187,11 @@ tr.sale-group.sale-group-start.sale-group-end td {
   border-bottom: 2px solid #dddddd !important;
 }
 
-/* กันกฎแนวตั้งของกลุ่มมาทับอีกรอบ */
-tr.sale-group.sale-group-start.sale-group-end td:nth-child(2),
-tr.sale-group.sale-group-start.sale-group-end td:nth-child(3),
-tr.sale-group.sale-group-start.sale-group-end td:nth-child(4) {
-  border-left: none !important;
-}
 /* ================================
-   CUSTOMER SEARCH BAR (Summary Page)
-   - ช่องกรอกชื่อลูกค้า + ปุ่มค้นหา
-   - อัปเดตแบบ partial (ไม่รีเฟรชหน้า)
-================================ */
+       SEARCH BOX STYLING
+       - จัดตำแหน่งกล่องค้นหาและปุ่มค้นหา
+       - รองรับแนวตั้งในจอขนาดเล็ก (ตามตัวอย่างภาพ)
+    ================================= */
 
 /* ให้กล่องค้นหาอ้างอิงตำแหน่งจากหน้า Summary */
 .summary-page {
@@ -209,11 +203,9 @@ tr.sale-group.sale-group-start.sale-group-end td:nth-child(4) {
   position: absolute;
   top: 10px;
   right: 10px;
-
   display: flex;
   align-items: center;
   gap: 8px;
-
   z-index: 2; /* ให้อยู่เหนือหัวตาราง/กล่องอื่น ๆ */
 }
 
@@ -222,7 +214,7 @@ tr.sale-group.sale-group-start.sale-group-end td:nth-child(4) {
 #customerNameInput {
   padding: 6px 10px;
   border: 1px solid #d9d9d9;
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: 0.95rem;
   outline: none;
 }
@@ -234,28 +226,34 @@ tr.sale-group.sale-group-start.sale-group-end td:nth-child(4) {
   color: #fff;
   border: none;
   padding: 6px 12px;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
   font-size: 0.95rem;
   font-weight: 600;
   transition: filter 0.15s ease;
 }
-
 .customer-search button:hover,
 #searchButton:hover {
   filter: brightness(0.95);
 }
 
-/* รองรับจอเล็ก: ย้ายกล่องค้นหาลงมาจัดแถว */
+/* รองรับจอเล็ก: ย้ายกล่องค้นหาลงมาจัดแถวแนวตั้งให้เหมือนตัวอย่าง */
 @media (max-width: 768px) {
   .customer-search {
     position: static;      /* เลิก absolute บนจอเล็ก */
     margin: 8px 0 0 0;
-    justify-content: flex-end;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
   }
   .customer-search input[type="text"],
-  #customerNameInput {
-    width: 55vw;
-    max-width: 320px;
+  #customerNameInput,
+  .customer-search button,
+  #searchButton {
+    width: 100%;
+  }
+  .customer-search button,
+  #searchButton {
+    margin-top: 4px;
   }
 }
