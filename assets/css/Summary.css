@@ -193,4 +193,69 @@ tr.sale-group.sale-group-start.sale-group-end td:nth-child(3),
 tr.sale-group.sale-group-start.sale-group-end td:nth-child(4) {
   border-left: none !important;
 }
+/* ================================
+   CUSTOMER SEARCH BAR (Summary Page)
+   - ช่องกรอกชื่อลูกค้า + ปุ่มค้นหา
+   - อัปเดตแบบ partial (ไม่รีเฟรชหน้า)
+================================ */
 
+/* ให้กล่องค้นหาอ้างอิงตำแหน่งจากหน้า Summary */
+.summary-page {
+  position: relative;
+}
+
+/* คอนเทนเนอร์กล่องค้นหา (มุมขวาบน) */
+.customer-search {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  z-index: 2; /* ให้อยู่เหนือหัวตาราง/กล่องอื่น ๆ */
+}
+
+/* ช่องกรอกชื่อ */
+.customer-search input[type="text"],
+#customerNameInput {
+  padding: 6px 10px;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  outline: none;
+}
+
+/* ปุ่มค้นหา */
+.customer-search button,
+#searchButton {
+  background-color: var(--primary-color);
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: filter 0.15s ease;
+}
+
+.customer-search button:hover,
+#searchButton:hover {
+  filter: brightness(0.95);
+}
+
+/* รองรับจอเล็ก: ย้ายกล่องค้นหาลงมาจัดแถว */
+@media (max-width: 768px) {
+  .customer-search {
+    position: static;      /* เลิก absolute บนจอเล็ก */
+    margin: 8px 0 0 0;
+    justify-content: flex-end;
+  }
+  .customer-search input[type="text"],
+  #customerNameInput {
+    width: 55vw;
+    max-width: 320px;
+  }
+}
