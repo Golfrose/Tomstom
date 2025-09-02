@@ -138,6 +138,19 @@
     <!-- Summary Page -->
     <div id="summary-page" class="page container summary-page">
       <h1>สรุปยอดขาย</h1>
+      <!--
+        Customer search bar
+        This section provides an input for entering a customer's name and a
+        button to trigger the search. When a name is entered and the
+        search button is clicked, the system will fetch the customer's
+        cumulative purchase history and display it in place of the daily
+        report. Leaving the input empty and pressing search will reset
+        the view back to the default daily report.
+      -->
+      <div class="customer-search">
+        <input type="text" id="customerNameInput" name="customerNameInput" placeholder="กรอกชื่อลูกค้า" />
+        <button id="searchButton">ค้นหา</button>
+      </div>
       <div class="date-filter">
         <label for="report-date">วันที่:</label>
         <input type="date" id="report-date">
@@ -247,6 +260,11 @@
   <script type="module" src="./assets/js/report.js"></script>
   <script type="module" src="./assets/js/compare.js"></script>
   <script type="module" src="./assets/js/main.js"></script>
+  <!-- Customer search module: handles searching for customer profiles
+       without refreshing the page and integrates with the existing
+       report system. Placed after other scripts to ensure all
+       dependencies are loaded. -->
+  <script type="module" src="./assets/js/customerSearch.js"></script>
 </body>
 
 </html>
